@@ -25,7 +25,7 @@ Vorbearbeitung:
 Schleife läuft über jeden Frame im Video:
 * Component Labeling auf Frame anwenden Input: Video-Frame Output: Maske in der alle Bälle eindeutig via farben gekennzeichnet sind.
  => Genauer Durchlauf mittels Glanzlichtern: Eingabe: Jede Component als Bild (volle Größe), Originalbild; Ausgabe: Die einzelnen Kugeln als Bild
-**(Florian, Theresa)**
+**(Theresa)**
 
 * Beim ersten durchlauf werden lediglich die Components erkannt
 **(Florian, Theresa)**
@@ -33,7 +33,8 @@ Schleife läuft über jeden Frame im Video:
 * Optimieren der Erkennung der Grünen Kugel
 **(Max)**
 
-* Erstellen der Positions- und Richtungsvektorliste, Farbe der Components mitteln und in Lookup-Tabelle schreiben
+* Erstellen der Positions- und Richtungsvektorliste, Farbe der Components mitteln und in Lookup-Tabelle schreiben 
+**(Florian, Gerald)**
 
 * Bei allen weiteren durchläufen wird die letzte Positions- und Richtungs-vektor-liste verwendet um möglichst die neu erkannten Components wieder den gleichen Components vom letzten Frame exakt zuordnen zu können.
 
@@ -41,6 +42,7 @@ Schleife läuft über jeden Frame im Video:
 **(Andreas, Gerald)**
 
 * Component-Flow-Matching funktion anwenden Input: Component-Maske, OpticalFlow-Matrix, Output: Array mit Richtungsvektoren der einzelnen Components
+**(Andreas, Gerald)**
 
 * Funktion anwenden die Position der Components bestimmt: Input Component-Maske Output: Array mit Positionsvektoren der einzelnen Components
 **(Gerald)**

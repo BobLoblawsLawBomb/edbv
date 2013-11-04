@@ -13,42 +13,46 @@ shapeInserterLine = vision.ShapeInserter('Shape','Lines','BorderColor','Custom',
 %shapeInserterPoint = vision.ShapeInserter('Shape','Circles','BorderColor','Custom', 'CustomBorderColor', 125);
 videoPlayer = vision.VideoPlayer('Name','Motion Vector');
 
-%TODO: Tisch ausschneiden / Maske erstellen
+%Tisch ausschneiden / Maske erstellen
+frame = step(videoReader);
+im = step(converter, frame);
+mask = table_mask(im);
 
-%TODO: VektorMatrix anlegen die für jeden Ball eine Farbe speichert
+%TODO: VektorMatrix anlegen die f?r jeden Ball eine Farbe speichert
 %Form:
 %BC = [1 0 0];        % Farbe von Ball 1 
 %BC(:,:,2) = [1 0 1]; % Farbe von Ball 2
 
-%TODO: VektorMatrix anlegen die für jeden Frame für jeden Ball einen Positionsvektor speichert
+%TODO: VektorMatrix anlegen die f?r jeden Frame f?r jeden Ball einen Positionsvektor speichert
 %Form: 
 %A = [1 2]; %Position von Ball 1 in Frame 1
 %A(:,:,2) = [2 3];   %Position von Ball 2 in Frame 1
 %A(:,:,1,2) = [2 2]; %Position von Ball 1 in Frame 2
 %A(:,:,2,2) = [3 3]; %Position von Ball 2 in Frame 2
 
-%TODO: VektorMatrix anlegen die für jeden Frame für jeden Ball einen Richtungsvektor speichert
+%TODO: VektorMatrix anlegen die f?r jeden Frame f?r jeden Ball einen Richtungsvektor speichert
 %Form: 
 %A = [1 2]; %Richtung von Ball 1 in Frame 1
 %A(:,:,2) = [2 3];	 %Richtung von Ball 2 in Frame 1
 %A(:,:,1,2) = [2 2]; %Richtung von Ball 1 in Frame 2
 %A(:,:,2,2) = [3 3]; %Richtung von Ball 2 in Frame 2
 
-%TODO: Datenstruktur für die Component-Masken festlegen (pro Ball separat oder eine Maske fürs gesamte Bild)
+%TODO: Datenstruktur f?r die Component-Masken festlegen (pro Ball separat oder eine Maske f?rs gesamte Bild)
 
 firstframe = 0;
 
 while ~isDone(videoReader)
-    frame = step(videoReader);
-    im = step(converter, frame);
+    
     
     if(firstframe == 0)
         %TODO: Erstes Component Labeling anwenden
     else
-        %TODO: Component Labeling unter Berücksichtigung vergangener Frames anwenden
+        %TODO: Component Labeling unter Ber?cksichtigung vergangener Frames anwenden
+        frame = step(videoReader);
+        im = step(converter, frame);
     end
     
-    %TODO: image und reference Frame an opticalFlow übergeben
+    %TODO: image und reference Frame an opticalFlow ?bergeben
     %of = step(opticalFlow, im, ref);
     of = step(opticalFlow, im);
 
@@ -74,8 +78,8 @@ release(videoPlayer);
 release(videoReader);
 % --------------------------------
 
-%TODO: Linien-Overlay erzeugen und über den letzten Frame legen, sowie als
-%      Resultat zurückgeben.
+%TODO: Linien-Overlay erzeugen und ?ber den letzten Frame legen, sowie als
+%      Resultat zur?ckgeben.
 
 output_args = im;
 

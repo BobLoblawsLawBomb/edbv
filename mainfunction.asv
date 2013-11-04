@@ -36,13 +36,13 @@ videoPlayer = vision.VideoPlayer('Name','Motion Vector');
 
 %TODO: Datenstruktur für die Component-Masken festlegen (pro Ball separat oder eine Maske fürs gesamte Bild)
 
-firstframe = 0;
+firstframe = TRUE;
 
 while ~isDone(videoReader)
     frame = step(videoReader);
     im = step(converter, frame);
     
-    if(firstframe == 0)
+    if(firstframe)
         %TODO: Erstes Component Labeling anwenden
     else
         %TODO: Component Labeling unter Berücksichtigung vergangener Frames anwenden
@@ -63,21 +63,12 @@ while ~isDone(videoReader)
     end
     % --------------------------------
     
-    %TODO: Mit Component-Masken und OpticalFlow-Vektoren
-    %      Geschwindigkeitsvektoren der einzelnen Components ermitteln.
-    
-    firstframe = 1;
+    firstframe = FALSE;
 end
 
-% --- FOR OPTICAL FLOW TEST OUTPUT ---
 release(videoPlayer);
 release(videoReader);
-% --------------------------------
 
-%TODO: Linien-Overlay erzeugen und über den letzten Frame legen, sowie als
-%      Resultat zurückgeben.
-
-output_args = im;
 
 end
 

@@ -22,6 +22,7 @@ Vorbearbeitung:
 
 Schleife läuft über jeden Frame im Video:
 * Component Labeling auf Frame anwenden Input: Video-Frame Output: Maske in der alle Bälle eindeutig via farben gekennzeichnet sind.
+ => Genauer Durchlauf mittels Glanzlichtern: Eingabe: Jede Component als Bild (volle Größe), Originalbild; Ausgabe: Die einzelnen Kugeln als Bild
 * Beim ersten durchlauf werden lediglich die Components erkannt
 * Bei allen weiteren durchläufen wird die letzte Positions- und Richtungs-vektor-liste verwendet um möglichst die neu erkannten Components wieder den gleichen Components vom letzten Frame exakt zuordnen zu können.
 * OpticalFlow anwenden Input: Video-Frame Output: Matrix in der für einen Raster über dem Bild jeweils Richtungsvektoren gespeichert sind.

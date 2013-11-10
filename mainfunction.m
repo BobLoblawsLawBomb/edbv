@@ -46,6 +46,9 @@ while ~isDone(videoReader)
     
     if(firstframe == 0)
         %TODO: Erstes Component Labeling anwenden
+        %componenten nach label getrennt, 
+        %kann noch fragmente vom tisch bzw. kö enthalten
+        connectedComponent(im.*mask);
     else
         %TODO: Component Labeling unter Ber?cksichtigung vergangener Frames anwenden
         frame = step(videoReader);

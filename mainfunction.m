@@ -3,7 +3,7 @@ function [ output_args ] = mainfunction()%argument:  video_path
 %   Detailed explanation goes here
 
 %default test video path
-video_path = 'res\test.mp4';
+video_path = ['res',filesep,'test.mp4'];
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','Intensity','VideoOutputDataType','uint8');
 converter = vision.ImageDataTypeConverter; 

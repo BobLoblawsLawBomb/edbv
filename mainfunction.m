@@ -5,18 +5,25 @@ function [ output_args ] = mainfunction()%argument:  video_path
 %default test video path
 video_path = ['res',filesep,'test.mp4'];
 
-videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','Intensity','VideoOutputDataType','uint8');
+videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
 converter = vision.ImageDataTypeConverter; 
+converter.OutputDataType = 'uint8';
 opticalFlow = vision.OpticalFlow('ReferenceFrameDelay', 1);
+opticalFlow.ReferenceFrameSource = 'Input port';
 opticalFlow.OutputValue = 'Horizontal and vertical components in complex form';
-shapeInserterLine = vision.ShapeInserter('Shape','Lines','BorderColor','Custom', 'CustomBorderColor', 255);
-%shapeInserterPoint = vision.ShapeInserter('Shape','Circles','BorderColor','Custom', 'CustomBorderColor', 125);
+shapeInserterLine = vision.ShapeInserter('Shape','Lines','BorderColor','Custom', 'CustomBorderColor', [255 255 255]);
 videoPlayer = vision.VideoPlayer('Name','Motion Vector');
 
 %Tisch ausschneiden / Maske erstellen
+frameNo = 1;
 frame = step(videoReader);
 im = step(converter, frame);
 mask = table_mask(im);
+im = im.*mask;
+gim = single(rgb2gray(im))./255;
+
+%TODO: Matrix anlegen die für jeden Ball die Component-Maske speichert.
+%compMask;
 
 %TODO: VektorMatrix anlegen die f?r jeden Ball eine Farbe speichert
 %Form:
@@ -29,6 +36,7 @@ mask = table_mask(im);
 %A(:,:,2) = [2 3];   %Position von Ball 2 in Frame 1
 %A(:,:,1,2) = [2 2]; %Position von Ball 1 in Frame 2
 %A(:,:,2,2) = [3 3]; %Position von Ball 2 in Frame 2
+%compPosition;
 
 %TODO: VektorMatrix anlegen die f?r jeden Frame f?r jeden Ball einen Richtungsvektor speichert
 %Form: 
@@ -36,44 +44,47 @@ mask = table_mask(im);
 %A(:,:,2) = [2 3];	 %Richtung von Ball 2 in Frame 1
 %A(:,:,1,2) = [2 2]; %Richtung von Ball 1 in Frame 2
 %A(:,:,2,2) = [3 3]; %Richtung von Ball 2 in Frame 2
+%compVelocity;
 
 %TODO: Datenstruktur f?r die Component-Masken festlegen (pro Ball separat oder eine Maske f?rs gesamte Bild)
 
-firstframe = 0;
-
 while ~isDone(videoReader)
     
-    
-    if(firstframe == 0)
+    if(frameNo == 1)
         %TODO: Erstes Component Labeling anwenden
         %componenten nach label getrennt, 
         %kann noch fragmente vom tisch bzw. kö enthalten
-        connectedComponent(im.*mask);
+        [resultBW, resultColor] = connectedComponent(im);
     else
+        im = step(converter, step(videoReader)).*mask;
+        gim = single(rgb2gray(im))./255;
+        
         %TODO: Component Labeling unter Ber?cksichtigung vergangener Frames anwenden
-        frame = step(videoReader);
-        im = step(converter, frame);
+        
+        %OpticalFlow auf aktuelles image mit last image anwenden.
+        of = step(opticalFlow, gim, lastgim);
+        
+        % --- OPTICAL FLOW TEST OUTPUT ---
+        lines = int32(videooptflowlines(of, 30));
+        
+        if ~isempty(lines)
+            out = step(shapeInserterLine, im, lines);
+            step(videoPlayer, out);
+        end
+        % --------------------------------
+        
+        %TODO: Mit Component-Masken und OpticalFlow-Vektoren
+        %      Geschwindigkeitsvektoren der einzelnen Components ermitteln.
+        %calcComponentVelocity(of, component);
+        
     end
     
-    %TODO: image und reference Frame an opticalFlow ?bergeben
-    %of = step(opticalFlow, im, ref);
-    of = step(opticalFlow, im);
-
-    % --- OPTICAL FLOW TEST OUTPUT ---
-    lines = videooptflowlines(of, 30);
-    %points = lines(1:end, 1:2);
-    %points(1:end, 3) = 0.5;
-    if ~isempty(lines)
-      %out = step(shapeInserterPoint, im, points); 
-      out = step(shapeInserterLine, im, lines); 
-      step(videoPlayer, out);
-    end
-    % --------------------------------
+    %TODO: Mit Component-Masken
+    %      Positionsvektoren der einzelnen Components ermitteln.
     
-    %TODO: Mit Component-Masken und OpticalFlow-Vektoren
-    %      Geschwindigkeitsvektoren der einzelnen Components ermitteln.
-    
-    firstframe = 1;
+    lastim = im;
+    lastgim = gimlastgim = single(rgb2gray(lastim))./255;
+    frameNo = frameNo + 1;
 end
 
 % --- FOR OPTICAL FLOW TEST OUTPUT ---

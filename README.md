@@ -54,11 +54,10 @@ Nachbearbeitung:
 * Funktion die basierend auf den Component Positionen und Richtungen der einzelnen Frames Linien in den korrekten Farben über den letzten Frame des Videos zeichnet. Input: VektorMatrix der Component Positionen, VektorMatrix der Component Richtungen, Letzter Video-Frame. Output: Bild mit darübergelegten Linien.
 **(im Prinzip fertig; Gerald, Andreas)**
 
---------------------------------------
 | Update: 11.11.2013 - Offene Punkte |
 --------------------------------------
 
-Main:
+**Main:**
 - VektorMatrix anlegen die für jeden Frame für jeden Ball einen Positionsvektor speichert
 - VektorMatrix anlegen die für jeden Frame für jeden Ball einen Richtungsvektor speichert
 - Ersten ComponentLabeling-Aufruf starten
@@ -66,29 +65,15 @@ Main:
 - Weitere Durchläufe mittels “vermutlicher” Position (anhand der alten Positionen und OpticalFlow)
 - Positions- und Richtungsvektoren schreiben (=> wenn eine Kugel in einem Loch verschwindet, müssen trotzdem Werte in die Matrix geschrieben werden: letzter Wert (bei Positionsvektoren) bzw. 0 (bei Richtungsvektoren)
 
-Funktion zum Ermitteln der neuen (zu erwartenden) Position einer Komponente.
-Eingabe: Maske der Componente, Richtungsvektor, Unsicherheitsfaktor, Originalbild
-Ausgabe: Neue Maske
-
-Zuverlässigkeit der Kugelerkennung (Grün)
-
-Farben für die Einträge der Matrix hinterlegen (zum Nachzeichnen der Vektoren)
-=> Funktionen zum Zeichnen der Linien soll die Farben berücksichtigen
-
-Funktion, die die Vektormatrix der Positionsvektoren definiert (mit Anzahl der Kugeln)
-Funktion, die der Vektormatrix der Positionsvektoren einen Eintrag (pro Frame) für eine Kugel hinzufügt
-
-Funktion, die die Vektormatrix der Richtungsvektoren definiert (mit Anzahl der Kugeln)
-Funktion, die der Vektormatrix der Richtungsvektoren einen Eintrag (pro Frame) für eine Kugel hinzufügt
-
-Funktion zum Anlegen der Matrix für die  Farben (die Reihenfolge muss der Reihenfolge der Kugeln)
-
-⇒ evtl. die beiden Funktionen zusammenlegen (1 Vektor mit 4 Einträgen => Die beiden ersten Einträge entsprechen der Position und die nachfolgenden dem Richtungsvektor)
-
-Funktion zum Anwenden von OpticalFlow
-Eingabe: Video-Frame
-Ausgabe: Matrix mit Richtungsvektoren für einen Raster über dem Bild
-
-Funktion zum Matchen von Component-Flow
-Eingabe: Component-Maske, OpticalFlow-Matrix 
-Ausgabe: Array mit Richtungsvektoren der einzelnen Components
+**Funktionen und Programmteile:**
+- Funktion zum Ermitteln der neuen (zu erwartenden) Position einer Komponente. Eingabe: Maske der Componente, Richtungsvektor, Unsicherheitsfaktor, Originalbild; Ausgabe: Neue Maske;
+- Zuverlässigkeit der Kugelerkennung (Grün)
+- Farben für die Einträge der Matrix hinterlegen (zum Nachzeichnen der Vektoren) => Funktionen zum Zeichnen der Linien soll die Farben berücksichtigen
+- Funktion zum Anwenden von OpticalFlow. Eingabe: Video-Frame; Ausgabe: Matrix mit Richtungsvektoren für einen Raster über dem Bild;
+- Funktion zum Matchen von Component-Flow. Eingabe: Component-Maske, OpticalFlow-Matrix; Ausgabe: Array mit Richtungsvektoren der einzelnen Components;
+- Funktion zum Anlegen der Matrix für die  Farben (die Reihenfolge muss der Reihenfolge der Kugeln entsprechen)
+- Funktion, die die Vektormatrix der Positionsvektoren definiert (mit Anzahl der Kugeln)
+- Funktion, die der Vektormatrix der Positionsvektoren einen Eintrag (pro Frame) für eine Kugel hinzufügt
+- Funktion, die die Vektormatrix der Richtungsvektoren definiert (mit Anzahl der Kugeln)
+- Funktion, die der Vektormatrix der Richtungsvektoren einen Eintrag (pro Frame) für eine Kugel hinzufügt
+⇒ evtl. Richtungs- und Positionsmatrix zusammenlegen (1 Vektor mit 4 Einträgen => Die beiden ersten Einträge entsprechen der Position und die nachfolgenden dem Richtungsvektor)

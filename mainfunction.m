@@ -44,7 +44,7 @@ gim = single(rgb2gray(im))./255;
 %A(:,:,2) = [2 3];	 %Richtung von Ball 2 in Frame 1
 %A(:,:,1,2) = [2 2]; %Richtung von Ball 1 in Frame 2
 %A(:,:,2,2) = [3 3]; %Richtung von Ball 2 in Frame 2
-%compVelocity;
+compVelocity = [0 0];
 
 %TODO: Datenstruktur f?r die Component-Masken festlegen (pro Ball separat oder eine Maske f?rs gesamte Bild)
 
@@ -55,13 +55,26 @@ while ~isDone(videoReader)
         %componenten nach label getrennt, 
         %kann noch fragmente vom tisch bzw. kö enthalten
         [resultBW, resultColor] = connectedComponent(im);
+        
+        %Component Velocities für jeden Ball im ersten Frame auf 0 setzen
+        i = 1;
+        while(i <= size(resultBW))
+            compVelocity(:, :, i, 1) = [0 0];
+            i = i + 1;
+        end
     else
+        %Nächsten Frame auslesen
         im = step(converter, step(videoReader)).*mask;
         gim = single(rgb2gray(im))./255;
         
-        %TODO: Component Labeling unter Ber?cksichtigung vergangener Frames anwenden
+        %Components im neuen Frame finden und passende Maske speichern.
+        i = 1;
+        while(i <= size(resultBW))
+            resultBW{i} = getNewMask(resultBW{i}, compVelocity(:, :, i, frameNo - 1), 5, im);
+            i = i + 1;
+        end
         
-        %OpticalFlow auf aktuelles image mit last image anwenden.
+        %OpticalFlow auf aktuellen Frame, unter berückichtung des vorhergehenden, anwenden.
         of = step(opticalFlow, gim, lastgim);
         
         % --- OPTICAL FLOW TEST OUTPUT ---
@@ -75,15 +88,19 @@ while ~isDone(videoReader)
         
         %TODO: Mit Component-Masken und OpticalFlow-Vektoren
         %      Geschwindigkeitsvektoren der einzelnen Components ermitteln.
-        %calcComponentVelocity(of, component);
-        
+        %calcComponentVelocity(of, componentMask);
+        i = 1;
+        while(i <= size(resultBW))
+            compVelocity(:, :, i, frameNo) = getNewMask(of, resultBW{i});
+            i = i + 1;
+        end
     end
     
     %TODO: Mit Component-Masken
     %      Positionsvektoren der einzelnen Components ermitteln.
     
     lastim = im;
-    lastgim = gimlastgim = single(rgb2gray(lastim))./255;
+    lastgim = gim;
     frameNo = frameNo + 1;
 end
 

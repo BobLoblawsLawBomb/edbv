@@ -1,5 +1,5 @@
 function [ component1, component2 ] = coloredComponents( input )
-%diese Funktion trennt die Kugeln vom Hintergrund, dies einzige Kugel, die
+%diese Funktion trennt die Kugeln vom Hintergrund, die einzige Kugel, die
 %laut dieser Funktion zum Hintergrund gezählt wir, ist die gelbe.
 %die Funktion wird von connectedComponent.m aufgerufen und ist dazu da, die
 %farbigen Komponenten zu ermitteln.
@@ -28,7 +28,12 @@ rgb_label = repmat(pixel_labels,[1 1 3]);
 for k = 1:nColors
     color = input;
     color(rgb_label ~= k) = 0;
+    bw = im2bw(color);
+    bw = bwmorph(bw,'thicken',10);
+    bw_mask = repmat( uint8(bw), [1 1 3]);
+    color = color .* bw_mask;
     segmented_images{k} = color;
+    %imshow(color);
     
 end
 

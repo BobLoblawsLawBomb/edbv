@@ -95,7 +95,7 @@ while ~isDone(videoReader)
         %calcComponentVelocity(of, componentMask);
         i = 1;
         while(i <= size(resultBW))
-            compVelocity(:, :, i, frameNo) = getNewMask(of, resultBW{i});
+            compVelocity(:, :, i, frameNo) = calcComponentVelocity(of, resultBW{i});
             i = i + 1;
         end
     end

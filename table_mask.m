@@ -23,6 +23,8 @@ BW_inv = imcomplement(BW);
 % holes are balls (mind the bad dirty joke!)
 BW_filled = imfill(BW_inv, 'holes');
 
+BW_filled = bwmorph(BW_filled,'thin',15);
+
 % convert it to uint8 to make it compatible with an image
 mask = uint8(BW_filled);
 

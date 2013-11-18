@@ -12,7 +12,7 @@ function [ resultBW, resultColor ] = connectedComponent( table_mask )
 img = table_mask;
 %aus dem bild wird binaerbild, nur die hellsten stellen werden weiß
 %kö und linke und rechte obere Ecke werden auch erkannt 
-BW = im2bw(img , 0.50);%0.60
+BW = im2bw(img , 0.60);
 
 %farbigen Componenten werden ermittelt
 %dabei wurde das gesamtBild in 2 Componenten geteilt: 

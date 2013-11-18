@@ -15,8 +15,8 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
 
     for i=1:size(boundaryPositions)
 %        disp(boundaryPositions(i,:));
-       movedBoundaryPositions(i,1)=boundaryPositions(i,1)+vector(1);
-       movedBoundaryPositions(i,2)=boundaryPositions(i,2)+vector(2);
+       movedBoundaryPositions(i,1)=int32(boundaryPositions(i,1)+vector(1));
+       movedBoundaryPositions(i,2)=int32(boundaryPositions(i,2)+vector(2));
 %        J=step(markerInserter,J,int32(boundaryPositions(i,:)));
     end
 

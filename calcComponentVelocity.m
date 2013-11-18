@@ -1,4 +1,4 @@
-function [ vx, vy ] = getNewMask( of, componentMask )
+function [ vx, vy ] = calcComponentVelocity( of, componentMask )
 %CALCCOMPONENTVELOCITY Summary of this function goes here
 %   Detailed explanation goes here
     xv = real(of).*componentMask;

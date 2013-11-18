@@ -36,7 +36,7 @@ color_img = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
 %elemente von einander trennen
 [L, num] = bwlabeln(BW, 4);
 %resultBW = zeros(size(BW,1),size(BW,2), num);
-resultBW = cell(3,num);
+resultBW = cell(1,num);
 resultColor = cell(3,num);
 
 %setzt für jedes Label alle anderen Elemente auf schwarz
@@ -46,10 +46,10 @@ for x = 1:num
     rx(rx<x) = 0;
     rx(rx>x) = 0;
     rx = bwmorph(rx,'thicken',10);
+    resultBW{x} = rx;
+    
     rx = im2uint8(rx);
     rx3 = cat(3, rx, rx, rx);
-    resultBW{x} = rx3;
-    
     rcx = img;
     
     rcx(rx3 == 0) = 0;
@@ -61,6 +61,7 @@ end;
 
 
 %imshow(color_img);
+
 
 end
 

@@ -3,7 +3,7 @@ function [ output_args ] = mainfunction()%argument:  video_path
 %   Detailed explanation goes here
 
 %default test video path
-video_path = ['res',filesep,'test.mp4'];
+video_path = [pwd,filesep,'res',filesep,'test.mp4'];
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
 converter = vision.ImageDataTypeConverter; 
@@ -91,7 +91,7 @@ while ~isDone(videoReader)
         %calcComponentVelocity(of, componentMask);
         i = 1;
         while(i <= size(resultBW))
-            compVelocity(:, :, i, frameNo) = getNewMask(of, resultBW{i});
+            compVelocity(:, :, i, frameNo) = calcComponentVelocity(of, resultBW{i});
             i = i + 1;
         end
     end

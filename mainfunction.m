@@ -77,8 +77,8 @@ while ~isDone(videoReader)
         while(i <= size(resultBW))
             cv = compVelocity(:, :, i, frameNo - 1);
             resultBW{i} = getNewMask(resultBW{i}, cv, 5, im_copy);
-            mask3D = repmat( uint8(resultBW{i}), [1 1 3]);
-            im_copy = mask3D.*im_copy;
+            %mask3D = repmat( uint8(resultBW{i}), [1 1 3]);
+            %im_copy = resultBW{i}.*im_copy;
             i = i + 1;
         end
         
@@ -106,6 +106,7 @@ while ~isDone(videoReader)
     
     %TODO: Mit Component-Masken
     %      Positionsvektoren der einzelnen Components ermitteln.
+    
     i = 1;
     while(i <= size(resultBW))
         compPosition(:, :, i, frameNo) = getPositionOfComponent(resultBW{i});

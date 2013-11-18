@@ -2,7 +2,9 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
 %GETNEWMASK Summary of this function goes here
 %   Detailed explanation goes here
 
-    subplot(1,2,1),subimage(oldMask)
+    oldMask3=repmat(uint8(oldMask),[1 1 3]);
+
+     subplot(1,2,1),subimage(oldMask3 .* im);
 
     boundaryPositions=getBoundaryPositionsOfComponent(oldMask);
     
@@ -10,6 +12,8 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
     movedBoundaryPositions=zeros(size(boundaryPositions));
 
     J=im;
+    
+    oldPosition=getPositionOfComponent(oldMask);
     
     imageSize=size(im);
 
@@ -28,8 +32,8 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
 %        J=step(markerInserter,J,int32(movedBoundaryPositions(k,:)));
 %        disp(movedBoundaryPositions(k,:));
         
-        x=movedBoundaryPositions(k,2);
-        y=movedBoundaryPositions(k,1);
+        x=int32(movedBoundaryPositions(k,2));
+        y=int32(movedBoundaryPositions(k,1));
         
         if x>0 && x<=imageSize(1) && y>0 && y<=imageSize(2)
             newMask(x,y)=1;
@@ -38,42 +42,69 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
         
         newMask=bwmorph(newMask,'bridge');
         newMask=imfill(newMask,4,'holes');
+
+
+    end
+    
+%     newPosition=getPositionOfComponent(newMask);
+    newPosition=[oldPosition(1)+vector(1),oldPosition(2)+vector(2)];
+    newPositionWithFactor=newPosition;
+    newPositionWithFactor(3)=instabilityFactor;
+    uint8NewMask=insertShape(uint8(newMask),'FilledCircle',newPositionWithFactor);
+    
+ 
+    
+    newMask=or(im2bw(uint8NewMask,0.5),newMask);    
+
+    newMask3=repmat(uint8(newMask),[1 1 3]);
+    
+    J=newMask3 .* im;
+   
+    [resultBW, resultColor]=connectedComponent(J);
+    
         
+    disp(size(resultBW));
+    disp(length(resultBW(:)));
+    index=1;
+    
+    d=inf;
+    
+        
+    for i=1:length(resultBW(:))
       
+       pos=getPositionOfComponent(cell2mat(resultBW(i)));
+       
+       disp('iteration: ');
+       disp(i);
 
-        grow(x+1,y,0);
-        grow(x,y+1,0);
-        grow(x-1,y,0);
-        grow(x,y-1,0);
+       disp(pos);
+       disp(newPosition);
+       disp(oldPosition);
 
-    end
-    
-    
-    function [ ] = grow(x,y,counter)
-       if counter < instabilityFactor && x>0 && x<=imageSize(1) && y>0 && y<=imageSize(2)
-          
-          newMask(x,y)=1;
-          
-          grow(x+1,y, counter+1);
-          grow(x,y+1, counter+1);
-          grow(x-1,y, counter+1);
-          grow(x,y-1, counter+1);
-         
+       newD=sqrt(double((pos(1)-newPosition(1))^2 + (pos(2)-newPosition(2))^2));
+       
+       disp('new distance');
+       disp(newD);
+       
+       if newD<d
+           d=newD;
+           index=i;
        end
+       
     end
+    
+    disp('choose index:');
+    
+    disp(index);
+    newMask=cell2mat(resultBW(index));
 
     
     newMask3=repmat(uint8(newMask),[1 1 3]);
     
-    disp(size(newMask3));
-    disp(size(im));
-    
     J=newMask3 .* im;
+   
     
-    [resultBW, resultColor]=connectedComponent(J);
-    
-    newMask=cell2mat(resultBW(1));
-    
-    subplot(1,2,2),subimage(newMask)
+%     imshow(J);
+     subplot(1,2,2),subimage(J)
 end
 

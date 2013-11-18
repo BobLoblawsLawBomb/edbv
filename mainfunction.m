@@ -40,7 +40,7 @@ gim = single(rgb2gray(im))./255;
 %A(:,:,2) = [2 3];   %Position von Ball 2 in Frame 1
 %A(:,:,1,2) = [2 2]; %Position von Ball 1 in Frame 2
 %A(:,:,2,2) = [3 3]; %Position von Ball 2 in Frame 2
-%compPosition;
+compPosition = [0 0];
 
 %TODO: VektorMatrix anlegen die f?r jeden Frame f?r jeden Ball einen Richtungsvektor speichert
 %Form: 
@@ -72,9 +72,12 @@ while ~isDone(videoReader)
         gim = single(rgb2gray(im))./255;
         
         %Components im neuen Frame finden und passende Maske speichern.
+        im_copy = im;
         i = 1;
         while(i <= size(resultBW))
-            resultBW{i} = getNewMask(resultBW{i}, compVelocity(:, :, i, frameNo - 1), 5, im);
+            cv = compVelocity(:, :, i, frameNo - 1);
+            resultBW{i} = getNewMask(resultBW{i}, cv, 5, im_copy);
+            im_copy = im_copy.*resultBW{i};
             i = i + 1;
         end
         
@@ -102,6 +105,11 @@ while ~isDone(videoReader)
     
     %TODO: Mit Component-Masken
     %      Positionsvektoren der einzelnen Components ermitteln.
+    i = 1;
+    while(i <= size(resultBW))
+        compPosition(:, :, i, frameNo) = getPositionOfComponent(resultBW{i});
+        i = i + 1;
+    end
     
     lastim = im;
     lastgim = gim;
@@ -116,7 +124,7 @@ release(videoReader);
 %TODO: Linien-Overlay erzeugen und ?ber den letzten Frame legen, sowie als
 %      Resultat zur?ckgeben.
 
-output_args = im;
+output_args = drawline(im, compPosition);
 
 end
 

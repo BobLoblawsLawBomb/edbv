@@ -6,7 +6,7 @@ positionVector = [0 0];	% default value for position
 s = size(vectorMatrix);
 
 if (ball <= s(5) && frame <= s(6) )
-	vec = vectorMatrix(:,:,:,:,ball,frame);
+	vec = vectorMatrix(:,:,ball,frame);
 	positionVector = [vec(1) vec(2)];
 end
 

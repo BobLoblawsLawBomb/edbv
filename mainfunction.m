@@ -3,6 +3,10 @@ function [ output_args ] = mainfunction()%argument:  video_path
 %   Detailed explanation goes here
 
 %default test video path
+%
+% relative pfade scheinen mit dem videfilereader auf
+% unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
+%
 video_path = [pwd,filesep,'res',filesep,'test.mp4'];
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
@@ -22,7 +26,7 @@ mask = table_mask(im);
 im = im.*mask;
 gim = single(rgb2gray(im))./255;
 
-%TODO: Matrix anlegen die für jeden Ball die Component-Maske speichert.
+%TODO: Matrix anlegen die f?r jeden Ball die Component-Maske speichert.
 %compMask;
 
 %TODO: VektorMatrix anlegen die f?r jeden Ball eine Farbe speichert
@@ -53,17 +57,17 @@ while ~isDone(videoReader)
     if(frameNo == 1)
         %TODO: Erstes Component Labeling anwenden
         %componenten nach label getrennt, 
-        %kann noch fragmente vom tisch bzw. kö enthalten
+        %kann noch fragmente vom tisch bzw. k? enthalten
         [resultBW, resultColor] = connectedComponent(im);
         
-        %Component Velocities für jeden Ball im ersten Frame auf 0 setzen
+        %Component Velocities f?r jeden Ball im ersten Frame auf 0 setzen
         i = 1;
         while(i <= size(resultBW))
             compVelocity(:, :, i, 1) = [0 0];
             i = i + 1;
         end
     else
-        %Nächsten Frame auslesen
+        %N?chsten Frame auslesen
         im = step(converter, step(videoReader)).*mask;
         gim = single(rgb2gray(im))./255;
         
@@ -74,7 +78,7 @@ while ~isDone(videoReader)
             i = i + 1;
         end
         
-        %OpticalFlow auf aktuellen Frame, unter berückichtung des vorhergehenden, anwenden.
+        %OpticalFlow auf aktuellen Frame, unter ber?ckichtung des vorhergehenden, anwenden.
         of = step(opticalFlow, gim, lastgim);
         
         % --- OPTICAL FLOW TEST OUTPUT ---

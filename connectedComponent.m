@@ -47,11 +47,9 @@ for x = 1:num
     rx(rx>x) = 0;
     rx = bwmorph(rx,'thicken',10);
     rx = im2uint8(rx);
-    resultBW{x} = rx;
-    
     rx3 = cat(3, rx, rx, rx);
+    resultBW{x} = rx3;
     
-    %rcx = coloredComponent;
     rcx = img;
     
     rcx(rx3 == 0) = 0;
@@ -59,11 +57,10 @@ for x = 1:num
     color_img = color_img + rcx;
     resultColor{x} = rcx;
     
-    
 end;
 
 
-imshow(color_img);
+%imshow(color_img);
 
 end
 

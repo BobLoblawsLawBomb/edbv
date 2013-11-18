@@ -53,7 +53,6 @@ compVelocity = [0 0];
 %TODO: Datenstruktur f?r die Component-Masken festlegen (pro Ball separat oder eine Maske f?rs gesamte Bild)
 
 while ~isDone(videoReader)
-    
     if(frameNo == 1)
         %TODO: Erstes Component Labeling anwenden
         %componenten nach label getrennt, 
@@ -126,7 +125,9 @@ release(videoReader);
 %TODO: Linien-Overlay erzeugen und ?ber den letzten Frame legen, sowie als
 %      Resultat zur?ckgeben.
 
-output_args = drawline(im, compPosition);
+drawline(im, compPosition);
+
+output_args = 'Success!';
 
 end
 

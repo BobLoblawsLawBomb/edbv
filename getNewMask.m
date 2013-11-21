@@ -4,7 +4,7 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
 
     oldMask3=repmat(uint8(oldMask),[1 1 3]);
 
-     subplot(1,2,1),subimage(oldMask3 .* im);
+    subplot(1,2,1),subimage(oldMask3 .* im);
 
     boundaryPositions=getBoundaryPositionsOfComponent(oldMask);
     
@@ -19,8 +19,8 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
 
     for i=1:size(boundaryPositions)
 %        disp(boundaryPositions(i,:));
-       movedBoundaryPositions(i,1)=int32(boundaryPositions(i,1)+vector(1));
-       movedBoundaryPositions(i,2)=int32(boundaryPositions(i,2)+vector(2));
+       movedBoundaryPositions(i,1)=int32(boundaryPositions(i,1)+vector(2));
+       movedBoundaryPositions(i,2)=int32(boundaryPositions(i,2)+vector(1));
 %        J=step(markerInserter,J,int32(boundaryPositions(i,:)));
     end
 
@@ -62,10 +62,10 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
    
     [resultBW, resultColor]=connectedComponent(J);
     
-        
-    disp(size(resultBW));
-    disp(length(resultBW(:)));
-    index=1;
+%         
+%     disp(size(resultBW));
+%     disp(length(resultBW(:)));
+    index=0;
     
     d=inf;
     
@@ -74,17 +74,17 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
       
        pos=getPositionOfComponent(cell2mat(resultBW(i)));
        
-       disp('iteration: ');
-       disp(i);
-
-       disp(pos);
-       disp(newPosition);
-       disp(oldPosition);
+%        disp('iteration: ');
+%        disp(i);
+% 
+%        disp(pos);
+%        disp(newPosition);
+%        disp(oldPosition);
 
        newD=sqrt(double((pos(1)-newPosition(1))^2 + (pos(2)-newPosition(2))^2));
-       
-       disp('new distance');
-       disp(newD);
+%        
+%        disp('new distance');
+%        disp(newD);
        
        if newD<d
            d=newD;
@@ -93,10 +93,12 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
        
     end
     
-    disp('choose index:');
+%     disp('choose index:');
     
-    disp(index);
-    newMask=cell2mat(resultBW(index));
+%     disp(index);
+    if length(resultBW(:))>0
+        newMask=cell2mat(resultBW(index));
+    end
 
     
     newMask3=repmat(uint8(newMask),[1 1 3]);

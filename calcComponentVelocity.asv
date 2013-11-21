@@ -1,4 +1,4 @@
-function [ vx, vy , newMask] = calcComponentVelocity( of, im, position, compSize)
+function [ vx, vy ] = calcComponentVelocity( of, im, position, compSize)
 %CALCCOMPONENTVELOCITY Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -14,24 +14,23 @@ function [ vx, vy , newMask] = calcComponentVelocity( of, im, position, compSize
     % grünen boden weg schneiden
     %************************
     
-%     %create color transformation structure
-%     cform = makecform('srgb2lab');
-%     
-%     % transform into L*a*b color space
-%     input_lab = applycform(im, cform);
-%     
-%     % extract the red-green chroma component
-%     rg_chroma = input_lab(:,:,2);
-%     
-%     % make a binary image
-%     THRESHOLD = 0.40;
-%     BW = im2bw(rg_chroma, THRESHOLD);
-%     
-%     newMask = and(newMask, BW);
+    %create color transformation structure
+    cform = makecform('srgb2lab');
+    
+    % transform into L*a*b color space
+    input_lab = applycform(im, cform);
+    
+    % extract the red-green chroma component
+    rg_chroma = input_lab(:,:,2);
+    
+    % make a binary image
+    THRESHOLD = 0.40;
+    BW = im2bw(rg_chroma, THRESHOLD);
+    
+    newMask = or(newMask, BW);
     
     %************************
 
-    %imshow(newMask);
     
     mask = double(newMask);
     

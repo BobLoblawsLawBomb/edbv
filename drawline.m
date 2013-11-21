@@ -28,11 +28,11 @@ for  ball_nr = 1 : size( A , 3)
      x2 = pos_frame_to(1);
      y2 = pos_frame_to(2);
      
-     disp(['Frame ',int2str(frame_nr),' Ball ',int2str(ball_nr),' Line from [ ', int2str(x1),', ', int2str(y1),' ] to [', int2str(x2),', ', int2str(y2),' ]']);
+     %disp(['Frame ',int2str(frame_nr),' Ball ',int2str(ball_nr),' Line from [ ', int2str(x1),', ', int2str(y1),' ] to [', int2str(x2),', ', int2str(y2),' ]']);
      
      % TODO: change to vision plot method
      shapeInserter = vision.ShapeInserter('Shape','Lines','BorderColor','Custom','CustomBorderColor',ball_color);
-     J = step(shapeInserter, im, [x1, y1, x2, y2]);
+     J = step(shapeInserter, J, [x1 y1 x2 y2]);
      
      %plot([pos_frame_from(2),pos_frame_to(2)],[pos_frame_from(1),pos_frame_to(1)],'Color',ball_color,'LineWidth',2);
      

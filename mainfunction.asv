@@ -75,38 +75,36 @@ while ~isDone(videoReader)
         %Components im neuen Frame finden und passende Maske speichern.
         im_copy = im;
         
+        
         for i=1:length(resultBW(:))
-            %if(i == 3)
-                pv = compPosition(:, :, i, frameNo - 1);
-                cv = compVelocity(:, :, i, frameNo - 1)*100;
-                
-                %             disp('size(resultBW(i))');
-                %             disp(size(resultBW(i)));
-                %             disp('cv');
-                %             disp(size(cv));
-                %
-                %             disp('ismember');
-                
-                %if isempty(resultBW(i)) || any(cellfun(@(j)isequal(j,getPositionOfComponent(cell2mat(resultBW(i)))), positions))
-                %    continue;
-                %end
-                
-                %positions{x}=getPositionOfComponent(cell2mat(resultBW(i)));
-                %x=x+1;
-                
-                cv_length = sqrt(cv(1)*cv(1)+cv(2)*cv(2));
-                
-                
-                disp([int2str(i),', ',int2str(frameNo),', ',num2str(cv),', ',num2str(cv_length)]);
-                
-                
-                if(cv_length > 0.0001)
-                    %resultBW{i} = getNewMask(cell2mat(resultBW(i)), cv, 50, im_copy);
-                    resultBW{i} = getNewMask(pv, cv, 10, im_copy);
-                    %mask3D = repmat( uint8(cell2mat(resultBW(i))), [1 1 3]);
-                    %im_copy = mask3D.*im_copy;
-                end
+            pv = compPosition(:, :, i, frameNo - 1);
+            cv = compVelocity(:, :, i, frameNo - 1)*100;
+            
+%             disp('size(resultBW(i))');  
+%             disp(size(resultBW(i)));  
+%             disp('cv');  
+%             disp(size(cv));  
+%             
+%             disp('ismember');
+
+            %if isempty(resultBW(i)) || any(cellfun(@(j)isequal(j,getPositionOfComponent(cell2mat(resultBW(i)))), positions))
+            %    continue;
             %end
+             
+            %positions{x}=getPositionOfComponent(cell2mat(resultBW(i)));
+            %x=x+1;
+            
+            cv_length = sqrt(cv(1)*cv(1)+cv(2)*cv(2));
+            
+            if()
+            disp([int2str(i),', ',int2str(frameNo),', ',num2str(cv),', ',num2str(cv_length)]);
+            
+            if(cv_length > 0.0001)
+                %resultBW{i} = getNewMask(cell2mat(resultBW(i)), cv, 50, im_copy);
+                resultBW{i} = getNewMask(pv, cv, 10, im_copy);
+                mask3D = repmat( uint8(cell2mat(resultBW(i))), [1 1 3]);
+                im_copy = mask3D.*im_copy;
+            end
         end
         
         %OpticalFlow auf aktuellen Frame, unter ber?ckichtung des vorhergehenden, anwenden.
@@ -129,14 +127,12 @@ while ~isDone(videoReader)
         
         output_mask = false(size(im2bw(im)));
         
-        %if(i == 3)
         for k=1:length(resultBW(:))
             compPosition(:, :, k, frameNo) = getPositionOfComponent(resultBW{k});
             [vx, vy, vmask] = calcComponentVelocity(of, im, compPosition(:, :, k, frameNo), 10);
             compVelocity(:, :, k, frameNo) = [vx, vy];
             output_mask = or(output_mask, vmask);
         end
-        %end
         
         imshow(output_mask);
     end

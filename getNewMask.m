@@ -62,9 +62,9 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
    
     [resultBW, resultColor]=connectedComponent(J);
     
-        
-    disp(size(resultBW));
-    disp(length(resultBW(:)));
+%         
+%     disp(size(resultBW));
+%     disp(length(resultBW(:)));
     index=0;
     
     d=inf;
@@ -74,17 +74,17 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
       
        pos=getPositionOfComponent(cell2mat(resultBW(i)));
        
-       disp('iteration: ');
-       disp(i);
-
-       disp(pos);
-       disp(newPosition);
-       disp(oldPosition);
+%        disp('iteration: ');
+%        disp(i);
+% 
+%        disp(pos);
+%        disp(newPosition);
+%        disp(oldPosition);
 
        newD=sqrt(double((pos(1)-newPosition(1))^2 + (pos(2)-newPosition(2))^2));
-       
-       disp('new distance');
-       disp(newD);
+%        
+%        disp('new distance');
+%        disp(newD);
        
        if newD<d
            d=newD;
@@ -93,9 +93,9 @@ function [ newMask ] = getNewMask( oldMask, vector, instabilityFactor, im)
        
     end
     
-    disp('choose index:');
+%     disp('choose index:');
     
-    disp(index);
+%     disp(index);
     if length(resultBW(:))>0
         newMask=cell2mat(resultBW(index));
     end

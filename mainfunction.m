@@ -54,7 +54,6 @@ compVelocity = [0 0];
 positions=cell(0);
 x=1;
 while ~isDone(videoReader)
-    
     if(frameNo == 1)
         %TODO: Erstes Component Labeling anwenden
         %componenten nach label getrennt, 
@@ -76,12 +75,12 @@ while ~isDone(videoReader)
         
         for i=1:length(resultBW(:))
             cv = compVelocity(:, :, i, frameNo - 1);
-            disp('size(resultBW(i))');  
-            disp(size(resultBW(i)));  
-            disp('cv');  
-            disp(size(cv));  
-            
-            disp('ismember');
+%             disp('size(resultBW(i))');  
+%             disp(size(resultBW(i)));  
+%             disp('cv');  
+%             disp(size(cv));  
+%             
+%             disp('ismember');
             if isempty(resultBW(i)) || any(cellfun(@(j)isequal(j,getPositionOfComponent(cell2mat(resultBW(i)))), positions))
                 continue;
             end
@@ -92,6 +91,7 @@ while ~isDone(videoReader)
             resultBW{i} = getNewMask(cell2mat(resultBW(i)), cv, 50, im_copy);
             mask3D = repmat( uint8(cell2mat(resultBW(i))), [1 1 3]);
             im_copy = mask3D.*im_copy;
+
         end
         
         %OpticalFlow auf aktuellen Frame, unter ber?ckichtung des vorhergehenden, anwenden.
@@ -133,7 +133,9 @@ release(videoReader);
 %TODO: Linien-Overlay erzeugen und ?ber den letzten Frame legen, sowie als
 %      Resultat zur?ckgeben.
 
-output_args = drawline(im, compPosition);
+drawline(im, compPosition);
+
+output_args = 'Success!';
 
 end
 

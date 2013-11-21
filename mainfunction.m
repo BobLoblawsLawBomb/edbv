@@ -7,7 +7,7 @@ function [ output_args ] = mainfunction()%argument:  video_path
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 %
-video_path = [pwd,filesep,'res',filesep,'test.mp4'];
+video_path = [pwd,filesep,'res',filesep,'test_short.mp4'];
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
 converter = vision.ImageDataTypeConverter; 
@@ -51,7 +51,8 @@ compPosition = [0 0];
 compVelocity = [0 0];
 
 %TODO: Datenstruktur f?r die Component-Masken festlegen (pro Ball separat oder eine Maske f?rs gesamte Bild)
-
+positions=cell(0);
+x=1;
 while ~isDone(videoReader)
     
     if(frameNo == 1)
@@ -61,10 +62,8 @@ while ~isDone(videoReader)
         [resultBW, resultColor] = connectedComponent(im);
         
         %Component Velocities f?r jeden Ball im ersten Frame auf 0 setzen
-        i = 1;
-        while(i <= size(resultBW))
+        for i=1:length(resultBW(:))
             compVelocity(:, :, i, 1) = [0 0];
-            i = i + 1;
         end
     else
         %N?chsten Frame auslesen
@@ -73,13 +72,26 @@ while ~isDone(videoReader)
         
         %Components im neuen Frame finden und passende Maske speichern.
         im_copy = im;
-        i = 1;
-        while(i <= size(resultBW))
+        
+        
+        for i=1:length(resultBW(:))
             cv = compVelocity(:, :, i, frameNo - 1);
-            resultBW{i} = getNewMask(resultBW{i}, cv, 5, im_copy);
-            mask3D = repmat( uint8(resultBW{i}), [1 1 3]);
+            disp('size(resultBW(i))');  
+            disp(size(resultBW(i)));  
+            disp('cv');  
+            disp(size(cv));  
+            
+            disp('ismember');
+            if isempty(resultBW(i)) || any(cellfun(@(j)isequal(j,getPositionOfComponent(cell2mat(resultBW(i)))), positions))
+                continue;
+            end
+             
+            positions{x}=getPositionOfComponent(cell2mat(resultBW(i)));
+            x=x+1;
+            
+            resultBW{i} = getNewMask(cell2mat(resultBW(i)), cv, 50, im_copy);
+            mask3D = repmat( uint8(cell2mat(resultBW(i))), [1 1 3]);
             im_copy = mask3D.*im_copy;
-            i = i + 1;
         end
         
         %OpticalFlow auf aktuellen Frame, unter ber?ckichtung des vorhergehenden, anwenden.
@@ -97,19 +109,15 @@ while ~isDone(videoReader)
         %TODO: Mit Component-Masken und OpticalFlow-Vektoren
         %      Geschwindigkeitsvektoren der einzelnen Components ermitteln.
         %calcComponentVelocity(of, componentMask);
-        i = 1;
-        while(i <= size(resultBW))
+        for i=1:length(resultBW(:))
             compVelocity(:, :, i, frameNo) = calcComponentVelocity(of, resultBW{i});
-            i = i + 1;
         end
     end
     
     %TODO: Mit Component-Masken
     %      Positionsvektoren der einzelnen Components ermitteln.
-    i = 1;
-    while(i <= size(resultBW))
+    for i=1:length(resultBW(:))
         compPosition(:, :, i, frameNo) = getPositionOfComponent(resultBW{i});
-        i = i + 1;
     end
     
     lastim = im;

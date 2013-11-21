@@ -20,7 +20,7 @@ BW = im2bw(img , 0.50);%0.60
 %[ component1, component2 ] = coloredComponents(img);
 
 BW = im2uint8(BW);
-BW3 = cat(3, BW, BW, BW);
+%BW3 = cat(3, BW, BW, BW);
 
 %alles, was nicht zu einem 'Glanzpunkt' gehört, wird schwarz
 %component1(BW3 == 0) = 0;
@@ -60,7 +60,7 @@ for x = 1:num
 end;
 
 
-%imshow(color_img);
+imshow(color_img);
 
 
 end

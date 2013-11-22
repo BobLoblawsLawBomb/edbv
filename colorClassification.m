@@ -27,6 +27,8 @@ for x = 1:num
     % hier faerben wir die Component einmal mit 
     % der Durschnittsfarbe ein
     mean_color = meanImageColor(component);
+    mean_color = mean_color - uint8([20 50 0]); % Pauschalkorrektur fuer Gruenstich durch gruene Pixel
+    mean_color = mean_color + uint8([80 80 80]); % pauschalfaktor um grau auf weiss zu bringen (grauwertkorrektur bei der wei?en kugel fixt auch die anderen baelle)
     meanRed = mean_color(1);
     meanGreen = mean_color(2);
     meanBlue = mean_color(3);

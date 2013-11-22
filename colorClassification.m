@@ -1,8 +1,8 @@
 %function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( colorComponents )
-%img = imread('res/table_test-1.png');
-%mask = table_mask(img);
-%image = img .* mask;
-%[BWComponents, ColorComponents] = connectedComponent(image);
+img = imread('res/table_test-1.png');
+mask = table_mask(img);
+image = img .* mask;
+[BWComponents, ColorComponents] = connectedComponent(image);
 red = [];
 [dim num] = size(ColorComponents);
 
@@ -23,6 +23,30 @@ for x = 1:num
     component = mask .* current;
     imshow(component);
     
+    
+    % hier faerben wir die Component einmal mit 
+    % der Durschnittsfarbe ein
+    mean_color = meanImageColor(component);
+    meanRed = mean_color(1);
+    meanGreen = mean_color(2);
+    meanBlue = mean_color(3);
+    component_mean_colored = mask;
+    redChannel = component(:,:,1);
+    greenChannel = component(:,:,2);
+    blueChannel = component(:,:,3);
+    
+    redChannel(redChannel ~= 0) = meanRed;
+    greenChannel(greenChannel ~= 0) = meanGreen;
+    blueChannel(blueChannel ~= 0) = meanBlue;
+    
+    component_mean_colored(:,:,1) = redChannel;
+    component_mean_colored(:,:,2) = greenChannel;
+    component_mean_colored(:,:,3) = blueChannel;
+    
+    imshow(component_mean_colored);
+    % Ende der Einfaerbung 
+    
+    
    
     [row,col,v] = find(current);
     pixels = impixel(current,col,row);
@@ -37,6 +61,7 @@ for x = 1:num
     p_cell = num2cell(pixels);
     
     imshow(current);
+    %colormap(jet)
 %     
 %     red = [red; current];
 %     red = [red; ColorComponents{x+1}];

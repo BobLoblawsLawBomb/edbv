@@ -57,6 +57,7 @@ for x = 1:num
     %rx = bwmorph(rx,'thicken',10);
     cx = stat(x).Centroid(1);
     cy = stat(x).Centroid(2);
+    cy = cy + 5; % Positionskorrektur von Glanzpunkt auf Ballmittelpunkt
     rx = insertShape(uint8(rx), 'FilledCircle', [cx cy 10]);
     rx = im2bw(rx); % ist durch shape insertion zu uint8 geworden
     

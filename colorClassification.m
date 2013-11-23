@@ -24,8 +24,7 @@ for x = 1:num
     imshow(component);
     
     
-    % hier faerben wir die Component einmal mit 
-    % der Durschnittsfarbe ein
+    % hier faerben wir die Component mit der durschnittlichen Farbe ein 
     mean_color = meanImageColor(component);
     mean_color = mean_color - uint8([20 50 0]); % Pauschalkorrektur fuer Gruenstich durch gruene Pixel
     mean_color = mean_color + uint8([80 80 80]); % pauschalfaktor um grau auf weiss zu bringen (grauwertkorrektur bei der wei?en kugel fixt auch die anderen baelle)
@@ -45,10 +44,31 @@ for x = 1:num
     component_mean_colored(:,:,2) = greenChannel;
     component_mean_colored(:,:,3) = blueChannel;
     
+    % HIER EINEN BREAKPOINT SETZEN
     imshow(component_mean_colored);
-    % Ende der Einfaerbung 
     
+    % - - - Ende der Einfaerbung - - - 
     
+    % hier faerben wir die Component mit der dominanten Bucket Color ein
+    bucketColor = dominantBucketColor(component, 6, 0);
+    
+    hsv = rgb2hsv(component);
+    hue = hsv(:,:,1);
+    sat = hsv(:,:,2);
+    val = hsv(:,:,3);
+    
+    hue(hue ~= 0) = bucketColor;
+    sat(hue ~= 0) = 1;
+    val(hue ~= 0) = 1;
+    
+    hsv(:,:,1) = hue;
+    hsv(:,:,2) = sat;
+    hsv(:,:,3) = val;
+   
+    % HIER EINEN BREAKPOINT SETZEN
+    imshow( hsv2rgb(hsv));
+   
+    % - - - Ende der Einfarbung - - - 
    
     [row,col,v] = find(current);
     pixels = impixel(current,col,row);

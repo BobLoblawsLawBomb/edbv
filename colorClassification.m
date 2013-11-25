@@ -1,4 +1,5 @@
 %function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( colorComponents )
+
 img = imread('res/table_test-1.png');
 mask = table_mask(img);
 image = img .* mask;
@@ -9,8 +10,7 @@ red = [];
 for x = 1:num
     
     current = ColorComponents{x};
-    %imshow(current);
-    
+
     %gruener Teil wegschneiden
     cform = makecform('srgb2lab');
     lab = applycform(current,cform);
@@ -74,11 +74,26 @@ for x = 1:num
     pixels = impixel(current,col,row);
     pixel_max = max(pixels);
     
-    p_single = im2single(pixels);
-    pixel_median = median(p_single);
+    %p_single = im2single(pixels);
+    pixel_median = median(reshape(pixels, [], 3), 2);
+    
     
     p_uint8 = im2uint8(pixels);
     pixel_mean = mean(p_uint8);
+    p_mean_red = mean(p_uint8(:,1));
+    p_mean_green = mean(p_uint8(:,2));
+    p_mean_blue = mean(p_uint8(:,3));
+    
+    [row_com,col_com,v_com] = find(component);
+    pixels_com = impixel(component,col_com,row_com);
+    pixel_max_com = max(pixels_com);
+    p_uint8_com = im2uint8(pixels_com);
+    pixel_mean_com = mean(p_uint8_com);
+    pixel_median_com = median(reshape(pixels_com, [], 3), 2);
+    p_mean_com_red = mean(p_uint8_com(:,1));
+    p_mean_com_green = mean(p_uint8_com(:,2));
+    p_mean_com_blue = mean(p_uint8_com(:,3));
+   
     
     p_cell = num2cell(pixels);
     

@@ -97,7 +97,7 @@ while ~isDone(videoReader)
                 cv_length = sqrt(cv(1)*cv(1)+cv(2)*cv(2));
                 
                 
-                %disp([int2str(i),', ',int2str(frameNo),', ',num2str(cv),', ',num2str(cv_length)]);
+                disp([int2str(i),', ',int2str(frameNo),', ',num2str(cv),', ',num2str(cv_length)]);
                 
                 
                 if(cv_length > 0.0001)
@@ -127,11 +127,14 @@ while ~isDone(videoReader)
         %      Geschwindigkeitsvektoren der einzelnen Components ermitteln.
         %calcComponentVelocity(of, componentMask);
         
-        %matrix um bereiche zu speichern in denen die geschwindigkeiten der
-        %komponenten gemittelt werden.
         output_vmask = false(size(im2bw(im)));
         
-        %matrix um geschwindigkeits-vektor-linien zu speichern
+        %imsize = size(im);
+        
+        %line_mask = false(imsize(1), imsize(2), 3);
+        
+        %
+        sIL = vision.ShapeInserter('Shape','Lines','BorderColor','Custom', 'CustomBorderColor', [255 0 0]);
         vlines = [0 0 0 0];
         
         %if(i == 3)
@@ -170,7 +173,6 @@ while ~isDone(videoReader)
         output_mask = output_mask./maxv;
         
         %Einzeichnen der geschwindigkeitsvektor-linien der komponenten
-        sIL = vision.ShapeInserter('Shape','Lines','BorderColor','Custom', 'CustomBorderColor', [255 0 0]);
         output_mask = step(sIL, output_mask, vlines);
         
         imshow(output_mask);

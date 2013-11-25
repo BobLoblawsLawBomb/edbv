@@ -76,7 +76,7 @@ for x = 1:num
 end;
 
 
-imshow(color_img);
+%imshow(color_img);
 
 end
 

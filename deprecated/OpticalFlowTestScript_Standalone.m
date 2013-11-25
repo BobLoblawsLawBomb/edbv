@@ -1,4 +1,4 @@
-video_path = ['res',filesep,'test.mp4'];
+video_path = ['..',filesep,'res',filesep,'test.mp4'];
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','Intensity','VideoOutputDataType','uint8');
 converter = vision.ImageDataTypeConverter; 
 opticalFlow = vision.OpticalFlow('ReferenceFrameDelay', 1);

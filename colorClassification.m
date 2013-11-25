@@ -10,10 +10,7 @@ red = [];
 for x = 1:num
     
     current = ColorComponents{x};
-    current = rgb2hsv(current);
-    %imshow(hsv);
-    %color = impixel(current);
-    
+
     %gruener Teil wegschneiden
     cform = makecform('srgb2lab');
     lab = applycform(current,cform);

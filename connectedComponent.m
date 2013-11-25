@@ -39,6 +39,7 @@ color_img = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
 % mittelpunkte der gelabelten BLOBs berechnen lassen
 % http://www.mathworks.com/matlabcentral/answers/28996-centroid-of-an-image
 stat = regionprops(L,'centroid');
+stat2 = regionprops(L, 'EquivDiameter');
 
 %resultBW = zeros(size(BW,1),size(BW,2), num);
 resultBW = cell(1,num);
@@ -61,28 +62,33 @@ for x = 1:num
     rx = insertShape(uint8(rx), 'FilledCircle', [cx cy 10]);
     rx = im2bw(rx); % ist durch shape insertion zu uint8 geworden
     
+    imshow(rx);
     
-    resultBW{x} = rx;
-    
-    rx = im2uint8(rx);
-    rx3 = cat(3, rx, rx, rx);
-    rcx = img;
-    
-    rcx(rx3 == 0) = 0;
-    
-    cform = makecform('srgb2lab');
-    lab = applycform(rcx,cform);
-    rg_chroma = lab(:,:,2);
-    THRESHOLD = 0.40;
-    BW = im2bw(rg_chroma, THRESHOLD);
-    mask = uint8(BW);
-    mask = repmat( mask, [1 1 3]);
-    rcx = mask .* rcx;
-    
-    imshow(rcx);
-    
-    color_img = color_img + rcx;
-    resultColor{x} = rcx;
+    if stat2(x).EquivDiameter < 17
+        
+        resultBW{x} = rx;
+
+        rx = im2uint8(rx);
+        rx3 = cat(3, rx, rx, rx);
+        rcx = img;
+
+        rcx(rx3 == 0) = 0;
+
+        cform = makecform('srgb2lab');
+        lab = applycform(rcx,cform);
+        rg_chroma = lab(:,:,2);
+        THRESHOLD = 0.40;
+        BW = im2bw(rg_chroma, THRESHOLD);
+        mask = uint8(BW);
+        mask = repmat( mask, [1 1 3]);
+        rcx = mask .* rcx;
+
+        imshow(rcx);
+
+        color_img = color_img + rcx;
+        resultColor{x} = rcx;
+
+    end
     
 end;
 

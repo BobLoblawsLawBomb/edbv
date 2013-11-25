@@ -15,16 +15,16 @@ for x = 1:num
     %color = impixel(current);
     
     %gruener Teil wegschneiden
-%     cform = makecform('srgb2lab');
-%     lab = applycform(current,cform);
-%     rg_chroma = lab(:,:,2);
-%     THRESHOLD = 0.40;
-%     BW = im2bw(rg_chroma, THRESHOLD);
-%     
-%     mask = uint8(BW);
-%     mask = repmat( mask, [1 1 3]);
-%     component = mask .* current;
-%     imshow(component);
+    cform = makecform('srgb2lab');
+    lab = applycform(current,cform);
+    rg_chroma = lab(:,:,2);
+    THRESHOLD = 0.40;
+    BW = im2bw(rg_chroma, THRESHOLD);
+    
+    mask = uint8(BW);
+    mask = repmat( mask, [1 1 3]);
+    component = mask .* current;
+    imshow(component);
     
     
     % hier faerben wir die Component mit der durschnittlichen Farbe ein 

@@ -1,0 +1,18 @@
+classdef brownBucket
+    %UNTITLED3 Summary of this class goes here
+    %   Detailed explanation goes here
+    
+    properties(Constant = true)
+        hueMin = 30/360;
+        hueMax = 55/360;
+        satMin = 0.5;
+        satMax = 1;
+        valMin = 0.35;
+        valMax = 0.75;
+    end
+    
+    methods
+    end
+    
+end
+

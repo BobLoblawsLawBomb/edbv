@@ -33,7 +33,7 @@ for k = 1:nColors
     bw_mask = repmat( uint8(bw), [1 1 3]);
     color = color .* bw_mask;
     segmented_images{k} = color;
-    %imshow(color);
+    imshow(color);
     
 end
 

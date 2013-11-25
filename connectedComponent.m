@@ -54,6 +54,17 @@ for x = 1:num
     
     rcx(rx3 == 0) = 0;
     
+    cform = makecform('srgb2lab');
+    lab = applycform(rcx,cform);
+    rg_chroma = lab(:,:,2);
+    THRESHOLD = 0.40;
+    BW = im2bw(rg_chroma, THRESHOLD);
+    mask = uint8(BW);
+    mask = repmat( mask, [1 1 3]);
+    rcx = mask .* rcx;
+    
+    imshow(rcx);
+    
     color_img = color_img + rcx;
     resultColor{x} = rcx;
     
@@ -61,7 +72,11 @@ end;
 
 
 imshow(color_img);
-
+color_img_hsv = rgb2hsv(color_img);
+imshow(color_img_hsv);
+imshow(color_img_hsv(:,:,1));
+imshow(color_img_hsv(:,:,2));
+imshow(color_img_hsv(:,:,3));
 
 end
 

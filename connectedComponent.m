@@ -1,17 +1,17 @@
 function [ resultBW, resultColor ] = connectedComponent( table_mask )
 %input bild: Tisch muss bereits durch die Tisch-Maske ausgeschnitten sein
 %Diese Funktion ermittelt die Components im Bild (d.h. die Kugeln) 
-%Dafür werden die Glanzpunkte der Kugeln benutzt. Durch sehr helle Stellen
-%im Bild, die zu keiner Kugel gehören, werden auch Fragmente vom Tisch und
+%Daf?r werden die Glanzpunkte der Kugeln benutzt. Durch sehr helle Stellen
+%im Bild, die zu keiner Kugel geh?ren, werden auch Fragmente vom Tisch und
 %Koe als Glanzpunkte interpretiert.
-%Ausgabe: resultBW: ist ein n-dim. cell-Element, das in jeder Zelle ein Binärbild
-%einer Komponente enthällt. insgesammt sind es n Components
+%Ausgabe: resultBW: ist ein n-dim. cell-Element, das in jeder Zelle ein Bin?rbild
+%einer Komponente enth?llt. insgesammt sind es n Components
 %Azsgabe: resultColor: ist ebenfalls ein n-dim. cell-Element, das in jeder Zelle
-%ein farbiges Bild (also ein 3-dim RGB-Bild) einer Komponente enthält.
+%ein farbiges Bild (also ein 3-dim RGB-Bild) einer Komponente enth?lt.
 
 img = table_mask;
-%aus dem bild wird binaerbild, nur die hellsten stellen werden weiß
-%kö und linke und rechte obere Ecke werden auch erkannt 
+%aus dem bild wird binaerbild, nur die hellsten stellen werden wei?
+%k? und linke und rechte obere Ecke werden auch erkannt 
 BW = im2bw(img , 0.50);%0.60
 
 %farbigen Componenten werden ermittelt
@@ -22,7 +22,7 @@ BW = im2bw(img , 0.50);%0.60
 BW = im2uint8(BW);
 %BW3 = cat(3, BW, BW, BW);
 
-%alles, was nicht zu einem 'Glanzpunkt' gehört, wird schwarz
+%alles, was nicht zu einem 'Glanzpunkt' geh?rt, wird schwarz
 %component1(BW3 == 0) = 0;
 %component2(BW3 == 0) = 0;
 
@@ -35,17 +35,33 @@ color_img = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
 
 %elemente von einander trennen
 [L, num] = bwlabeln(BW, 4);
+
+% mittelpunkte der gelabelten BLOBs berechnen lassen
+% http://www.mathworks.com/matlabcentral/answers/28996-centroid-of-an-image
+stat = regionprops(L,'centroid');
+
 %resultBW = zeros(size(BW,1),size(BW,2), num);
 resultBW = cell(1,num);
 resultColor = cell(3,num);
 
-%setzt für jedes Label alle anderen Elemente auf schwarz
+%setzt f?r jedes Label alle anderen Elemente auf schwarz
 for x = 1:num
     
     rx = L;
+    
+    % alles was nicht die aktuelle component ist ausmaskieren
     rx(rx<x) = 0;
     rx(rx>x) = 0;
-    rx = bwmorph(rx,'thicken',10);
+    
+    % jetzt maskieren wir die Kugel mit einem Kreis aus
+    %rx = bwmorph(rx,'thicken',10);
+    cx = stat(x).Centroid(1);
+    cy = stat(x).Centroid(2);
+    cy = cy + 5; % Positionskorrektur von Glanzpunkt auf Ballmittelpunkt
+    rx = insertShape(uint8(rx), 'FilledCircle', [cx cy 10]);
+    rx = im2bw(rx); % ist durch shape insertion zu uint8 geworden
+    
+    
     resultBW{x} = rx;
     
     rx = im2uint8(rx);
@@ -72,11 +88,7 @@ end;
 
 
 imshow(color_img);
-color_img_hsv = rgb2hsv(color_img);
-imshow(color_img_hsv);
-imshow(color_img_hsv(:,:,1));
-imshow(color_img_hsv(:,:,2));
-imshow(color_img_hsv(:,:,3));
+
 
 end
 

@@ -3,6 +3,7 @@ classdef GreenBucket < AbstractBucket
     %   Detailed explanation goes here
     
     properties(Constant = true)
+        colorName = 'Green';
         rgbColor = [0,255,0];
         hueMin = 90/360;
         hueMax = 150/360;

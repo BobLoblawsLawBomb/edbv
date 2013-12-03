@@ -3,6 +3,7 @@ classdef PinkBucket < AbstractBucket
     %   Detailed explanation goes here
     
     properties(Constant = true)
+        colorName = 'Pink';
         rgbColor = [255,20,147];
         hueMin = 310/360;
         hueMax = 40/360;

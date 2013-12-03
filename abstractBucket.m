@@ -3,6 +3,7 @@ classdef (Abstract) AbstractBucket
     %   Detailed explanation goes here
     
     properties (Abstract, Constant)
+        colorName;
         rgbColor;
         hueMin;
         hueMax;

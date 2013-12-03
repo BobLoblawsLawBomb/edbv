@@ -1,4 +1,4 @@
-function [ newMask ] = getNewMask( oldPosition, vector, instabilityFactor, im)
+function [ newMask, resultRaw, searchMask ] = getNewMask( oldPosition, vector, instabilityFactor, im)
 %GETNEWMASK Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -55,13 +55,15 @@ function [ newMask ] = getNewMask( oldPosition, vector, instabilityFactor, im)
     
     %disp(['oldPos: ',num2str(oldPosition), ' | newPos: ', num2str(newPosition), ' | velocity: ', num2str(vector)]);
     
-    newMask = im2bw(uint8NewMask,0.5);    
+    newMask = im2bw(uint8NewMask,0.5);
+    
+    searchMask = newMask;
 
     newMask3 = repmat(uint8(newMask),[1 1 3]);
     
     J = newMask3 .* im;
    
-    [resultBW, resultColor] = connectedComponent(J);
+    [resultBW, resultColor, resultRaw] = connectedComponent(J);
     
 %         
 %     disp(size(resultBW));

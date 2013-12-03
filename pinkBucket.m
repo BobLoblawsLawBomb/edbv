@@ -1,8 +1,9 @@
-classdef pinkBucket
+classdef PinkBucket < AbstractBucket
     %UNTITLED8 Summary of this class goes here
     %   Detailed explanation goes here
     
     properties(Constant = true)
+        rgbColor = [255,20,147];
         hueMin = 310/360;
         hueMax = 40/360;
         satMin = 0;
@@ -10,9 +11,6 @@ classdef pinkBucket
         valMin = 0.85;
         valMax = 1;
     end
-    
-    methods
-    end
-    
+
 end
 

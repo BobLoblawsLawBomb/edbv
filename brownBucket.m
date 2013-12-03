@@ -1,8 +1,9 @@
-classdef brownBucket
+classdef BrownBucket < AbstractBucket
     %UNTITLED3 Summary of this class goes here
     %   Detailed explanation goes here
     
     properties(Constant = true)
+        rgbColor = [139,69,19];
         hueMin = 30/360;
         hueMax = 55/360;
         satMin = 0.5;
@@ -10,9 +11,6 @@ classdef brownBucket
         valMin = 0.35;
         valMax = 0.75;
     end
-    
-    methods
-    end
-    
+
 end
 

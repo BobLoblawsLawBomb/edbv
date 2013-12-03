@@ -1,4 +1,4 @@
-classdef redBucket
+classdef redBucket < abstractBucket
     %UNTITLED2 Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -10,9 +10,6 @@ classdef redBucket
         valMin = 0.70;
         valMax = 1;
     end
-    
-    methods
-    end
-    
+
 end
 

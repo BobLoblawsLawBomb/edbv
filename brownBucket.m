@@ -1,4 +1,4 @@
-classdef brownBucket
+classdef brownBucket < abstractBucket
     %UNTITLED3 Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -10,9 +10,6 @@ classdef brownBucket
         valMin = 0.35;
         valMax = 0.75;
     end
-    
-    methods
-    end
-    
+
 end
 

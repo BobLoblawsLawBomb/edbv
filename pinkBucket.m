@@ -1,4 +1,4 @@
-classdef pinkBucket
+classdef pinkBucket < abstractBucket
     %UNTITLED8 Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -10,9 +10,6 @@ classdef pinkBucket
         valMin = 0.85;
         valMax = 1;
     end
-    
-    methods
-    end
-    
+
 end
 

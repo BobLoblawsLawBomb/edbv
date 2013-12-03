@@ -1,4 +1,4 @@
-classdef greenBucket
+classdef greenBucket < abstractBucket
     %UNTITLED5 Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -10,9 +10,6 @@ classdef greenBucket
         valMin = 0.35;
         valMax = 1;
     end
-    
-    methods
-    end
-    
+
 end
 

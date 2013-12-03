@@ -1,4 +1,4 @@
-classdef blackBucket
+classdef blackBucket < abstractBucket
     %UNTITLED9 Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -10,9 +10,5 @@ classdef blackBucket
         valMin = 0;
         valMax = 0.15;
     end
-    
-    methods
-    end
-    
 end
 

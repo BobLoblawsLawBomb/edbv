@@ -1,4 +1,4 @@
-classdef yellowBucket
+classdef yellowBucket < abstractBucket
     %UNTITLED7 Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -9,9 +9,6 @@ classdef yellowBucket
         satMax = 1;
         valMin = 0.85;
         valMax = 1;
-    end
-    
-    methods
     end
     
 end

@@ -1,4 +1,4 @@
-classdef blueBucket
+classdef blueBucket < abstractBucket
     %UNTITLED6 Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -9,9 +9,6 @@ classdef blueBucket
         satMax = 1;
         valMin = 0.35;
         valMax = 1;
-    end
-    
-    methods
     end
     
 end

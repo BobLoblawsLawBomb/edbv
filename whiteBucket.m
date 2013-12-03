@@ -1,4 +1,4 @@
-classdef whiteBucket < abstractBucket
+classdef WhiteBucket < AbstractBucket
     %UNTITLED10 Summary of this class goes here
     %   Detailed explanation goes here
     

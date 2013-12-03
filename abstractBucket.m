@@ -1,11 +1,9 @@
-classdef (Abstract) abstractBucket
+classdef (Abstract) AbstractBucket
     %UNTITLED2 Summary of this class goes here
     %   Detailed explanation goes here
     
     properties (Abstract, Constant)
-        
-    % hier brauchen wir noch repraesentative Farben!
-        
+        rgbColor;
         hueMin;
         hueMax;
         satMin;

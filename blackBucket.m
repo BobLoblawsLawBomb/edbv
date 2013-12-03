@@ -1,4 +1,4 @@
-classdef blackBucket < abstractBucket
+classdef BlackBucket < AbstractBucket
     %UNTITLED9 Summary of this class goes here
     %   Detailed explanation goes here
     

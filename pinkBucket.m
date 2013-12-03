@@ -1,4 +1,4 @@
-classdef pinkBucket < abstractBucket
+classdef PinkBucket < AbstractBucket
     %UNTITLED8 Summary of this class goes here
     %   Detailed explanation goes here
     

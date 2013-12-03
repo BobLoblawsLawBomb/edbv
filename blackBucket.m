@@ -3,6 +3,7 @@ classdef BlackBucket < AbstractBucket
     %   Detailed explanation goes here
     
     properties(Constant = true)
+        rgbColor = [48,48,48]; % grau, damit man es von der maske unterscheiden kann
         hueMin = 0;
         hueMax = 1;
         satMin = 0;

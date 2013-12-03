@@ -3,6 +3,9 @@ classdef (Abstract) abstractBucket
     %   Detailed explanation goes here
     
     properties (Abstract, Constant)
+        
+    % hier brauchen wir noch repraesentative Farben!
+        
         hueMin;
         hueMax;
         satMin;

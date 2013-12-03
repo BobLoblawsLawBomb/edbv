@@ -1,4 +1,4 @@
-function [ resultBW, resultColor ] = connectedComponent( table_mask )
+function [ resultBW, resultColor, resultRaw] = connectedComponent( table_mask )
 %input bild: Tisch muss bereits durch die Tisch-Maske ausgeschnitten sein
 %Diese Funktion ermittelt die Components im Bild (d.h. die Kugeln) 
 %Daf?r werden die Glanzpunkte der Kugeln benutzt. Durch sehr helle Stellen
@@ -36,6 +36,15 @@ color_img = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
 %elemente von einander trennen
 [L, num] = bwlabeln(BW, 4);
 
+resultRaw = L;
+
+%berechne möglichst passende komponente für eine kugel
+%annahme: 
+%   der glanzpunkt ist auf der x-achse in der mitte
+%   der glanzpunkt endet auf der y-achse oben genau wo die kugel endet
+bbox = regionprops(L, 'BoundingBox');
+%disp(['x: ', num2str(bbox(1).BoundingBox(1)), ', y: ', num2str(bbox(1).BoundingBox(2)), ', xw: ', num2str(bbox(1).BoundingBox(3)), ', yw: ', num2str(bbox(1).BoundingBox(4))]);
+
 % mittelpunkte der gelabelten BLOBs berechnen lassen
 % http://www.mathworks.com/matlabcentral/answers/28996-centroid-of-an-image
 stat = regionprops(L,'centroid');
@@ -57,12 +66,13 @@ for x = 1:num
     % jetzt maskieren wir die Kugel mit einem Kreis aus
     %rx = bwmorph(rx,'thicken',10);
     cx = stat(x).Centroid(1);
-    cy = stat(x).Centroid(2);
+    %cy = stat(x).Centroid(2);
+    cy = bbox(x).BoundingBox(2);
     cy = cy + 5; % Positionskorrektur von Glanzpunkt auf Ballmittelpunkt
-    rx = insertShape(uint8(rx), 'FilledCircle', [cx cy 10]);
+    rx = insertShape(uint8(rx), 'FilledCircle', [cx cy 7]);
     rx = im2bw(rx); % ist durch shape insertion zu uint8 geworden
     
-    imshow(rx);
+%     imshow(rx);
     
     if stat2(x).EquivDiameter < 17
         
@@ -83,7 +93,7 @@ for x = 1:num
         mask = repmat( mask, [1 1 3]);
         rcx = mask .* rcx;
 
-        imshow(rcx);
+%         imshow(rcx);
 
         color_img = color_img + rcx;
         resultColor{x} = rcx;

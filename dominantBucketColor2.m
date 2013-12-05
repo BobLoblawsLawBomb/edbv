@@ -3,8 +3,8 @@ function [ dominantBucket ] = dominantBucketColor2( img )
 %   Detailed explanation goes here
 %   @author Maximilian Irro
 
-    bucketList = {  WhiteBucket(), GreenBucket(), BlueBucket(), BrownBucket(),  
-                    PinkBucket(), BlackBucket(), YellowBucket(), RedBucket()};
+    bucketList = {  WhiteBucket(), PinkBucket(), BlueBucket(), BrownBucket(),  
+                    GreenBucket(), BlackBucket(), YellowBucket(), RedBucket()};
             
     bucketStack = [0,0,0,0,0,0,0,0];
             
@@ -25,37 +25,50 @@ function [ dominantBucket ] = dominantBucketColor2( img )
     sat = hsv(:,:,2);
     val = hsv(:,:,3);
             
-    for n=1:7 % there are 7 buckets
+    for n=1:8 % there are 7 buckets
         
         bucket = bucketList{n};
+%         class(bucket)
         
         % make a mask that lets only pass those pixels 
         % within the specified bucket hue range
         if isa(bucket, 'RedBucket') % red bucket has different evaluation due to hsv hue definition
-            hueMask = hue>=bucket.hueMin | hue<=bucket.hueMax; 
+            hueMask = hue>=bucket.hueMin | hue<=bucket.hueMax;
+        elseif isa(bucket, 'PinkBucket')
+            hueMask = hue>=bucket.hueMin | hue<=bucket.hueMax;
         else
             hueMask = hue>=bucket.hueMin & hue<=bucket.hueMax;   
         end
-        imshow(hueMask)
+        
+%         imshow(hueMask)
         
         % make a mask that lets only pass those pixels 
         % within the specified bucket saturation range
-        sat(sat>0)
-        imshow(sat)
-        bucket.satMax
-        satMask = sat<=bucket.satMax;
-        %satMask = sat>=bucket.satMin & sat<=bucket.satMax;
-        imshow(satMask)
+        
+%         imshow(sat)
+%         sat(sat>0)
+%         bucket.satMax
+        satMask = sat>=bucket.satMin & sat<=bucket.satMax;
+%         imshow(satMask)
         
         % make a mask that lets only pass those pixels 
         % within the specified bucket value range
         valMask = val>=bucket.valMin & sat<=bucket.valMax;
-        imshow(valMask)
+%         val(val>0.5)
+%         imshow(valMask)
+        
+        % TEST
+%         if isa(bucket, 'RedBucket')
+%             sat(sat>0.3)
+%             imshow(sat)
+%             
+%             val(val>0.7)
+%             imshow(valMask)
+%         end
         
         % filter every pixel that passes all 3 HSV filters
         bucketPixels = tableMask .* hueMask .* satMask .* valMask;
-        class(bucket)
-        imshow(bucketPixels)
+%         imshow(bucketPixels)
         
         % count all pixels that are not 0
         % those match the HSV specifications of this color bucket
@@ -65,6 +78,11 @@ function [ dominantBucket ] = dominantBucketColor2( img )
         bucketStack(n) = pixelCount;
         
     end
+    
+    for n=1:8
+        fprintf('%s\t %i \n', class(bucketList{n}),bucketStack(n));
+    end
+    
     
     % find the bucket with the most classified pixels
     [maxPixelCount, bucketIndex] = max(bucketStack(:));

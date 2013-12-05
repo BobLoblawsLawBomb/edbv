@@ -5,11 +5,11 @@ classdef YellowBucket < AbstractBucket
     properties(Constant = true)
         colorName = 'Yellow';
         rgbColor = [255,255,0];
-        hueMin = 65/360;
-        hueMax = 55/360;
-        satMin = 0;
+        hueMin = 40/360;
+        hueMax = 60/360;
+        satMin = 0.8;
         satMax = 1;
-        valMin = 0.85;
+        valMin = 0.8;
         valMax = 1;
     end
     

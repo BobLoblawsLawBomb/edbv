@@ -3,6 +3,7 @@
 img = imread('res/table_test-1.png');
 mask = table_mask(img);
 image = img .* mask;
+imshow(image)
 [BWComponents, ColorComponents] = connectedComponent(image);
 red = [];
 [dim num] = size(ColorComponents);
@@ -22,7 +23,6 @@ for x = 1:num
     mask = repmat( mask, [1 1 3]);
     component = mask .* current;
     imshow(component);
-    
     
 %     % hier faerben wir die Component mit der durschnittlichen Farbe ein 
 %     mean_color = meanImageColor(component);
@@ -91,7 +91,7 @@ for x = 1:num
     new_comp(:,:,2) = comp_green;
     new_comp(:,:,3) = comp_blue;
     
-    imshow(new_comp);
+     imshow(uint8(new_comp));
     
 %     % - - - Ende der Einfarbung - - - 
 %    

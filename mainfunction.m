@@ -7,7 +7,10 @@ function [ output_args ] = mainfunction()%argument:  video_path
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 %
-video_path = [pwd,filesep,'res',filesep,'test_short2_2.mp4'];
+video_path = [pwd,filesep,'res',filesep,'test_hd_4.mp4'];
+
+
+
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
 converter = vision.ImageDataTypeConverter; 
@@ -21,9 +24,12 @@ videoPlayer = vision.VideoPlayer('Name','Motion Vector');
 %Tisch ausschneiden / Maske erstellen
 frameNo = 1;
 frame = step(videoReader);
-im = step(converter, frame);
-mask = table_mask(im);
-im = im.*mask;
+im2 = step(converter, frame);
+mask = table_mask(im2);
+im2 = im2.*mask;
+
+im = imresize(im2,[360 NaN]);
+
 gim = single(rgb2gray(im))./255;
 
 %TODO: Matrix anlegen die f?r jeden Ball die Component-Maske speichert.
@@ -60,14 +66,30 @@ while ~isDone(videoReader)
         %kann noch fragmente vom tisch bzw. k? enthalten
         [resultBW, resultColor, resultRaw] = connectedComponent(im);
                 
+        
+      
+%         diameterList = zeros(length(resultBW(:)));
+        
         %Component Velocities f?r jeden Ball im ersten Frame auf 0 setzen
         for i=1:length(resultBW(:))
             compPosition(:, :, i, frameNo) = getPositionOfComponent(resultBW{i});
             compVelocity(:, :, i, 1) = [0 0];
+            
+%             s =  regionprops(resultBW{i},'EquivDiameter');
+%             diameterList(i) = s.EquivDiameter;
+            
         end
+                
     else
         %N?chsten Frame auslesen
-        im = step(converter, step(videoReader)).*mask;
+%         im2 = step(converter, step(videoReader)).*mask;
+        im2 = step(converter, step(videoReader));
+        
+        mask = table_mask(im2);
+        im2 = im2.*mask;
+        
+        im = imresize(im2,[360 NaN]);
+        
         gim = single(rgb2gray(im))./255;
         
         %Components im neuen Frame finden und passende Maske speichern.

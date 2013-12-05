@@ -1,4 +1,4 @@
-function [ runlengthTable ] = ccl_buttonUpLabeling(runlengthTable )
+function [ runlengthTable ] = ccl_bottomUpLabeling(runlengthTable )
 
 % labeling von unten nach oben
 % für jede Zeichenkette in der runlengthTable wird überprüft, ob die

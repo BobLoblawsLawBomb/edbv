@@ -3,6 +3,7 @@ classdef RedBucket < AbstractBucket
     %   Detailed explanation goes here
     
     properties(Constant = true)
+        colorName = 'Red';
         rgbColor = [255,0,0];
         hueMin = 310/360;
         hueMax = 40/360;

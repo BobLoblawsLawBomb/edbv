@@ -3,6 +3,7 @@ classdef BlueBucket < AbstractBucket
     %   Detailed explanation goes here
     
     properties(Constant = true)
+        colorName = 'Blue';
         rgbColor = [0,0,255];
         hueMin = 190/360;
         hueMax = 250/360;

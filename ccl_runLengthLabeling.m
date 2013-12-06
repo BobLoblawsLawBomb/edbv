@@ -1,4 +1,6 @@
-function [ runlengthTable ] = ccl_runLengthLabeling( bw_img )
+function [ runlengthTable ] = ccl_runLengthLabeling()
+%function [ runlengthTable ] = ccl_runLengthLabeling( bw_img )
+
 % n Reihen, 4 Spalten: Aktuelle Reihe, start, ende, Label
 
 img = imread('res/connected1.png');
@@ -35,15 +37,16 @@ for x = 1:size(bw_img,2)
              
              % vorläufiges Label
               [~, num] = size(runlengthTable);
-             if ~isempty(runlengthTable{1})
-                 label = num + 1;
-             else
-                 label = 1;
-             end
+%              if ~isempty(runlengthTable{1})
+%                  label = num + 1;
+%              else
+%                  label = 1;
+%              end
+             label = count;
              
              % Schleife läuft, bis das Ende der Zeichenkette erreicht ist
              while (cursor_row <= length(currentRow)) && (currentRow(cursor_row) ~= 0)
-                 if x>1
+                 if x > 1
                     bool = 1;
                     % für jede Zeichenkette eine Zeile darüber wird
                     % überprüft, ob die Zeichenkette direkt über dem
@@ -52,7 +55,7 @@ for x = 1:size(bw_img,2)
                          if ~isempty(runlengthTable{1}) && runlengthTable{1,num}(1) == (x-1)
                              if (runlengthTable{1,num}(2)<=cursor_row) && (runlengthTable{1,num}(3)>=cursor_row)
                                  if label > runlengthTable{1,num}(4)
-                                    label = runlengthTable{1,num}(4);
+                                     label = runlengthTable{1,num}(4);
                                  end
                              end
                          else

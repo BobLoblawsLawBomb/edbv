@@ -7,7 +7,7 @@ classdef RedBucket < AbstractBucket
         rgbColor = [255,0,0];
         hueMin = 310/360;
         hueMax = 40/360;
-        satMin = 0.30;
+        satMin = 0.435;
         satMax = 1;
         valMin = 0.70;
         valMax = 1;

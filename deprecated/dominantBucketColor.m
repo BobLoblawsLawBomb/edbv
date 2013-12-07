@@ -7,23 +7,29 @@ function [ dominantColor ] = dominantBucketColor( img, bucketCount, offset )
 %   @author Maximilian Irro
 
     buckets = zeros(bucketCount);
+    satBuckets = zeros(bucketCount);
+    valBuckets = zeros(bucketCount);
     
     tableMask = im2bw(img,0.000001);
 
     hsv = rgb2hsv(img);
     hue = hsv(:,:,1);
-    
-    % TODO: Wie ist denn die hue der schwarzen ausmaskierten Pixel? Dazu
-    % muesse man sich eigentloch das value anschauen um die herauszufiltern
-    
+    sat = hsv(:,:,2);
+    val = hsv(:,:,3);
     
     % wir bauen uns ein Fenster, mit dem wir die Farben diskriminieren. Die
     % Hue wir zwar meistens zwischen 0-360 Grad angegeben, der Wert liegt
     % aber zwischen [0,1]. Wir muessen also umrechnen. 
+    %
+    % http://stackoverflow.com/questions/17932166/color-pass-filter-by-hue
     
     windowSize = 1 / bucketCount;
     windowStart = 1-windowSize/2; % Rot ist von ~330-30 Grad
     windowEnd = windowSize/2;
+    
+    satWindowStart = 0;
+    satWindowEnd = 1 / bucketCount;
+    
     for b = 1 : bucketCount
        
        if b == 1 % Uebergang zwischen 0/1 muss anders behandelt werden
@@ -31,6 +37,17 @@ function [ dominantColor ] = dominantBucketColor( img, bucketCount, offset )
        else
            colorMask = hue>windowStart & hue<windowEnd; 
        end
+       
+       % ### ### ###
+       satMask = sat>satWindowStart & sat<satWindowEnd;
+       satBuckets(b) = nnz( satMask .* tableMask );
+       
+       valMask = val>satWindowStart & sat<satWindowEnd;
+       valBuckets(b) = nnz( valMask .* tableMask );
+       
+       satWindowStart = satWindowStart + windowSize;
+       satWindowEnd = satWindowEnd + windowSize;
+       % ### ### ###
        
        % wir maskieren den Tisch aus (ausmaskierte Pixel = 0 wuerden als Rot
        % klassifiziert werden) und schneiden schliesslich noch alles auf
@@ -52,6 +69,13 @@ function [ dominantColor ] = dominantBucketColor( img, bucketCount, offset )
     end
     
     [colorElementCount, bucketIndex] = max(buckets(:));
+    
+    % ### ### ###
+    [satElementCount, satBucketIndex] = max(satBuckets(:)); 
+    [valElementCount, valBucketIndex] = max(valBuckets(:)); 
+    satBucketIndex
+    valBucketIndex
+    % ### ### ###
 
     dominantColor = 1/bucketCount * bucketIndex - 1/bucketCount + 0.001;
 end

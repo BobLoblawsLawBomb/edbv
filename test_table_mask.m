@@ -1,4 +1,4 @@
-path = ['res',filesep,'table_test-6.png'];
+path = ['res',filesep,'table_test-1.png'];
 img = imread(path);
 mask = table_mask(img);
 

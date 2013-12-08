@@ -13,9 +13,9 @@ im_gray = rgb2gray(masked_img);
 %             0  0  0
 %           -10 -9 -10 ];
 
-kernel = [ 15  10  10 
-            0   0   0
-          -15 -10 -15 ];
+%kernel = [10,9,10,0,0,0,-10,-9,-10];
+%kernel = [ 10,10,10; 0,0,0; -10,-10,-10 ];
+kernel = [ 15,10,10; 0,0,0; -15,-10,-15 ];
 
 % Jetzt wenden wir einen "ma?geschneiderten" Gradientenfilter an. 
 % Je wilder der Kernel aussieht, desto besser das Ergebnis fuer
@@ -53,10 +53,12 @@ im_thickend = bwmorph(im_bw,'thicken',6);
 
 % Jetzt erzeugen wir eine neue Maske aus den erkannten Punkten. 
 ball_mask = zeros(size(im_gray));
+
 for i=1:size(radii)
     cx = round(centers(i,2));
     cy = round(centers(i,1));
-    %radius = radii(i);
+    radius = radii(i);
+    %insertShape(uint8(ball_mask),'FilledCircle',[cx,cy,radius]);
     ball_mask(cx,cy) = 1; 
 end
 

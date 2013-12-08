@@ -38,7 +38,7 @@ color_img = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
 
 resultRaw = L;
 
-%berechne möglichst passende komponente für eine kugel
+%berechne m?glichst passende komponente f?r eine kugel
 %annahme: 
 %   der glanzpunkt ist auf der x-achse in der mitte
 %   der glanzpunkt endet auf der y-achse oben genau wo die kugel endet
@@ -84,14 +84,14 @@ for x = 1:num
 
         rcx(rx3 == 0) = 0;
 
-        cform = makecform('srgb2lab');
-        lab = applycform(rcx,cform);
-        rg_chroma = lab(:,:,2);
-        THRESHOLD = 0.40;
-        BW = im2bw(rg_chroma, THRESHOLD);
-        mask = uint8(BW);
-        mask = repmat( mask, [1 1 3]);
-        rcx = mask .* rcx;
+%         cform = makecform('srgb2lab');
+%         lab = applycform(rcx,cform);
+%         rg_chroma = lab(:,:,2);
+%         THRESHOLD = 0.40;
+%         BW = im2bw(rg_chroma, THRESHOLD);
+%         mask = uint8(BW);
+%         mask = repmat( mask, [1 1 3]);
+%         rcx = mask .* rcx;
 
 %         imshow(rcx);
 

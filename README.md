@@ -55,18 +55,18 @@ Nachbearbeitung:
 **(im Prinzip fertig; Gerald, Andreas)**
 
 | Update: 05.12.2013 - Neue vorgehensweise zum Erkennen der passenden Components im folgenden Frame |
-1. Optical Flow durchf¸hren
-2. Optical Flow Raster in Richtungen klassifizieren. 
-3. F¸r jede gefundene Richtungs-Klasse wird eine maske erstellt, bei der ein dynamischer Threshold verwendet wird um nur relevante geschwindigkeiten zu ber¸cksichtigen.
-4. Auf jede dieser Masken wird component-labeling angewandt.
-5. F¸r jedes dieser Components werden Schnittpunkte von Kreisfˆrmigen arealen um die Mittelpunkte der Components berechnet.
-6. F¸r jeden dieser Schnittpunkte werden mittlere geschwindigkeiten aus den beteiligten arealen berechnet.
-7. In einem Kreisfˆrmigen Areal um diesen Schnittpunkt wird nach bekannten Positionen von "Ball"-Komponenten aus dem vorherigen Frame gesucht.
-8. F¸r jede dieser Positionen wird eine neue position mithilfe der mittleren geschwindigkeit vorhergesagt.
-9. um die vorhergesagte neue position herum wird mittels component labeling nach Ball-komponenten gesucht.
-10. Falls mehrere Ballkomponenten gefunden werden wird die mit dem geringsten abstand zur vorhergesagten position gew‰hlt.
-11. Die neue Position der gew‰hlten komponente wird als folge-position der alten position gesetzt.
-Falls bei Punkt 7 bekannte Position im areal zu finden ist wird sofort mit punkt 9 fortgesetzt und eventuell gefundene Komponenten als neue Komponenten zur liste hinzugef¸gt.
+* 1. Optical Flow durchf√ºhren
+* 2. Optical Flow Raster in Richtungen klassifizieren. 
+* 3. F√ºr jede gefundene Richtungs-Klasse wird eine maske erstellt, bei der ein dynamischer Threshold verwendet wird um nur relevante geschwindigkeiten zu ber√ºcksichtigen.
+* 4. Auf jede dieser Masken wird component-labeling angewandt.
+* 5. F√ºr jedes dieser Components werden Schnittpunkte von Kreisf√∂rmigen arealen um die Mittelpunkte der Components berechnet. **getCirclesForPositions, intersectMasks**
+* 6. F√ºr jeden dieser Schnittpunkte werden mittlere geschwindigkeiten aus den beteiligten arealen berechnet.
+* 7. In einem Kreisf√∂rmigen Areal um diesen Schnittpunkt wird nach bekannten Positionen von "Ball"-Komponenten aus dem vorherigen Frame gesucht. **getCirclesForPositions, connectedComponent**
+* 8. F√ºr jede dieser Positionen wird eine neue position mithilfe der mittleren geschwindigkeit vorhergesagt.
+* 9. um die vorhergesagte neue position herum wird mittels component labeling nach Ball-komponenten gesucht.
+* 10. Falls mehrere Ballkomponenten gefunden werden wird die mit dem geringsten abstand zur vorhergesagten position gew√§hlt.
+* 11. Die neue Position der gew√§hlten komponente wird als folge-position der alten position gesetzt.
+Falls bei Punkt 7 bekannte Position im areal zu finden ist wird sofort mit punkt 9 fortgesetzt und eventuell gefundene Komponenten als neue Komponenten zur liste hinzugef√ºgt.
 
 | Update: 11.11.2013 - Offene Punkte |
 --------------------------------------
@@ -76,7 +76,7 @@ Falls bei Punkt 7 bekannte Position im areal zu finden ist wird sofort mit punkt
 - VektorMatrix anlegen die f√ºr jeden Frame f√ºr jeden Ball einen Richtungsvektor speichert
 - Ersten ComponentLabeling-Aufruf starten
 - Neue Positionen in die Matrix schreiben (Funktion verwenden)
-- Weitere Durchl√§ufe mittels ‚Äúvermutlicher‚Ä? Position (anhand der alten Positionen und OpticalFlow)
+- Weitere Durchl√§ufe mittels ‚ÄúvermutlicherÔøΩÔøΩ? Position (anhand der alten Positionen und OpticalFlow)
 - Positions- und Richtungsvektoren schreiben (=> wenn eine Kugel in einem Loch verschwindet, m√ºssen trotzdem Werte in die Matrix geschrieben werden: letzter Wert (bei Positionsvektoren) bzw. 0 (bei Richtungsvektoren)
 
 **Funktionen und Programmteile:**

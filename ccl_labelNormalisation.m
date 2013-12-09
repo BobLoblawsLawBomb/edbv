@@ -3,7 +3,7 @@ function [ components_img, labelCount ] = ccl_labelNormalisation(runlengthTable,
 %img = imread('res/connected1.png');
 %bw_img = im2bw(img, 0.50);
 
-runlengthTable = ccl_bottomUpLabeling();
+%runlengthTable = ccl_bottomUpLabeling();
 
 
 % hier werden die Werte der Labels zuerst normalisiert, sodass diese eine
@@ -55,6 +55,8 @@ for tableIndex = 1:num
   
 end
 
+% TODO: labelCount richtig setzen!!!!
+labelCount = 0;
 % TEST
 imshow(label2rgb(components_img));
 end

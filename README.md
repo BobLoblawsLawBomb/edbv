@@ -55,18 +55,18 @@ Nachbearbeitung:
 **(im Prinzip fertig; Gerald, Andreas)**
 
 | Update: 05.12.2013 - Neue vorgehensweise zum Erkennen der passenden Components im folgenden Frame |
-* 1. Optical Flow durchf�hren
+* 1. Optical Flow durchführen
 * 2. Optical Flow Raster in Richtungen klassifizieren. 
-* 3. F�r jede gefundene Richtungs-Klasse wird eine maske erstellt, bei der ein dynamischer Threshold verwendet wird um nur relevante geschwindigkeiten zu ber�cksichtigen.
+* 3. Für jede gefundene Richtungs-Klasse wird eine maske erstellt, bei der ein dynamischer Threshold verwendet wird um nur relevante geschwindigkeiten zu berücksichtigen.
 * 4. Auf jede dieser Masken wird component-labeling angewandt.
-* 5. F�r jedes dieser Components werden Schnittpunkte von Kreisf�rmigen arealen um die Mittelpunkte der Components berechnet.
-* 6. F�r jeden dieser Schnittpunkte werden mittlere geschwindigkeiten aus den beteiligten arealen berechnet.
-* 7. In einem Kreisf�rmigen Areal um diesen Schnittpunkt wird nach bekannten Positionen von "Ball"-Komponenten aus dem vorherigen Frame gesucht.
-* 8. F�r jede dieser Positionen wird eine neue position mithilfe der mittleren geschwindigkeit vorhergesagt.
+* 5. Für jedes dieser Components werden Schnittpunkte von Kreisförmigen arealen um die Mittelpunkte der Components berechnet.
+* 6. Für jeden dieser Schnittpunkte werden mittlere geschwindigkeiten aus den beteiligten arealen berechnet.
+* 7. In einem Kreisförmigen Areal um diesen Schnittpunkt wird nach bekannten Positionen von "Ball"-Komponenten aus dem vorherigen Frame gesucht.
+* 8. Für jede dieser Positionen wird eine neue position mithilfe der mittleren geschwindigkeit vorhergesagt.
 * 9. um die vorhergesagte neue position herum wird mittels component labeling nach Ball-komponenten gesucht.
-* 10. Falls mehrere Ballkomponenten gefunden werden wird die mit dem geringsten abstand zur vorhergesagten position gew�hlt.
-* 11. Die neue Position der gew�hlten komponente wird als folge-position der alten position gesetzt.
-Falls bei Punkt 7 bekannte Position im areal zu finden ist wird sofort mit punkt 9 fortgesetzt und eventuell gefundene Komponenten als neue Komponenten zur liste hinzugef�gt.
+* 10. Falls mehrere Ballkomponenten gefunden werden wird die mit dem geringsten abstand zur vorhergesagten position gewählt.
+* 11. Die neue Position der gewählten komponente wird als folge-position der alten position gesetzt.
+Falls bei Punkt 7 bekannte Position im areal zu finden ist wird sofort mit punkt 9 fortgesetzt und eventuell gefundene Komponenten als neue Komponenten zur liste hinzugefügt.
 
 | Update: 11.11.2013 - Offene Punkte |
 --------------------------------------

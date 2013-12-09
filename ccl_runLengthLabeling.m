@@ -52,12 +52,11 @@ count = 1;
          while cursor_row <= length(currentRow) && cursor_ind <= length(indices)
              % Start der Zeichenkette und Cursor fuer Reihe und Index-Vektor setzen
              start_string = indices(cursor_ind);
-             %cursor_row = start_string + 1;
-             %cursor_ind = cursor_ind + 1;
+             cursor_row = start_string;
+             cursor_ind = cursor_ind + 1;
              
              % vorlaeufiges Label
-              [~, num] = size(runlengthTable);
-%              if ~isempty(runlengthTable{1})
+              
 %                  label = num + 1;
 %              else
 %                  label = 1;
@@ -65,19 +64,31 @@ count = 1;
              label = count;
              
              % Schleife laeuft, bis das Ende der Zeichenkette erreicht ist
+            % length(currentRow)
+            % currentRow(cursor_row)
+            % cursor_row
              while (cursor_row <= length(currentRow)) && (currentRow(cursor_row) ~= 0)
                  if x > 1
                     bool = 1;
                     % fuer jede Zeichenkette eine Zeile darueber wird
                     % ueberprueft, ob die Zeichenkette direkt ueber dem
                     % aktuellen Element liegt
+                    [~, num] = size(runlengthTable);
                      while bool && num > 0
-                        % blubb = runlengthTable{1,num}(1);
-                         if ~isempty(runlengthTable{1}) && runlengthTable{1,num}(1) == (x-1)
-                             if (runlengthTable{1,num}(2)<=cursor_row) && (runlengthTable{1,num}(3)>=cursor_row)
-                                 if label > runlengthTable{1,num}(4)
+                       blubb = runlengthTable{1,num}(1);
+                         if ~isempty(runlengthTable{1}) && runlengthTable{1,num}(1) >= (x-1)
+                             if (runlengthTable{1,num}(2)<cursor_row) && (runlengthTable{1,num}(3)>cursor_row)
+                                if label > runlengthTable{1,num}(4)
                                      label = runlengthTable{1,num}(4);
-                                 end
+                                end
+                             elseif cursor_row == runlengthTable{1,num}(2)
+                                if label > runlengthTable{1,num}(4)
+                                     label = runlengthTable{1,num}(4);
+                                end 
+                             elseif cursor_row == runlengthTable{1,num}(3)
+                                if label > runlengthTable{1,num}(4)
+                                     label = runlengthTable{1,num}(4);
+                                end 
                              end
                          else
                              bool = 0;
@@ -92,6 +103,7 @@ count = 1;
              
              % Ende der Zeichenkette angeben
              end_string = cursor_row - 1;
+             cursor_ind = cursor_ind - 1;
              
              % codierte Zeichenkette in Tabelle speichern
              runlengthTable{count} = [x start_string end_string label];

@@ -37,6 +37,10 @@ for x=1:num
     
 end
 
+% die Anzahl an individuellen Labels istgleichtzeitg die Menge 
+% angefunden Components
+labelCount = normalizedLabelCount;
+
 % jetzt bauen wir aus unserem Binaerbild noch ein neues Bild auf, in dem
 % alle Pixel einer Components mit ihrem Componentlabel versehen ist
 

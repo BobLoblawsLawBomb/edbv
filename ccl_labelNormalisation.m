@@ -37,10 +37,6 @@ for x=1:num
     
 end
 
-% der erste Rueckgabeparameter ist bereits fertig!
-%num = normalizedLabelCount;
-
-
 % jetzt bauen wir aus unserem Binaerbild noch ein neues Bild auf, in dem
 % alle Pixel einer Components mit ihrem Componentlabel versehen ist
 
@@ -55,14 +51,12 @@ for tableIndex = 1:num
     label = data(4);
     %[row, startX, endX, label] = runlengthTable{tableIndex};
     
-    for x=startX:endX
-        components_img(row,x) = label;
-    end
+    components_img(row, startX:endX) = label;
   
 end
 
 % TEST
-imshow(label2rgb(components_img))
+imshow(label2rgb(components_img));
 end
      
      

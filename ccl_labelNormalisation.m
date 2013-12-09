@@ -38,7 +38,7 @@ for x=1:num
 end
 
 % der erste Rueckgabeparameter ist bereits fertig!
-num = normalizedLabelCount;
+%num = normalizedLabelCount;
 
 
 % jetzt bauen wir aus unserem Binaerbild noch ein neues Bild auf, in dem

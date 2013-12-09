@@ -35,13 +35,13 @@ test = [ 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0;
 
 % Tabelle der Zeichenketten der Zeilen
 runlengthTable = cell(1);
-col = size(test,1);
+
 count = 1;
-%for x = 1:size(bw_img,2)
- for x = 1:size(test,1)   
+for x = 1:size(bw_img,1)
+% for x = 1:size(test,1)   
      % x-te zeile aus tabelle holen
-     %currentRow = bw_img(x,:);
-     currentRow = test(x,:);
+     currentRow = bw_img(x,:);
+     %currentRow = test(x,:);
       
      % Indizes der nonzero-Elemente des Zeilenvektors
      indices = find(currentRow);
@@ -75,7 +75,6 @@ count = 1;
                     % aktuellen Element liegt
                     [~, num] = size(runlengthTable);
                      while bool && num > 0
-                       blubb = runlengthTable{1,num}(1);
                          if ~isempty(runlengthTable{1}) && runlengthTable{1,num}(1) >= (x-1)
                              if (runlengthTable{1,num}(2)<cursor_row) && (runlengthTable{1,num}(3)>cursor_row)
                                 if label > runlengthTable{1,num}(4)

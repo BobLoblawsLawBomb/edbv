@@ -19,13 +19,19 @@ for x = drange(num:-1:1)
                     check = 1;
                 elseif runlengthTable{x}(2) < runlengthTable{counter}(2) && runlengthTable{x}(3) == runlengthTable{counter}(3)
                     check = 1;
+                elseif runlengthTable{x}(2) > runlengthTable{counter}(2) && runlengthTable{x}(3) == runlengthTable{counter}(3)
+                    check = 1;
                 elseif runlengthTable{x}(2) == runlengthTable{counter}(2) && runlengthTable{x}(3) > runlengthTable{counter}(3)
                     check = 1;
-                elseif runlengthTable{x}(2) < runlengthTable{counter}(2) && runlengthTable{x}(3) > runlengthTable{counter}(2)
-                    check = 1;
-                elseif runlengthTable{x}(2) > runlengthTable{counter}(2) && runlengthTable{x}(2) < runlengthTable{counter}(3)
+                elseif runlengthTable{x}(2) == runlengthTable{counter}(2) && runlengthTable{x}(3) < runlengthTable{counter}(3)
                     check = 1;
                 elseif runlengthTable{x}(2) < runlengthTable{counter}(2) && runlengthTable{x}(3) > runlengthTable{counter}(3)
+                    check = 1;
+                elseif runlengthTable{x}(2) > runlengthTable{counter}(2) && runlengthTable{x}(3) < runlengthTable{counter}(3)
+                    check = 1;
+                elseif runlengthTable{x}(2) == runlengthTable{counter}(3) 
+                    check = 1;
+                elseif runlengthTable{x}(3) == runlengthTable{counter}(2) 
                     check = 1;
                 end
             end

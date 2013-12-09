@@ -6,4 +6,4 @@ imshow(image)
 
 [BWComponents, ColorComponents] = connectedComponent(image);
 
-[ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( colorComponents );
+[ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( ColorComponents );

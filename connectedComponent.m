@@ -6,39 +6,23 @@ function [ resultBW, resultColor, resultRaw] = connectedComponent( table_mask )
 %Koe als Glanzpunkte interpretiert.
 %Ausgabe: resultBW: ist ein n-dim. cell-Element, das in jeder Zelle ein Bin?rbild
 %einer Komponente enth?llt. insgesammt sind es n Components
-%Azsgabe: resultColor: ist ebenfalls ein n-dim. cell-Element, das in jeder Zelle
+%Ausgabe: resultColor: ist ebenfalls ein n-dim. cell-Element, das in jeder Zelle
 %ein farbiges Bild (also ein 3-dim RGB-Bild) einer Komponente enth?lt.
 
 img = table_mask;
-%aus dem bild wird binaerbild, nur die hellsten stellen werden wei?
-%k? und linke und rechte obere Ecke werden auch erkannt 
+
+%aus dem bild wird binaerbild, nur die hellsten stellen werden weiss
+%koe und linke und rechte obere Ecke werden auch erkannt 
 BW = im2bw(img , 0.50);%0.60
-
-%farbigen Componenten werden ermittelt
-%dabei wurde das gesamtBild in 2 Componenten geteilt: 
-%Hintergrund und Kugeln
-%[ component1, component2 ] = coloredComponents(img);
-
 BW = im2uint8(BW);
-%BW3 = cat(3, BW, BW, BW);
-
-%alles, was nicht zu einem 'Glanzpunkt' geh?rt, wird schwarz
-%component1(BW3 == 0) = 0;
-%component2(BW3 == 0) = 0;
-
-
 color_img = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
-
-%Addition der farbigen Components,
-%da die gelbe Kugel auch als Hintergrund erkannt wird.
-%coloredComponent = component1 + component2;
 
 %elemente von einander trennen
 [L, num] = bwlabeln(BW, 4);
 
 resultRaw = L;
 
-%berechne m?glichst passende komponente f?r eine kugel
+%berechne moeglichst passende komponente fuer eine kugel
 %annahme: 
 %   der glanzpunkt ist auf der x-achse in der mitte
 %   der glanzpunkt endet auf der y-achse oben genau wo die kugel endet

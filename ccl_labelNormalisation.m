@@ -1,7 +1,7 @@
 function [ components_img, labelCount ] = ccl_labelNormalisation(runlengthTable, bw_img)
 %function [ components_img, labelCount ] = ccl_labelNormalisation(runlengthTable, bw_img)
-img = imread('res/connected1.png');
-bw_img = im2bw(img, 0.50);
+%img = imread('res/connected1.png');
+%bw_img = im2bw(img, 0.50);
 
 runlengthTable = ccl_bottomUpLabeling();
 

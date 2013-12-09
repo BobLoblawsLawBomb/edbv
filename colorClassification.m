@@ -1,4 +1,4 @@
-%function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( colorComponents )
+function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( colorComponents )
 
 %====================================
 % fuer Testzwecke
@@ -10,21 +10,27 @@ imshow(image)
 %====================================
 
 
-% das hier sind die Farbklassen, in die jede Component eingeordnet wird
-red = {};
-white = {};
-black = {};
-green = {};
-blue = {};
-yellow = {};
-pink = {};
-brown = {};
+% Das hier sind die Farbklassen, in die jede Component eingeordnet wird.
+% Aus Performancegruenden allokieren wir den Speicer bereits vorher. Wir
+% wissen ja wie viele Kugel maximal in jedem Bucket sein koennen (naja,
+% sollten...)
+red = cell(15);
+white = cell(1);
+black = cell(1);
+green = cell(1);
+blue = cell(1);
+yellow = cell(1);
+pink = cell(1);
+brown = cell(1);
 
 [dim num] = size(ColorComponents);
 
 for x = 1:num
     
     current = ColorComponents{x};
+    
+    size(current)
+    
     imshow(current)
 
     %gruener Teil wegschneiden
@@ -68,25 +74,25 @@ for x = 1:num
     if isa(ballClass, 'RedBucket')
         redSize = size(red);
         red{redSize(2)} = red{redSize(2)}+1;
-    else if isa(ballClass, 'WhiteBucket')
+    elseif isa(ballClass, 'WhiteBucket')
         whiteSize = size(white);
         white{whiteSize(2)} = white{whiteSize(2)}+1;    
-    else if isa(ballClass, 'BlackBucket')
+    elseif isa(ballClass, 'BlackBucket')
         blackSize = size(black);
-        black{blackSize(2)} = black{blackSize(2)}+1;        
-    else if isa(ballClass, 'GreenBucket')
+        black{blackSize(2)} = black{blackSize(2)}+1; 
+    elseif isa(ballClass, 'GreenBucket')
         greenSize = size(green);
-        green{greenSize(2)} = green{greenSize(2)}+1;            
-    else if isa(ballClass, 'BlueBucket')
+        green{greenSize(2)} = green{greenSize(2)}+1;     
+    elseif isa(ballClass, 'BlueBucket')
         blueSize = size(blue);
-        blue{blueSize(2)} = blue{blueSize(2)}+1;        
-    else if isa(ballClass, 'YellowBucket')
+        blue{blueSize(2)} = blue{blueSize(2)}+1;
+    elseif isa(ballClass, 'YellowBucket')
         yellowSize = size(yellow);
-        yellow{yellowSize(2)} = yellow{yellowSize(2)}+1;        
-    else if isa(ballClass, 'PinkBucket')
+        yellow{yellowSize(2)} = yellow{yellowSize(2)}+1;  
+    elseif isa(ballClass, 'PinkBucket')
         pinkSize = size(pink);
         pink{pinkSize(2)} = pink{pinkSize(2)}+1;        
-    else if isa(ballClass, 'BrownBucket')
+    elseif isa(ballClass, 'BrownBucket')
         brownSize = size(brown);
         brown{brownSize(2)} = brown{brownSize(2)}+1;
     end

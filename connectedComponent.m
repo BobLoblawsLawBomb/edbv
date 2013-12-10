@@ -9,16 +9,27 @@ function [ resultBW, resultColor, resultRaw] = connectedComponent( table_mask )
 %Ausgabe: resultColor: ist ebenfalls ein n-dim. cell-Element, das in jeder Zelle
 %ein farbiges Bild (also ein 3-dim RGB-Bild) einer Komponente enth?lt.
 
+% zum Testen
+% path = ['res',filesep,'table_test-1.png'];
+% img = imread(path);
+% mask = table_mask(img);
+% im2 = img.*mask;
+
+%im = imresize(im2,[360 NaN]);
+
 img = table_mask;
+%img = table_mask;
 
 %aus dem bild wird binaerbild, nur die hellsten stellen werden weiss
 %koe und linke und rechte obere Ecke werden auch erkannt 
 BW = im2bw(img , 0.50);%0.60
-BW = im2uint8(BW);
-color_img = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
 
 %elemente von einander trennen
-[L, num] = bwlabeln(BW, 4);
+%[L, num] = bwlabeln(BW, 4);
+[L, num] = ccl_labeling(BW);
+
+BW = im2uint8(BW);
+color_img = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
 
 resultRaw = L;
 

@@ -59,8 +59,39 @@ for tableIndex = 1:num
   
 end
 
-% TODO: labelCount richtig setzen!!!!
-labelCount = 0;
+
+% hier sollen noch alle components eliminiert werden, die zu
+% klein/gross sind, und daher keine baelle sein koennen
+
+newLabelCount = labelCount;
+for label=1:labelCount
+    
+    % fuer jedes label alles ausmaskieren, was nicht das label ist
+    comp = components_img(components_img==label);
+    
+    % die flaeche der component ist somit die anzahl aller
+    % pixel ungleich 0
+    areaSize = nnz(comp);
+    
+    % TODO: hier brauchen wir noch das grnezintervall einer validen
+    % ballgroe?e. diese muss klein genug sein, um einen ball zu
+    % akzeptieren der nur aus seinem glanzpunkt besteht, sowie die,
+    % welche komplett erkannt werde (weiss und gelb)
+    if not(minSize <= areaSize && areaSize <= maxSize)
+        
+        % falls das nicht gegeben ist, wird das label verworfen
+        components_img(components_img==label) = 0;
+        newLabelCount = newLabelCount - 1;
+    end
+    
+end
+
+% ACHTUNG: wenn labels verworfen wurden, ist nicht mehr gegeben,
+% dass die labels von 1:n durchnummeriert sind. es sind luecken
+% entstanden, die durch eine erneute normalisierung wieder gefuellt
+% werden muessen
+
+
 % TEST
 %figure(4)
 %imshow(label2rgb(components_img));

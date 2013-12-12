@@ -88,7 +88,8 @@ for x = 1:num
 %         mask = repmat( mask, [1 1 3]);
 %         rcx = mask .* rcx;
 
-%         imshow(rcx);
+         imshow(rcx);
+         imshow(color_img);
 
         color_img = color_img + rcx;
         resultColor{x} = rcx;

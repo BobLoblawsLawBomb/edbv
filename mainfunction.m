@@ -64,10 +64,8 @@ while ~isDone(videoReader)
         %TODO: Erstes Component Labeling anwenden
         %componenten nach label getrennt, 
         %kann noch fragmente vom tisch bzw. k? enthalten
-        [resultBW, resultColor, resultRaw] = connectedComponent(im);
-                
+        [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
         
-      
 %         diameterList = zeros(length(resultBW(:)));
         
         %Component Velocities f?r jeden Ball im ersten Frame auf 0 setzen
@@ -166,64 +164,33 @@ while ~isDone(videoReader)
         end
         
         %berechne optical-flow komponenten
-        angleVariance = 5; %ähnlichkeitsumgebung in grad
-        velocityThreshold = 0.001;
+        %         OpticalFlow_Analysis1(of);
+%         OpticalFlow_Analysis2(of);
         
-        [ofw, ofh] = size(of);
-        ofAngle = angle(of);
+        %Bewegende Komponenten des Bildes finden (wo sich bälle bewegen könnten)
         ofVelocity = abs(of);
-        ofAngleListAll = reshape(ofAngle, ofw*ofh, 1);
-        ofVelocityListAll = reshape(ofVelocity, ofw*ofh, 1);
+        ofVelocityFiltered = zeros(size(ofVelocity));
+        ofVelocityFiltered(ofVelocity(:,:) > 0.01) = 1;
+        [of_comps, of_comp_count] = ccl_labeling( ofVelocityFiltered );
         
-        ofAngleListTrim = ofAngleListAll(ofVelocityListAll(:) > velocityThreshold);
+        %opticalFlow masks und positions matrix erstellen
         
-        ofAngleListSorted = sort(radtodeg(ofAngleListTrim)); % von bei pos 1 weg: -180 < angle <= 180
-        ofAngleUniqueList = unique(ofAngleListSorted);
-        ofAngleCountList = zeros(size(ofAngleUniqueList));
         
-        disp([size(ofAngleUniqueList) size(ofAngleListSorted)]);
-        
-        for k = 1 : size(ofAngleUniqueList)
-            anglek = ofAngleUniqueList(k);
-            %zähle ähnliche richtungen in gewissem bereich
-            edge1 = anglek - angleVariance;
-            if edge1 <= -180
-                edge1 = edge1 + 360;
-            end
-            
-            edge2 = anglek + angleVariance;
-            if edge2 > 180
-                edge2 = edge2 - 360;
-            end
-            
-            if edge1 > edge2   % achtung: der zu betrachtende bereich springt von 180 zu -180
-                n = histc(ofAngleListSorted, [-inf edge2 edge1 inf]);
-                ofAngleCountList(k) = n(1) + n(3);
-            else
-                n = histc(ofAngleListSorted, [edge1 edge2]);
-                ofAngleCountList(k) = n(1);
-            end
+        %liste der alten Positionen der Bälle
+        for i = 1 : length(compPosition(:, :, :, frameNo - 1))
+            oldCompPositions = compPosition(:, :, i, frameNo - 1);
         end
         
-        fig3 = figure(3);
-        of_max = max(max(max(abs(of))));
-        color_of = double(repmat(output_vmask, [1 1 3]));
-        color_of(:,:,1) = 0.5 + ofAngle/(2*pi);
-        color_of(:,:,2) = 1;
-        color_of(:,:,3) = abs(of)/of_max;
-        imshow(hsv2rgb(color_of));
+        %Bälle im neuen Frame finden
+        [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
         
-        print(fig3, '-dpng', [pwd filesep 'results' filesep 'OF_Color_' num2str(frameNo) '.png'])
+        %Jede neue Position versuchen mit einer alten zu verknüpfen
+        for i = 1 : length(resultBW(:))
+            newCompPosition = getPositionOfComponent(resultBW{i});
+            oldCompIndex = linkNewPositionWithOldPosition_modified( oldCompPositions, newCompPosition, intensityMasks, intensityPositions, of, 5);
+        end
         
-        [pks, locs] = findpeaks(ofAngleCountList, 'MINPEAKHEIGHT', 1, 'THRESHOLD', 3);
         
-        fig2 = figure(2);
-        bar(ofAngleUniqueList, ofAngleCountList, 'BarWidth', 1);
-        ylim([0 2000])
-        hold on;
-        plot(ofAngleUniqueList(locs), pks + 0.05, 'k^', 'markerfacecolor', [1 0 0]);
-        hold off;
-        %print(fig2, '-dpng', [pwd filesep 'results' filesep 'Vert_' num2str(velocityThreshold) '_' num2str(angleVariance) filesep 'Vert_' num2str(frameNo) '.png'])
         
         %berechne geschwindigkeiten der komponenten
         for k = 1 : length(resultBW(:))

@@ -1,4 +1,4 @@
-function [ resultBW, resultColor, resultRaw] = connectedComponent( table_mask )
+function [ resultBW, resultColor, resultRaw] = connectedComponent( table_mask , threshold)
 %input bild: Tisch muss bereits durch die Tisch-Maske ausgeschnitten sein
 %Diese Funktion ermittelt die Components im Bild (d.h. die Kugeln) 
 %Daf?r werden die Glanzpunkte der Kugeln benutzt. Durch sehr helle Stellen
@@ -22,7 +22,7 @@ img = table_mask;
 
 %aus dem bild wird binaerbild, nur die hellsten stellen werden weiss
 %koe und linke und rechte obere Ecke werden auch erkannt 
-BW = im2bw(img , 0.50);%0.60
+BW = im2bw(img , threshold);%0.5 %0.60
 
 %elemente von einander trennen
 %[L, num] = bwlabeln(BW, 4);

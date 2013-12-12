@@ -62,7 +62,8 @@ end
 % TODO: labelCount richtig setzen!!!!
 labelCount = 0;
 % TEST
-imshow(label2rgb(components_img));
+%figure(4)
+%imshow(label2rgb(components_img));
 end
      
      

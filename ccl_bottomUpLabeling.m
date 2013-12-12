@@ -1,11 +1,12 @@
-function [ runlengthTable ] = ccl_bottomUpLabeling( )
-% function [ runlengthTable ] = ccl_bottomUpLabeling(runlengthTable )
+%function [ runlengthTable ] = ccl_bottomUpLabeling( )
+ function [ runlengthTable ] = ccl_bottomUpLabeling(runlengthTable )
 
 % labeling von unten nach oben
 % für jede Zeichenkette in der runlengthTable wird überprüft, ob die
 % Elemente der Zeichenkette darunter an anderes gelabeltes Element haben,
 % dass ein kleineres Label hat.
-runlengthTable = ccl_runLengthLabeling();
+
+%runlengthTable = ccl_runLengthLabeling();
 [~, num] = size(runlengthTable);
 
 for x = drange(num:-1:1)
@@ -19,13 +20,19 @@ for x = drange(num:-1:1)
                     check = 1;
                 elseif runlengthTable{x}(2) < runlengthTable{counter}(2) && runlengthTable{x}(3) == runlengthTable{counter}(3)
                     check = 1;
+                elseif runlengthTable{x}(2) > runlengthTable{counter}(2) && runlengthTable{x}(3) == runlengthTable{counter}(3)
+                    check = 1;
                 elseif runlengthTable{x}(2) == runlengthTable{counter}(2) && runlengthTable{x}(3) > runlengthTable{counter}(3)
                     check = 1;
-                elseif runlengthTable{x}(2) < runlengthTable{counter}(2) && runlengthTable{x}(3) > runlengthTable{counter}(2)
-                    check = 1;
-                elseif runlengthTable{x}(2) > runlengthTable{counter}(2) && runlengthTable{x}(2) < runlengthTable{counter}(3)
+                elseif runlengthTable{x}(2) == runlengthTable{counter}(2) && runlengthTable{x}(3) < runlengthTable{counter}(3)
                     check = 1;
                 elseif runlengthTable{x}(2) < runlengthTable{counter}(2) && runlengthTable{x}(3) > runlengthTable{counter}(3)
+                    check = 1;
+                elseif runlengthTable{x}(2) > runlengthTable{counter}(2) && runlengthTable{x}(3) < runlengthTable{counter}(3)
+                    check = 1;
+                elseif runlengthTable{x}(2) == runlengthTable{counter}(3) 
+                    check = 1;
+                elseif runlengthTable{x}(3) == runlengthTable{counter}(2) 
                     check = 1;
                 end
             end

@@ -1,11 +1,15 @@
+function [ components_img, labelCount ] = ccl_labelNormalisation(runlengthTable, bw_img)
 %function [ components_img, labelCount ] = ccl_labelNormalisation(runlengthTable, bw_img)
-runlengthTable = ccl_runLengthLabeling();
+%img = imread('res/connected1.png');
+%bw_img = im2bw(img, 0.50);
+
+%runlengthTable = ccl_bottomUpLabeling();
 
 
 % hier werden die Werte der Labels zuerst normalisiert, sodass diese eine
 % durchgehende Nummerierung haben,
-% anschlie?end wird das Ursprungsbild anhand dieser Labels ge?ndert
-% zur?ckgegeben wird das gelabelte Logical-Bild und die Anzahl der darin
+% anschliessend wird das Ursprungsbild anhand dieser Labels geaendert
+% zurueckgegeben wird das gelabelte Logical-Bild und die Anzahl der darin
 % enthaltenen Components
 
 [~, num] = size(runlengthTable);
@@ -33,9 +37,9 @@ for x=1:num
     
 end
 
-% der erste Rueckgabeparameter ist bereits fertig!
-num = normalizedLabelCount;
-
+% die Anzahl an individuellen Labels istgleichtzeitg die Menge 
+% angefunden Components
+labelCount = normalizedLabelCount;
 
 % jetzt bauen wir aus unserem Binaerbild noch ein neues Bild auf, in dem
 % alle Pixel einer Components mit ihrem Componentlabel versehen ist
@@ -51,14 +55,15 @@ for tableIndex = 1:num
     label = data(4);
     %[row, startX, endX, label] = runlengthTable{tableIndex};
     
-    for x=startX:endX
-        components_img(row,x) = label;
-    end
+    components_img(row, startX:endX) = label;
   
 end
 
+% TODO: labelCount richtig setzen!!!!
+labelCount = 0;
 % TEST
-imshow(label2rgb(components_img))
+imshow(label2rgb(components_img));
+end
      
      
 

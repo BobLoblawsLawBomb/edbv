@@ -3,14 +3,14 @@ function [ componentColorList ] = colorClassification( ColorComponents )
 % function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
 % % 
 % % fuer Testzwecke
-% img = imread('res/table_test-6.png');
-% mask = table_mask(img);
-% image = img .* mask;
-% %imshow(image)
-% [BWComponents, ColorComponents] = connectedComponent(image, 0.5);
+img = imread('res/table_test-1.png');
+mask = table_mask(img);
+image = img .* mask;
+%imshow(image)
+[~, ColorComponents] = connectedComponent(image, 0.5);
 %====================================
 
-[dim num] = size(ColorComponents);
+[~, num] = size(ColorComponents);
 
 % diese Liste enthaelt fuer jede Component einen Eintrag, der mit einem
 % colorIndex einer Farbklasse korreliert

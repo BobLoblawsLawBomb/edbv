@@ -73,6 +73,10 @@ for label=1:labelCount
     % pixel ungleich 0
     areaSize = nnz(comp);
     
+    %zum testen fixe grenzen
+    minSize = 0;
+    maxSize = 10000;
+    
     % TODO: hier brauchen wir noch das grnezintervall einer validen
     % ballgroe?e. diese muss klein genug sein, um einen ball zu
     % akzeptieren der nur aus seinem glanzpunkt besteht, sowie die,

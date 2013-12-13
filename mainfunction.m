@@ -7,7 +7,7 @@ function [ output_args ] = mainfunction()%argument:  video_path
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 %
-video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
+video_path = [pwd,filesep,'res',filesep,'test_hit1.mp4'];
 
 
 
@@ -69,7 +69,10 @@ while ~isDone(videoReader)
 %         diameterList = zeros(length(resultBW(:)));
         
         %Component Velocities f?r jeden Ball im ersten Frame auf 0 setzen
-        for i=1:length(resultBW(:))
+        for i = 1 : length(resultBW(:))
+%             p = getPositionOfComponent(resultBW{i});
+%             disp([num2str(frameNo), ' ', num2str(i), ' ',num2str(p)]);
+%             disp(sum(sum(resultBW{i})));
             compPosition(:, :, i, frameNo) = getPositionOfComponent(resultBW{i});
             compVelocity(:, :, i, 1) = [0 0];
             
@@ -98,39 +101,39 @@ while ~isDone(videoReader)
         resultRaw = false(size(resultRaw));
         searchMask = false(size(resultRaw));
         
-        for i=1:length(resultBW(:))
-            %if(i == 3)
-                pv = compPosition(:, :, i, frameNo - 1);
-                cv = compVelocity(:, :, i, frameNo - 1)*100;
-                
-                %             disp('size(resultBW(i))');
-                %             disp(size(resultBW(i)));
-                %             disp('cv');
-                %             disp(size(cv));
-                %
-                %             disp('ismember');
-                
-                %if isempty(resultBW(i)) || any(cellfun(@(j)isequal(j,getPositionOfComponent(cell2mat(resultBW(i)))), positions))
-                %    continue;
-                %end
-                
-                %positions{x}=getPositionOfComponent(cell2mat(resultBW(i)));
-                %x=x+1;
-                
-                cv_length = sqrt(cv(1)*cv(1)+cv(2)*cv(2));
-                
-                %disp([int2str(i),', ',int2str(frameNo),', ',num2str(cv),', ',num2str(cv_length)]);
-                
-                if(cv_length > 0.01)
-                    %resultBW{i} = getNewMask(cell2mat(resultBW(i)), cv, 50, im_copy);
-                    [resultBW{i}, resultRaw_part, searchMask_part] = getNewMask(pv, cv, 7, im_copy);
-                    resultRaw = or(resultRaw, logical(resultRaw_part));
-                    searchMask = or(searchMask, logical(searchMask_part));
-                    %mask3D = repmat( uint8(cell2mat(resultBW(i))), [1 1 3]);
-                    %im_copy = mask3D.*im_copy;
-                end
-            %end
-        end
+%         for i=1:length(resultBW(:))
+%             %if(i == 3)
+%                 pv = compPosition(:, :, i, frameNo - 1);
+%                 cv = compVelocity(:, :, i, frameNo - 1)*100;
+%                 
+%                 %             disp('size(resultBW(i))');
+%                 %             disp(size(resultBW(i)));
+%                 %             disp('cv');
+%                 %             disp(size(cv));
+%                 %
+%                 %             disp('ismember');
+%                 
+%                 %if isempty(resultBW(i)) || any(cellfun(@(j)isequal(j,getPositionOfComponent(cell2mat(resultBW(i)))), positions))
+%                 %    continue;
+%                 %end
+%                 
+%                 %positions{x}=getPositionOfComponent(cell2mat(resultBW(i)));
+%                 %x=x+1;
+%                 
+%                 cv_length = sqrt(cv(1)*cv(1)+cv(2)*cv(2));
+%                 
+%                 %disp([int2str(i),', ',int2str(frameNo),', ',num2str(cv),', ',num2str(cv_length)]);
+%                 
+%                 if(cv_length > 0.01)
+%                     %resultBW{i} = getNewMask(cell2mat(resultBW(i)), cv, 50, im_copy);
+%                     [resultBW{i}, resultRaw_part, searchMask_part] = getNewMask(pv, cv, 7, im_copy, 0.5);
+%                     resultRaw = or(resultRaw, logical(resultRaw_part));
+%                     searchMask = or(searchMask, logical(searchMask_part));
+%                     %mask3D = repmat( uint8(cell2mat(resultBW(i))), [1 1 3]);
+%                     %im_copy = mask3D.*im_copy;
+%                 end
+%             %end
+%         end
         
         %OpticalFlow auf aktuellen Frame, unter ber?ckichtung des vorhergehenden, anwenden.
         of = step(opticalFlow, gim, lastgim);
@@ -159,41 +162,92 @@ while ~isDone(videoReader)
         vlines = [0 0 0 0];
         
         %berechne positionen der komponenten
-        for k = 1 : length(resultBW(:))
-            compPosition(:, :, k, frameNo) = getPositionOfComponent(resultBW{k});
-        end
+%         for k = 1 : length(resultBW(:))
+%             compPosition(:, :, k, frameNo) = getPositionOfComponent(resultBW{k});
+%         end
         
         %berechne optical-flow komponenten
         %         OpticalFlow_Analysis1(of);
 %         OpticalFlow_Analysis2(of);
         
         %Bewegende Komponenten des Bildes finden (wo sich bälle bewegen könnten)
+%         disp('SIZES');
         ofVelocity = abs(of);
         ofVelocityFiltered = zeros(size(ofVelocity));
         ofVelocityFiltered(ofVelocity(:,:) > 0.01) = 1;
         [of_comps, of_comp_count] = ccl_labeling( ofVelocityFiltered );
         
         %opticalFlow masks und positions matrix erstellen
-        
+%         ofCompMasks = zeros([1, of_comp_count, 1, 1, 1]);
+%         ofCompPositions = zeros([1, of_comp_count, 1, 1]);
+
+        of_comp2 = zeros;
+
+        for i = 1 : of_comp_count
+            of_comp = of_comps;
+            of_comp(of_comp < i | of_comp > i) = 0; %lösche alles was nicht zur aktuellen komponente (ID = i) gehört.
+            
+            of_comp2 = or(of_comp2, of_comp);%for debugging output
+            
+            of_comp = logical(of_comp);
+            ofCompMasks(:,:,1,i) = of_comp;
+            ofCompPositions(:,:,1,i) = int32(fliplr(getPositionOfComponent(of_comp)));
+%             disp(ofCompPositions(:,:,1,i));
+        end
+        figure(7)
+        imshow(of_comp2);
         
         %liste der alten Positionen der Bälle
-        for i = 1 : length(compPosition(:, :, :, frameNo - 1))
-            oldCompPositions = compPosition(:, :, i, frameNo - 1);
+        compPositionSize = size(compPosition);
+        for i = 1 : compPositionSize(3)
+            oldCompPositions(:, :, i) = int32(fliplr(compPosition(:, :, i, frameNo - 1)));
+            compPosition(:, :, i, frameNo) = -1; %set error code, für den fall das kein neuer eintrag dazu kommt
+%             disp([num2str(i), ': ', num2str(oldCompPositions(:, :, i))]);
         end
         
         %Bälle im neuen Frame finden
-        [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
+        [resultBW, resultColor, resultRaw_part] = connectedComponent(im, 0.5);
         
         %Jede neue Position versuchen mit einer alten zu verknüpfen
         for i = 1 : length(resultBW(:))
+%             resultRaw = or(resultRaw, logical(resultBW{i}));
             newCompPosition = getPositionOfComponent(resultBW{i});
-            oldCompIndex = linkNewPositionWithOldPosition_modified( oldCompPositions, newCompPosition, intensityMasks, intensityPositions, of, 5);
+%             disp('newCompPosition');
+%             disp(newCompPosition);
+            oldCompIndex = linkNewPositionWithOldPosition_modified( oldCompPositions, newCompPosition, ofCompMasks, ofCompPositions, of, 5);
+            %TODO: react to oldCompIndex = 0, maybe create new component
+%             disp('fin');
+%             disp(oldCompIndex);
+            if(oldCompIndex ~= 0)
+%                 disp(['set: ', num2str(oldCompIndex), ' to ', num2str(newCompPosition), ' | before: ', num2str(compPosition(:, :, oldCompIndex, frameNo-1))]);
+                compPosition(:, :, oldCompIndex, frameNo) = newCompPosition;
+                %for debugging output
+%                 resultRaw = or(resultRaw, logical(resultRaw_part));
+%                 searchMask = or(searchMask, logical(searchMask_part));
+            else
+                disp(['create new Component: ', num2str(compPositionSize(3) + 1), ' at ', num2str(newCompPosition(1)), ' ', num2str(newCompPosition(2))]);
+                for j = 1 : frameNo
+                    compPosition(:, :, compPositionSize(3) + 1, j) = newCompPosition;
+                end
+            end
         end
         
+        compPositionSize = size(compPosition);
+        for i = 1 : compPositionSize(3)
+            if compPosition(:, :, i, frameNo) == -1
+                compPosition(:, :, i, frameNo) = compPosition(:, :, i, frameNo - 1);
+            end
+        end
         
+%         figure(7)
+%         imshow(resultRaw);
         
+        figure(10)
+        drawline(im, compPosition);
+        
+        compPositionSize = size(compPosition);
         %berechne geschwindigkeiten der komponenten
-        for k = 1 : length(resultBW(:))
+        for k = 1 : compPositionSize(3)
             [vx, vy, vmask] = calcComponentVelocity(of, im, compPosition(:, :, k, frameNo), 20);
             compVelocity(:, :, k, frameNo) = [vx vy];
             

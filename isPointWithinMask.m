@@ -1,7 +1,7 @@
 function [ isPointWithinMask ] = isPointWithinMask( point, mask )
 %ISPOINTWITHINMASK Returns if the given point is within the given mask
 
-    if mask(point(1),point(2)) == 0
+    if mask(point(1), point(2)) == 0
         isPointWithinMask=false;
     else
         isPointWithinMask=true;

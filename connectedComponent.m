@@ -46,10 +46,16 @@ stat = regionprops(L,'centroid');
 stat2 = regionprops(L, 'EquivDiameter');
 
 %resultBW = zeros(size(BW,1),size(BW,2), num);
-resultBW = cell(1,num);
-resultColor = cell(3,num);
+% resultBW = cell(1,num);
+% resultColor = cell(3,num);
+
+% Die groesse kann nicht vorher fixiert werden, da eventuell komponenten
+% verworfen werden, das wuerde zu leeren eintraegen fuehren.
+clear resultBW;
+clear resultColor;
 
 %setzt f?r jedes Label alle anderen Elemente auf schwarz
+idx = 1;
 for x = 1:num
     
     rx = L;
@@ -71,7 +77,7 @@ for x = 1:num
     
     if stat2(x).EquivDiameter < 17
         
-        resultBW{x} = rx;
+        resultBW{idx} = rx;
 
         rx = im2uint8(rx);
         rx3 = cat(3, rx, rx, rx);
@@ -88,12 +94,14 @@ for x = 1:num
 %         mask = repmat( mask, [1 1 3]);
 %         rcx = mask .* rcx;
 
-         imshow(rcx);
-         imshow(color_img);
+%          figure(8)
+%          imshow(rcx);
+         %imshow(color_img);
 
         color_img = color_img + rcx;
-        resultColor{x} = rcx;
-
+        resultColor{idx} = rcx;
+        
+        idx = idx + 1;
     end
     
 end;

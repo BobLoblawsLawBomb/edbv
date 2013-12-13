@@ -34,8 +34,8 @@ bbox = regionprops(L, 'BoundingBox');
 stat = regionprops(L,'centroid');
 stat2 = regionprops(L, 'EquivDiameter');
 
-resultBW = cell(1,num);
-resultColor = cell(1,num);
+resultBW = cell(1);
+resultColor = cell(1);
 
 idx = 1;
 for x = 1:num
@@ -58,7 +58,7 @@ for x = 1:num
 
         rx = im2uint8(rx);
         rx3 = cat(3, rx, rx, rx);
-        rcx = img;
+        rcx = table_mask;
 
         rcx(rx3 == 0) = 0;
 

@@ -1,4 +1,4 @@
-function [ output_args ] = mainfunction()%argument:  video_path 
+function [ output_args ] = mainfunction(video_path)%argument:  video_path 
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -7,9 +7,16 @@ function [ output_args ] = mainfunction()%argument:  video_path
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 %
-video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
+% <<<<<<< HEAD
+video_path = [pwd,filesep,'res',filesep,video_path];
+
+
+
+% =======
+% video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hit1.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
+% >>>>>>> b1443e6a32d333abfe03107d3ba4004cf5b15448
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
 converter = vision.ImageDataTypeConverter; 

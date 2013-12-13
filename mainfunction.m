@@ -1,4 +1,4 @@
-function [ output_args ] = mainfunction()%argument:  video_path 
+function [ output_args ] = mainfunction(video_path)%argument:  video_path 
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -7,7 +7,7 @@ function [ output_args ] = mainfunction()%argument:  video_path
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 %
-video_path = [pwd,filesep,'res',filesep,'test_hd_4.mp4'];
+video_path = [pwd,filesep,'res',filesep,video_path];
 
 
 

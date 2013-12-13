@@ -1,31 +1,24 @@
 function [ resultBW, resultColor, resultRaw] = connectedComponent( table_mask )
+
 %input bild: Tisch muss bereits durch die Tisch-Maske ausgeschnitten sein
+
 %Diese Funktion ermittelt die Components im Bild (d.h. die Kugeln) 
-%Daf?r werden die Glanzpunkte der Kugeln benutzt. Durch sehr helle Stellen
-%im Bild, die zu keiner Kugel geh?ren, werden auch Fragmente vom Tisch und
+%Dafuer werden die Glanzpunkte der Kugeln benutzt. Durch sehr helle Stellen
+%im Bild, die zu keiner Kugel gehoeren, werden auch Fragmente vom Tisch und
 %Koe als Glanzpunkte interpretiert.
-%Ausgabe: resultBW: ist ein n-dim. cell-Element, das in jeder Zelle ein Bin?rbild
+%Ausgabe: resultBW: ist ein n-dim. cell-Element, das in jeder Zelle ein Binaerbild
 %einer Komponente enth?llt. insgesammt sind es n Components
+
 %Ausgabe: resultColor: ist ebenfalls ein n-dim. cell-Element, das in jeder Zelle
 %ein farbiges Bild (also ein 3-dim RGB-Bild) einer Komponente enth?lt.
 
-% zum Testen
-% path = ['res',filesep,'table_test-1.png'];
-% img = imread(path);
-% mask = table_mask(img);
-% im2 = img.*mask;
-
-%im = imresize(im2,[360 NaN]);
-
 img = table_mask;
-%img = table_mask;
 
 %aus dem bild wird binaerbild, nur die hellsten stellen werden weiss
-%koe und linke und rechte obere Ecke werden auch erkannt 
-BW = im2bw(img , 0.50);%0.60
+BW = im2bw(img , 0.50);
 
 %elemente von einander trennen
-%[L, num] = bwlabeln(BW, 4);
+%Anwendung des selbst implementierten Funktion zu Connected-Component-Labeling
 [L, num] = ccl_labeling(BW);
 
 BW = im2uint8(BW);
@@ -49,7 +42,7 @@ stat2 = regionprops(L, 'EquivDiameter');
 resultBW = cell(1,num);
 resultColor = cell(3,num);
 
-%setzt f?r jedes Label alle anderen Elemente auf schwarz
+%setzt fuer jedes Label alle anderen Elemente auf schwarz
 for x = 1:num
     
     rx = L;

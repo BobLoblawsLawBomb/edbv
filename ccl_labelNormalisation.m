@@ -79,7 +79,7 @@ for label=1:labelCount
     % pixel ungleich 0
     areaSize = nnz(comp);
     
-    % Breite und Hoehe für BoundingBox der Komponente
+    % Breite und Hoehe f?r BoundingBox der Komponente
     x_width = stat(label).BoundingBox(3);
     y_width = stat(label).BoundingBox(4);
     
@@ -101,7 +101,7 @@ for label=1:labelCount
         % immer <=altes normalisiertes label
         newLabelCount = newLabelCount + 1;
         labelMap(label) = newLabelCount;
-        fprintf('substituting label %i with %i \n', label,newLabelCount);
+%         fprintf('substituting label %i with %i \n', label,newLabelCount);
     end
 end
 

@@ -3,6 +3,7 @@ classdef BrownBucket < AbstractBucket
     %   Detailed explanation goes here
     
     properties(Constant = true)
+        colorIndex = 3;
         colorName = 'Brown';
         rgbColor = [139,69,19];
         hueMin = 30/360;

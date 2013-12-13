@@ -3,10 +3,9 @@ classdef WhiteBucket < AbstractBucket
     %   Detailed explanation goes here
     
     properties(Constant = true)
+        colorIndex = 7;
         colorName = 'White';
         rgbColor = [255,255,255];
-%         hueMin = 0;
-%         hueMax = 1;
         hueMin = 40/360;
         hueMax = 350/360;
         satMin = 0;

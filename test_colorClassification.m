@@ -1,9 +1,9 @@
-img = imread('res/table_test-1.png');
+img = imread('res/table_test-7.png');
 mask = table_mask(img);
 image = img .* mask;
 
-imshow(image)
+imshow(image);
 
-[BWComponents, ColorComponents] = connectedComponent(image);
+[BWComponents, ColorComponents] = connectedComponent(image, 0.5);
 
-[ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( ColorComponents );
+componentColorList = colorClassification( ColorComponents );

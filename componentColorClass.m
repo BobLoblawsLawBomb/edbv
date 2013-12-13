@@ -8,9 +8,9 @@ function [ result ] = componentColorClass( component )
             
     bucketStack = [0,0,0,0,0,0,0,0];
            
-    imshow(component)
+    
     tableMask = im2bw(component,0.000001);
-    imshow(tableMask)
+    
     
     hsv = rgb2hsv(component);
     hue = hsv(:,:,1);

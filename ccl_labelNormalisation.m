@@ -1,9 +1,9 @@
 function [ components_img, labelCount ] = ccl_labelNormalisation(runlengthTable, bw_img)
-%function [ components_img, labelCount ] = ccl_labelNormalisation(runlengthTable, bw_img)
-%img = imread('res/connected1.png');
-%bw_img = im2bw(img, 0.50);
 
-%runlengthTable = ccl_bottomUpLabeling();
+% img = imread('res/connected1.png');
+% bw_img = im2bw(img, 0.50);
+% 
+% runlengthTable = ccl_bottomUpLabeling();
 
 
 % hier werden die Werte der Labels zuerst normalisiert, sodass diese eine
@@ -58,42 +58,69 @@ for tableIndex = 1:num
     components_img(row, startX:endX) = label;
   
 end
+%imshow(label2rgb(components_img));
 
+% hier werden alle components eliminiert werden, die zu klein/gross sind, 
+% und daher keine baelle sein koennen.
+% da dadurch die normalisierten labels wieder zerstoert werden, muessen wir
+% uns ein weiteres mal eine substitutions map aufbauen, mit der wir
+% anschliessend erneut normalisieren koennen
+labelMap = containers.Map('KeyType','int32','ValueType','int32');
+newLabelCount = 0;
 
-% hier sollen noch alle components eliminiert werden, die zu
-% klein/gross sind, und daher keine baelle sein koennen
+stat = regionprops(components_img,'BoundingBox');
 
-newLabelCount = labelCount;
 for label=1:labelCount
     
     % fuer jedes label alles ausmaskieren, was nicht das label ist
     comp = components_img(components_img==label);
-    
+
     % die flaeche der component ist somit die anzahl aller
     % pixel ungleich 0
     areaSize = nnz(comp);
     
-    % TODO: hier brauchen wir noch das grnezintervall einer validen
-    % ballgroe?e. diese muss klein genug sein, um einen ball zu
+    % Breite und Hoehe für BoundingBox der Komponente
+    x_width = stat(label).BoundingBox(3);
+    y_width = stat(label).BoundingBox(4);
+    
+    
+    % TODO: hier brauchen wir noch das grenzintervall einer validen
+    % ballgroesse. diese muss klein genug sein, um einen ball zu
     % akzeptieren der nur aus seinem glanzpunkt besteht, sowie die,
     % welche komplett erkannt werde (weiss und gelb)
-    if not(minSize <= areaSize && areaSize <= maxSize)
-        
+    if not(2 <= areaSize && areaSize <= 350)   %minSize=20, maxSize=150; die werte funktioniern nicht wirklich
         % falls das nicht gegeben ist, wird das label verworfen
-        components_img(components_img==label) = 0;
-        newLabelCount = newLabelCount - 1;
+        components_img(components_img == label) = 0;
+    elseif not(0.7 <= (x_width / y_width) <= 4)
+        components_img(components_img == label) = 0;
+    elseif (x_width > 30) || (y_width > 30)
+        components_img(components_img == label) = 0;
+    else
+        % wenn die component erhalten bleibt, weissen wir ihr noch ein
+        % neues normalisiertes label zu. das neue normalisierte label ist 
+        % immer <=altes normalisiertes label
+        newLabelCount = newLabelCount + 1;
+        labelMap(label) = newLabelCount;
+        fprintf('substituting label %i with %i \n', label,newLabelCount);
     end
-    
 end
 
-% ACHTUNG: wenn labels verworfen wurden, ist nicht mehr gegeben,
-% dass die labels von 1:n durchnummeriert sind. es sind luecken
-% entstanden, die durch eine erneute normalisierung wieder gefuellt
-% werden muessen
+% da wir jetzt unsere neue label map haben, muessen wir noch einmal ueber
+% alle keys in ihr iterieren und substituieren
+oldLabels = labelMap.keys();
+for i=1:numel(oldLabels)
+    oldLabel = oldLabels{i};
+    newLabel = labelMap(oldLabel);
+    components_img(components_img==oldLabel) = newLabel;
+end 
 
+% abschliessend noch den labelCount rueckgabeparameter updaten - nich das
+% wir spaeter ueber eine falsche anzahl an components iterieren
+labelCount = newLabelCount;
 
 % TEST
-imshow(label2rgb(components_img));
+%figure(4)
+%imshow(label2rgb(components_img));
 end
      
      

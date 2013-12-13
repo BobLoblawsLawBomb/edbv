@@ -4,13 +4,14 @@ function [ centroid ] = calculateCentroid( points )
 
     sumx = 0;
     sumy = 0;
-    for i = 1 : length(points)
+    psize = size(points);
+    k = psize(1);
+    for i = 1 : k
        sumx = sumx + points(i,1);
        sumy = sumy + points(i,2);
     end
     
-    
-    centroid = [sumx / length(points) , sumy / lengths(points)];
+    centroid = [sumx / k , sumy / k];
 
 end
 

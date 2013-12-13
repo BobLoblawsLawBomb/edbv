@@ -76,11 +76,15 @@ for label=1:labelCount
     % pixel ungleich 0
     areaSize = nnz(comp);
     
+    %zum testen fixe grenzen
+    minSize = 0;
+    maxSize = 10000;
+    
     % TODO: hier brauchen wir noch das grnezintervall einer validen
     % ballgroe?e. diese muss klein genug sein, um einen ball zu
     % akzeptieren der nur aus seinem glanzpunkt besteht, sowie die,
     % welche komplett erkannt werde (weiss und gelb)
-    if not(20 <= areaSize && areaSize <= 150)      
+    if not(0 <= areaSize && areaSize <= 500)   %minSize=20, maxSize=150; die werte funktioniern nicht wirklich
         % falls das nicht gegeben ist, wird das label verworfen
         components_img(components_img==label) = 0;
     else
@@ -107,7 +111,8 @@ end
 labelCount = newLabelCount;
 
 % TEST
-imshow(label2rgb(components_img));
+%figure(4)
+%imshow(label2rgb(components_img));
 end
      
      

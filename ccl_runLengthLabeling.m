@@ -2,46 +2,22 @@ function [ runlengthTable ] = ccl_runLengthLabeling( bw_img )
 
 % n Reihen, 4 Spalten: Aktuelle Reihe, start, ende, Label
 
-%img = imread('res/connected1.png');
-%bw_img = im2bw(img, 0.50);
-% test = [ 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0;
-%          0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0;
-%          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0;
-%          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0;
-%          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0;
-%          0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0;
-%          0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
-%          0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
-%          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
-%          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0;
-%          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0;
-%          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0;
-%          0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0;
-%          0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
-%          0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
-%          0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
-%          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
-%          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;];
-% %imshow(img);
-
 % bw_img Zeilenweise durchgehen und nach Zeichenketten suchen.
 % fuer jede Zeichenkette den Anfangswert und den Endwert in der
 % runlengthTable speichern
 % gleichzeitig die Zeichenkette labeln, d.h. den Labelwert in die Tabelle
 % speichern
 % fuer jeden Element der Zeichenkette ueberpruefen, ob das Element der in
-% dar?berliegenden Zeile bereits gelabelt wurde.
+% darueberliegenden Zeile bereits gelabelt wurde.
 
 % Tabelle der Zeichenketten der Zeilen
 runlengthTable = cell(1);
 count = 1;
 rows = size(bw_img, 1);
 
-for x = 1:rows
-% for x = 1:size(test,1)   
+for x = 1:rows   
      % x-te zeile aus tabelle holen
      currentRow = bw_img(x,:);
-     %currentRow = test(x,:);
       
      % Indizes der nonzero-Elemente des Zeilenvektors
      indices = find(currentRow);
@@ -55,18 +31,11 @@ for x = 1:rows
              cursor_row = start_string;
              cursor_ind = cursor_ind + 1;
              
-             % vorlaeufiges Label
-              
-%                  label = num + 1;
-%              else
-%                  label = 1;
-%              end
+             %vorlaufiges Label setzen
              label = count;
              
              % Schleife laeuft, bis das Ende der Zeichenkette erreicht ist
-            % length(currentRow)
-            % currentRow(cursor_row)
-            % cursor_row
+             % oder bis das Ende der Bild-Reihe erreicht ist
              while (cursor_row <= length(currentRow)) && (currentRow(cursor_row) ~= 0)
                  if x > 1
                     bool = 1;

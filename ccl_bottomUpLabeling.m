@@ -1,12 +1,10 @@
-%function [ runlengthTable ] = ccl_bottomUpLabeling( )
- function [ runlengthTable ] = ccl_bottomUpLabeling(runlengthTable )
+function [ runlengthTable ] = ccl_bottomUpLabeling(runlengthTable )
 
 % labeling von unten nach oben
 % für jede Zeichenkette in der runlengthTable wird überprüft, ob die
 % Elemente der Zeichenkette darunter an anderes gelabeltes Element haben,
 % dass ein kleineres Label hat.
 
-%runlengthTable = ccl_runLengthLabeling();
 [~, num] = size(runlengthTable);
 
 for x = drange(num:-1:1)

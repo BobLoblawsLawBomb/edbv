@@ -1,11 +1,10 @@
 function [ componentColorList ] = colorClassification( ColorComponents )
 %====================================
- %function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
+%function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
 % % 
 % % fuer Testzwecke
 img = imread('res/table_test-2.png');
-z = zeros(size(img,1), size(img,2));
-z = uint8(z);
+z = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
 mask = table_mask(img);
 image = img .* mask;
 %imshow(image)

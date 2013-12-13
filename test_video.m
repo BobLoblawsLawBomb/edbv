@@ -19,6 +19,7 @@ im = step(converter, frame);
 [y,x,z]=size(im);
 is_ok = x >= 480 && y >= 360;
 if ~is_ok
+    disp('Die Aufl�sung ist zu niedrig');
 	return
 end
 
@@ -26,7 +27,7 @@ end
 
 % 2. Farbige Kugeln (nicht rot/weiss) muessen gefunden werden (falls am Tisch vorhanden)
 
-% Kann nur vom Benutzer verifiziert werden…
+% Kann nur vom Benutzer verifiziert werden!
 
 % -------------------------------------------------------------------------
 
@@ -36,7 +37,8 @@ end
 
 % 4. Aufnahmewinkel: Der Tisch muss eine bestimmte Form haben (Trapez):
 
-% TODO: Fuer HD ausbessern (die Linien scheinen zu duenn zu sein)!
+ im = imresize(im,[360 NaN]);
+ [y,x,z]=size(im);
 
 % Maske holen:
 cform = makecform('srgb2lab');
@@ -45,16 +47,14 @@ rg_chroma = input_lab(:,:,2);
 BW = im2bw(rg_chroma, 0.45);
 
 % Tisch fuellen und Artefakte entfernen:
-BW = bwareaopen(BW, 500);
+BW = bwareaopen(BW, 1000, 4);
 BW = imcomplement(BW);
-BW = bwareaopen(BW, 500);
+BW = bwareaopen(BW, 1000, 4);
 
-BW = edge(BW, 'canny', 0.9, 10.0); %SD
-% BW = edge(BW, 'canny', 0.999, 15.0); %HD
-%imshow(BW)
+BW = edge(BW, 'canny', 0.9, 16.0);
 [H,theta,rho] = hough(BW);
 P = houghpeaks(H,5,'threshold',ceil(0.3*max(H(:))));
-lines = houghlines(BW,theta,rho,P,'FillGap',5,'MinLength',7);
+lines = houghlines(BW,theta,rho,P,'FillGap',200,'MinLength',100);
 
 % Linien erzeugen:
 fit_func = fittype('poly1'); 
@@ -69,7 +69,7 @@ end
 
 corners = [0 0];
 index = 0;
-imshow(im)
+imshow(im);
 hold on
 for k = 1:length(lines)
     i = k*2;
@@ -100,24 +100,40 @@ hold off
 
 is_ok = index == 4;
 if ~is_ok
+    disp('Es konnten nicht genau 4 Ecken des Tisches erkannt werden');
 	return
 end
 
-a = [corners(1,1), corners(1,2)];	% Rechts oben
-b = [corners(2,1), corners(2,2)];	% Rechts unten
-c = [corners(3,1), corners(3,2)];	% Links unten
+a = [corners(1,1), corners(1,2)];
+b = [corners(2,1), corners(2,2)];
+c = [corners(3,1), corners(3,2)];
+d = [corners(4,1), corners(4,2)];
 
-% Die Trapezschenkel muessen mindestens 2/3 der unteren Linie betragen
+y_sorted = sort([a(2),b(2),c(2),d(2)]);
+x_sorted = sort([a(1),b(1),c(1),d(1)]);
+
+a = [x_sorted(3), y_sorted(2)];	% Rechts oben
+b = [x_sorted(4), y_sorted(4)];	% Rechts unten
+c = [x_sorted(1), y_sorted(3)];	% Links unten
+d = [x_sorted(2), y_sorted(1)];	% Links oben
+
+% Die Trapezschenkel muessen mindestens 5/8 der unteren Linie betragen
 % (einer reicht):
 
 % Laenge der horizontalen Linie ermitteln:
-vert = sqrt((a(1)-b(1))^2+(a(2)-b(2))^2);
+vert = sqrt((a(1)-b(1))^2+(a(2)-b(2))^2)
 
 % Laenge der vertikalen Linie ermitteln:
-hor = sqrt((b(1)-c(1))^2+(b(2)-c(2))^2);
+hor = sqrt((b(1)-c(1))^2+(b(2)-c(2))^2)
 
 % Offizieller Turniertisch: 3556 mm × 1778 mm (jeweils +/- 13 mm)
 
 % Laenge vergleichen:
-is_ok = ((hor/3)*2) <= vert;
+is_ok = ((hor*5)/8) <= vert;
+
+if ~is_ok
+    disp('Der Aufnahmewinkel passt nicht.');
+else
+    disp('Das Video scheint in Ordnung zu sein.');
+end
 end

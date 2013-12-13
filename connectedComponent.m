@@ -15,6 +15,8 @@ img = table_mask;
 %koe und linke und rechte obere Ecke werden auch erkannt 
 BW = im2bw(table_mask , threshold);%0.5 %0.60
 
+imshow(BW);
+
 %elemente von einander trennen
 %[L, num] = bwlabeln(BW, 4);
 [L, num] = ccl_labeling(BW);
@@ -98,7 +100,7 @@ for x = 1:num
 end;
 
 
-%imshow(color_img);
+imshow(color_img);
 
 
 end

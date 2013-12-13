@@ -58,7 +58,7 @@ for tableIndex = 1:num
     components_img(row, startX:endX) = label;
   
 end
-imshow(label2rgb(components_img));
+%imshow(label2rgb(components_img));
 
 % hier werden alle components eliminiert werden, die zu klein/gross sind, 
 % und daher keine baelle sein koennen.
@@ -120,7 +120,7 @@ labelCount = newLabelCount;
 
 % TEST
 %figure(4)
-imshow(label2rgb(components_img));
+%imshow(label2rgb(components_img));
 end
      
      

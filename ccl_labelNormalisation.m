@@ -71,18 +71,28 @@ for label=1:labelCount
     
     % fuer jedes label alles ausmaskieren, was nicht das label ist
     comp = components_img(components_img==label);
-    
+    temp = components_img;
+    temp(temp~=label)=0;
+    imshow((temp));
+
     % die flaeche der component ist somit die anzahl aller
     % pixel ungleich 0
     areaSize = nnz(comp);
+    
+    stat = regionprops(temp,'BoundingBox');
+    x_width = stat(1).BoundingBox(4)-stat(1).BoundingBox(2);
+    y_width = stat(1).BoundingBox(3)-stat(1).BoundingBox(1);
+    x_width / y_width
     
     % TODO: hier brauchen wir noch das grnezintervall einer validen
     % ballgroe?e. diese muss klein genug sein, um einen ball zu
     % akzeptieren der nur aus seinem glanzpunkt besteht, sowie die,
     % welche komplett erkannt werde (weiss und gelb)
-    if not(20 <= areaSize && areaSize <= 150)      
+    if not(20 <= areaSize && areaSize <= 200)      
         % falls das nicht gegeben ist, wird das label verworfen
-        components_img(components_img==label) = 0;
+        components_img(components_img == label) = 0;
+    elseif (x_width / y_width) >= 2 || (x_width / y_width) <= 0.5
+        components_img(components_img == label) = 0;
     else
         % wenn die component erhalten bleibt, weissen wir ihr noch ein
         % neues normalisiertes label zu. das neue normalisierte label ist 

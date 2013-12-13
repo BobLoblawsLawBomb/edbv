@@ -5,7 +5,7 @@ function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassifi
 img = imread('res/table_test-1.png');
 mask = table_mask(img);
 image = img .* mask;
-imshow(image)
+%imshow(image)
 [BWComponents, ColorComponents] = connectedComponent(image);
 %====================================
 

@@ -79,16 +79,26 @@ for label=1:labelCount
     % pixel ungleich 0
     areaSize = nnz(comp);
     
+<<<<<<< HEAD
     stat = regionprops(temp,'BoundingBox');
     x_width = stat(1).BoundingBox(4)-stat(1).BoundingBox(2);
     y_width = stat(1).BoundingBox(3)-stat(1).BoundingBox(1);
     x_width / y_width
+=======
+    %zum testen fixe grenzen
+    minSize = 0;
+    maxSize = 10000;
+>>>>>>> b1443e6a32d333abfe03107d3ba4004cf5b15448
     
     % TODO: hier brauchen wir noch das grnezintervall einer validen
     % ballgroe?e. diese muss klein genug sein, um einen ball zu
     % akzeptieren der nur aus seinem glanzpunkt besteht, sowie die,
     % welche komplett erkannt werde (weiss und gelb)
+<<<<<<< HEAD
     if not(20 <= areaSize && areaSize <= 200)      
+=======
+    if not(0 <= areaSize && areaSize <= 500)   %minSize=20, maxSize=150; die werte funktioniern nicht wirklich
+>>>>>>> b1443e6a32d333abfe03107d3ba4004cf5b15448
         % falls das nicht gegeben ist, wird das label verworfen
         components_img(components_img == label) = 0;
     elseif (x_width / y_width) >= 2 || (x_width / y_width) <= 0.5
@@ -117,7 +127,8 @@ end
 labelCount = newLabelCount;
 
 % TEST
-imshow(label2rgb(components_img));
+%figure(4)
+%imshow(label2rgb(components_img));
 end
      
      

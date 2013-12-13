@@ -1,4 +1,4 @@
-function [ newMask, resultRaw, searchMask ] = getNewMask( oldPosition, vector, instabilityFactor, im)
+function [ newMask, resultRaw, searchMask ] = getNewMask( oldPosition, vector, instabilityFactor, im, threshold)
 %GETNEWMASK Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -63,7 +63,7 @@ function [ newMask, resultRaw, searchMask ] = getNewMask( oldPosition, vector, i
     
     J = newMask3 .* im;
    
-    [resultBW, resultColor, resultRaw] = connectedComponent(J);
+    [resultBW, resultColor, resultRaw] = connectedComponent(J, threshold);
     
 %         
 %     disp(size(resultBW));

@@ -7,10 +7,9 @@ function [ output_args ] = mainfunction()%argument:  video_path
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 %
+% video_path = [pwd,filesep,'res',filesep,'test_short2.mp4'];
 video_path = [pwd,filesep,'res',filesep,'test_hit1.mp4'];
-
-
-
+% video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
 converter = vision.ImageDataTypeConverter; 
@@ -60,6 +59,7 @@ compVelocity = [0 0];
 positions=cell(0);
 x=1;
 while ~isDone(videoReader)
+    disp(['next Frame no: ', num2str(frameNo)]);
     if(frameNo == 1)
         %TODO: Erstes Component Labeling anwenden
         %componenten nach label getrennt, 
@@ -98,8 +98,8 @@ while ~isDone(videoReader)
         
         %for debugging, stores raw mask of all components over a certain
         %velocity-threshold
-        resultRaw = false(size(resultRaw));
-        searchMask = false(size(resultRaw));
+%         resultRaw = false(size(resultRaw));
+%         searchMask = false(size(resultRaw));
         
 %         for i=1:length(resultBW(:))
 %             %if(i == 3)
@@ -156,7 +156,7 @@ while ~isDone(videoReader)
         %matrix um bereiche zu speichern in denen die geschwindigkeiten der
         %komponenten gemittelt werden.
         output_vmask = false(size(im2bw(im)));
-        %output_cmask = false(size(im2bw(im)));
+        output_cmask = false(size(im2bw(im)));
         
         %matrix um geschwindigkeits-vektor-linien zu speichern
         vlines = [0 0 0 0];
@@ -181,18 +181,34 @@ while ~isDone(videoReader)
 %         ofCompMasks = zeros([1, of_comp_count, 1, 1, 1]);
 %         ofCompPositions = zeros([1, of_comp_count, 1, 1]);
 
-        of_comp2 = zeros;
+        %muss mindestens zwei drin haben, damit immer jedenfalls 2 drinnen
+        %sind, sonst gibt es probleme bei size() aufrufen und iterationen ueber 
+        %die matrizen, weil die matrizen dann automatisch verkleinert werden.
+        ofCompMasks(:,:,1,1) = zeros(size(gim));
+        ofCompPositions(:,:,1,1) = [-1, -1];
+        ofCompMasks(:,:,1,2) = zeros(size(gim));
+        ofCompPositions(:,:,1,2) = [-1, -1];
 
+        of_comp2 = zeros;
+        
+        ofc_idx = 3;
         for i = 1 : of_comp_count
             of_comp = of_comps;
             of_comp(of_comp < i | of_comp > i) = 0; %lösche alles was nicht zur aktuellen komponente (ID = i) gehört.
             
+            if(sum(sum(of_comp)) < 100)
+                continue
+            end
+            
+%             disp(sum(sum(of_comp)));
+            
             of_comp2 = or(of_comp2, of_comp);%for debugging output
             
             of_comp = logical(of_comp);
-            ofCompMasks(:,:,1,i) = of_comp;
-            ofCompPositions(:,:,1,i) = int32(fliplr(getPositionOfComponent(of_comp)));
-%             disp(ofCompPositions(:,:,1,i));
+            ofCompMasks(:,:,1,ofc_idx) = of_comp;
+            ofCompPositions(:,:,1,ofc_idx) = int32(fliplr(getPositionOfComponent(of_comp)));
+%             disp(ofCompPositions(:,:,1,ofc_idx));
+            ofc_idx = ofc_idx + 1;
         end
         figure(7)
         imshow(of_comp2);
@@ -206,24 +222,36 @@ while ~isDone(videoReader)
         end
         
         %Bälle im neuen Frame finden
-        [resultBW, resultColor, resultRaw_part] = connectedComponent(im, 0.5);
+        [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
         
         %Jede neue Position versuchen mit einer alten zu verknüpfen
         for i = 1 : length(resultBW(:))
-%             resultRaw = or(resultRaw, logical(resultBW{i}));
+            %             resultRaw = or(resultRaw, logical(resultBW{i}));
             newCompPosition = getPositionOfComponent(resultBW{i});
-%             disp('newCompPosition');
-%             disp(newCompPosition);
-            oldCompIndex = linkNewPositionWithOldPosition_modified( oldCompPositions, newCompPosition, ofCompMasks, ofCompPositions, of, 5);
+            %             disp('newCompPosition');
+            %             disp(newCompPosition);
+            [oldCompIndex vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified( oldCompPositions, newCompPosition, ofCompMasks, ofCompPositions, of, 6, 6);
             %TODO: react to oldCompIndex = 0, maybe create new component
 %             disp('fin');
 %             disp(oldCompIndex);
             if(oldCompIndex ~= 0)
-%                 disp(['set: ', num2str(oldCompIndex), ' to ', num2str(newCompPosition), ' | before: ', num2str(compPosition(:, :, oldCompIndex, frameNo-1))]);
+                %                 disp(['set: ', num2str(oldCompIndex), ' to ', num2str(newCompPosition), ' | before: ', num2str(compPosition(:, :, oldCompIndex, frameNo-1))]);
                 compPosition(:, :, oldCompIndex, frameNo) = newCompPosition;
                 %for debugging output
-%                 resultRaw = or(resultRaw, logical(resultRaw_part));
-%                 searchMask = or(searchMask, logical(searchMask_part));
+                %                 resultRaw = or(resultRaw, logical(resultRaw_part));
+                %                 searchMask = or(searchMask, logical(searchMask_part));
+                
+                %draw oldPosition-search-areas
+                output_vmask = or(output_vmask, vmask);
+                
+                %draw component-masks
+                output_cmask = or(output_cmask, smask);
+                
+                %draw velocity lines
+                p1 = compPosition(:, :, oldCompIndex, frameNo);
+                %vlines(oldCompIndex, :) = [p1(1) p1(2) p1(1)+vx*1000 p1(2)+vy*1000];
+                vlines(oldCompIndex, :) = [p1(1) p1(2) p1(1)+vx p1(2)+vy];
+                
             else
                 disp(['create new Component: ', num2str(compPositionSize(3) + 1), ' at ', num2str(newCompPosition(1)), ' ', num2str(newCompPosition(2))]);
                 for j = 1 : frameNo
@@ -236,35 +264,57 @@ while ~isDone(videoReader)
         for i = 1 : compPositionSize(3)
             if compPosition(:, :, i, frameNo) == -1
                 compPosition(:, :, i, frameNo) = compPosition(:, :, i, frameNo - 1);
+                %check distance to recognized components, if there are
+                %none, maybe over several frames, delete the position.
             end
         end
+        
+        %linedraw-debugging-output
+%         im_with_line = drawline(im, compPosition, ones(compPositionSize(3), 1, 3));
+%         figure(10)
+%         imshow(im_with_line);
         
 %         figure(7)
 %         imshow(resultRaw);
         
-        figure(10)
-        drawline(im, compPosition);
+%         if exist('fig10', 'var') == 1
+%             clf(fig10);
+%         end
+%         fig10 = figure(10);
+%         imsize = size(im);
+%         lineimg = zeros(imsize);
+%         lineimg = drawline(lineimg, compPosition, ones(compPositionSize(3), 1, 3));
+%         lineimg = bwmorph(im2bw(lineimg,0.5), 'thicken', 1);
+%         lineimg = drawline(repmat(1-(double(lineimg)),[1 1 3]), compPosition, repmat(0.9,[compPositionSize(3), 1, 3]));
+%         for i = 1 : imsize(1)
+%             for j = 1 : imsize(2)
+%                 if lineimg(i,j,1) == 1 && lineimg(i,j,2) == 1 && lineimg(i,j,3) == 1
+%                     lineimg(i,j,:) = double(im(i,j,:))/255;
+%                 end
+%             end
+%         end
+%         imshow(lineimg);
         
-        compPositionSize = size(compPosition);
+%         compPositionSize = size(compPosition);
         %berechne geschwindigkeiten der komponenten
-        for k = 1 : compPositionSize(3)
-            [vx, vy, vmask] = calcComponentVelocity(of, im, compPosition(:, :, k, frameNo), 20);
-            compVelocity(:, :, k, frameNo) = [vx vy];
-            
-            %draw component-areas
-            output_vmask = or(output_vmask, vmask);
-            
-            %draw component-masks
-            %output_cmask = or(output_cmask, resultBW{k});
-            
-            %draw velocity lines
-            p1 = compPosition(:, :, k, frameNo);
-            vlines(k, :) = [p1(1) p1(2) p1(1)+vx*1000 p1(2)+vy*1000];
-        end
+%         for k = 1 : compPositionSize(3)
+%             [vx, vy, vmask] = calcComponentVelocity(of, im, compPosition(:, :, k, frameNo), 20);
+%             compVelocity(:, :, k, frameNo) = [vx vy];
+%             
+%             %draw component-areas
+%             output_vmask = or(output_vmask, vmask);
+%             
+%             %draw component-masks
+%             %output_cmask = or(output_cmask, resultBW{k});
+%             
+%             %draw velocity lines
+%             p1 = compPosition(:, :, k, frameNo);
+%             vlines(k, :) = [p1(1) p1(2) p1(1)+vx*1000 p1(2)+vy*1000];
+%         end
         
         %optical-flow-intensitäten in matrix speichern
-        vof = abs(of);
-        output_mask = double(im)*0.001 + double(repmat(mat2gray(vof),[1 1 3]));
+%         vof = abs(of);
+        output_mask = double(im)*0.001 + double(repmat(mat2gray(ofVelocity),[1 1 3]));
         maxv = max(max(max(output_mask)));
         if maxv > 1
             output_mask = output_mask./maxv;
@@ -277,17 +327,28 @@ while ~isDone(videoReader)
         output_vmask(:,:,2) = output_vmask(:,:,2)*0.075;
         output_vmask(:,:,3) = output_vmask(:,:,3)*0.25;
         
+        output_cmask = double(repmat(output_cmask, [1 1 3]));
+        output_cmask(:,:,1) = output_cmask(:,:,1)*0.15;
+        output_cmask(:,:,2) = output_cmask(:,:,2)*0;
+        output_cmask(:,:,3) = output_cmask(:,:,3)*0;
+        
         %masken ebene einfärben
-        output_resultRaw = double(repmat(logical(resultRaw), [1 1 3]));
-        output_resultRaw(:,:,1) = output_resultRaw(:,:,1)*0;
-        output_resultRaw(:,:,2) = output_resultRaw(:,:,2)*0.4;
-        output_resultRaw(:,:,3) = output_resultRaw(:,:,3)*0;
+        output_resultRaw = double(label2rgb(resultRaw));
+        output_resultRaw(output_resultRaw(:,:,1:3) == 255) = 0;
+        
+        figure(15);
+        imshow(output_resultRaw);
+        
+%         output_resultRaw = double(repmat(logical(resultRaw), [1 1 3]));
+%         output_resultRaw(:,:,1) = output_resultRaw(:,:,1)*0;
+%         output_resultRaw(:,:,2) = output_resultRaw(:,:,2)*0.4;
+%         output_resultRaw(:,:,3) = output_resultRaw(:,:,3)*0;
         
         %such-masken ebene einfärben
-        output_seachMask = double(repmat(logical(searchMask), [1 1 3]));
-        output_seachMask(:,:,1) = output_seachMask(:,:,1)*0.25;
-        output_seachMask(:,:,2) = output_seachMask(:,:,2)*0;
-        output_seachMask(:,:,3) = output_seachMask(:,:,3)*0;
+%         output_seachMask = double(repmat(logical(searchMask), [1 1 3]));
+%         output_seachMask(:,:,1) = output_seachMask(:,:,1)*0.25;
+%         output_seachMask(:,:,2) = output_seachMask(:,:,2)*0;
+%         output_seachMask(:,:,3) = output_seachMask(:,:,3)*0;
         
         %komponenten nur mit bereichen der optical-flow-intensitäts-matrix
         %mischen bei denen die intensität gering ist, damit diese gut
@@ -295,8 +356,9 @@ while ~isDone(videoReader)
         output_mask = double(output_mask);
         idx = output_mask < 0.12;
         output_mask(idx) = output_mask(idx) + output_vmask(idx);
-        output_mask = output_mask + output_resultRaw;
-        output_mask = output_mask + output_seachMask;
+        output_mask(idx) = output_mask(idx) + output_cmask(idx);
+        output_mask = output_mask + (output_resultRaw/255);
+%         output_mask = output_mask + output_seachMask;
         maxv = max(max(max(output_mask)));
         output_mask = output_mask./maxv;
         
@@ -313,7 +375,7 @@ while ~isDone(videoReader)
         imshow(output_mask);
         
         %For movie creation at the end
-        %MF(frameNo - 1) = im2frame(output_mask);
+%         MF(frameNo - 1) = im2frame(output_mask);
     end
     
     lastim = im;
@@ -329,11 +391,28 @@ release(videoReader);
 %TODO: Linien-Overlay erzeugen und ?ber den letzten Frame legen, sowie als
 %      Resultat zur?ckgeben.
 
-im_with_line = drawline(im, compPosition);
+im_with_line = drawline(im, compPosition, ones(compPositionSize(3), 1, 3));
+figure(12)
+imshow(im_with_line);
+
+% imsize = size(im);
+% lineimg = zeros(imsize);
+% lineimg = drawline(lineimg, compPosition, ones(compPositionSize(3), 1, 3));
+% lineimg = bwmorph(im2bw(lineimg,0.5), 'thicken', 1);
+% lineimg = drawline(repmat(1-(double(lineimg)),[1 1 3]), compPosition, repmat(0.9,[compPositionSize(3), 1, 3]));
+% for i = 1 : imsize(1)
+%     for j = 1 : imsize(2)
+%         if lineimg(i,j,1) == 1 && lineimg(i,j,2) == 1 && lineimg(i,j,3) == 1
+%             lineimg(i,j,:) = double(im(i,j,:))/255;
+%         end
+%     end
+% end
+% figure(13)
+% imshow(lineimg);
 
 %exports a movie for debugging purposes
-%MF(frameNo - 1) = im2frame(im_with_line);
-%movie2avi(MF, [pwd,filesep,'results',filesep,'debug_mov.avi'], 'Compression', 'None');
+% MF(frameNo - 1) = im2frame(im_with_line);
+% movie2avi(MF, [pwd,filesep,'results',filesep,'debug_mov.avi'], 'Compression', 'None');
 
 output_args = 'Success!';
 

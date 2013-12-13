@@ -1,4 +1,4 @@
-function [ index  ] = linkNewPositionWithOldPosition_modified( oldPositions, newPosition, intensityMasks, intensityPositions, of, radius)
+function [index, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified( oldPositions, newPosition, intensityMasks, intensityPositions, of, mask_search_radius, position_search_radius)
 %UNTITLED6 Summary of this function goes here
 %   Detailed explanation goes here
     
@@ -6,10 +6,12 @@ function [ index  ] = linkNewPositionWithOldPosition_modified( oldPositions, new
 
     position = [newPosition(1), newPosition(2)];
     positionWithFactor = position;
-    positionWithFactor(3) = radius;
+    positionWithFactor(3) = mask_search_radius;
     uint8Mask = insertShape(uint8(mask), 'FilledCircle', positionWithFactor);
 
-    circleMask = im2bw(uint8Mask,0.5);
+    circleMask = im2bw(uint8Mask, 0.5);
+    
+    smask = circleMask;
     
 %     figure(11)
 %     imshow(circleMask);
@@ -21,15 +23,39 @@ function [ index  ] = linkNewPositionWithOldPosition_modified( oldPositions, new
     
     iPosSize = size(intensityPositions);
     
+%     ipvis = uint8(repmat(zeros(size(of)),[1 1 3]));
+%     for i = 1 : iPosSize(3)
+%         for k = 1 : iPosSize(4)
+%             point = intensityPositions(:,:,i,k);
+% %             disp(intensityPositions(:,:,i,k));
+%             if point(1) == -1 && point(2) == -1
+%                 continue
+%             end
+%             ipvis(point(1), point(2), 1) = 0;
+%             ipvis(point(1), point(2), 2) = 255;
+%             ipvis(point(1), point(2), 3) = 0;
+%         end
+%     end
+%     figure(30);
+%     imshow(ipvis);
+    
+%     disp(intensityPositions);
+%     disp(iPosSize);
 %     disp('search points:');
     
-    for i = 1 : iPosSize(1)
+    for i = 1 : iPosSize(3)
         
         j = 1;
         
-        for k = 1 : iPosSize(2);
+        for k = 1 : iPosSize(4)
+            
+%             disp([num2str(i),' ',num2str(k),' ',num2str(iPosSize(1)),' ',num2str(iPosSize(2))]);
             point = intensityPositions(:,:,i,k);
-%             disp(point);
+            
+            if point(1) == -1 && point(2) == -1
+                continue
+            end
+            
             if isPointWithinMask(point, circleMask)
                 foundIntensityPoints(:,:,l,j) = point;
                 foundIntensityMasks{l,j} = intensityMasks(:,:,i,k);
@@ -52,8 +78,9 @@ function [ index  ] = linkNewPositionWithOldPosition_modified( oldPositions, new
 %     disp('schwerpunkte:');
     % Suche Index der klasse für die gefundene Punktwolke, dessen
     % Schwerpunkt am nähesten zum Ursprungspunkt ist
-    if exist('foundIntensityPoints') ~= 0
+    if exist('foundIntensityPoints', 'var') == 1
         fIPointsSize = size(foundIntensityPoints);
+%         disp(fIPointsSize);
         for i = 1 : fIPointsSize(1)
 %             disp(foundIntensityPoints(:,:,i));
             centroid = calculateCentroid(foundIntensityPoints(:,:,i));
@@ -71,6 +98,7 @@ function [ index  ] = linkNewPositionWithOldPosition_modified( oldPositions, new
     s = 0;
     vx = 0;
     vy = 0;
+    va = 0;
     
     if(classindex ~= 0)
         fIMasksSize = size(foundIntensityMasks);
@@ -87,13 +115,23 @@ function [ index  ] = linkNewPositionWithOldPosition_modified( oldPositions, new
 %             disp(vy);
         end   
         
-        vx = vx / s;
-        vy = vy / s;
+        %skalierung der geschwindigkeit, weil der wert sonst so klein ist,
+        %das keine verschiebung erfolgt
+        va = abs(vx + vy*i);
+        vx = -(vx / s)*200 * (0.5 + (va/(1 + (va^3)))*2); %skalierung die anfangs stark steigt und bald abfaellt
+        vy = -(vy / s)*200 * (0.5 + (va/(1 + (va^3)))*2);
+%         vx = -(vx / s)*200 * (0.5 + (va/(0.5 + (va^4)))*2); %skalierung die anfangs stark steigt und bald abfaellt
+%         vy = -(vy / s)*200 * (0.5 + (va/(0.5 + (va^4)))*2);
+%         vx = -(vx / s)*100 * (0.5 + ((va*4)/(0.25 + (va)))*(1/exp(va^4))); %skalierung die anfangs stark steigt und bald abfaellt
+%         vy = -(vy / s)*100 * (0.5 + ((va*4)/(0.25 + (va)))*(1/exp(va^4)));
     end
     
-    nvx = -vx;
-    nvy = -vy;
+%     if va ~= 0
+%         disp([num2str(vx), ' ',num2str(vy), ' = ', num2str(va)]);
+%     end
     
+    nvx = vx;
+    nvy = vy;
     
     % Verschiebe ursprungspunkt in die entgegengesetzte Richtung des
     % gemittelten Geschwindigkeitsvektor.
@@ -107,12 +145,13 @@ function [ index  ] = linkNewPositionWithOldPosition_modified( oldPositions, new
     
     mask2 = false(size(of));
 
-    position2 = [calculatedOldPosition(1), calculatedOldPosition(2)];
+    position2 = [calculatedOldPosition(1), calculatedOldPosition(2) + 2];
     position2WithFactor = position2;
-    position2WithFactor(3) = radius;
+    position2WithFactor(3) = position_search_radius + 1*(va/(0.5 + (va^3)))*2;% + 1*(va/3);
     uint8Mask = insertShape(uint8(mask2), 'FilledCircle', position2WithFactor);
 
     circleMask2 = im2bw(uint8Mask,0.5);
+    vmask = circleMask2; %for debugging
     
    %Suche darin nach eventuell vorhandenen oldPositions und speichere deren
    %indices
@@ -136,7 +175,7 @@ function [ index  ] = linkNewPositionWithOldPosition_modified( oldPositions, new
    
    index = 0;
    
-   if exist('relevantOldPositionIndices') ~= 0
+   if exist('relevantOldPositionIndices', 'var') == 1
        d = inf;
        for i = 1 : length(relevantOldPositionIndices)
            oldPositionIndex = relevantOldPositionIndices(i);

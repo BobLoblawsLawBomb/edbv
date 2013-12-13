@@ -58,7 +58,7 @@ for tableIndex = 1:num
     components_img(row, startX:endX) = label;
   
 end
-
+imshow(label2rgb(components_img));
 
 % hier werden alle components eliminiert werden, die zu klein/gross sind, 
 % und daher keine baelle sein koennen.
@@ -74,27 +74,26 @@ for label=1:labelCount
     
     % fuer jedes label alles ausmaskieren, was nicht das label ist
     comp = components_img(components_img==label);
-    temp = components_img;
-    temp(temp~=label)=0;
-    imshow((temp));
 
     % die flaeche der component ist somit die anzahl aller
     % pixel ungleich 0
     areaSize = nnz(comp);
-
-    x_width = stat(label).BoundingBox(4)-stat(label).BoundingBox(2);
-    y_width = stat(label).BoundingBox(3)-stat(label).BoundingBox(1);
-    x_width / y_width
-
     
-    % TODO: hier brauchen wir noch das grnezintervall einer validen
-    % ballgroe?e. diese muss klein genug sein, um einen ball zu
+    % Breite und Hoehe für BoundingBox der Komponente
+    x_width = stat(label).BoundingBox(3);
+    y_width = stat(label).BoundingBox(4);
+    
+    
+    % TODO: hier brauchen wir noch das grenzintervall einer validen
+    % ballgroesse. diese muss klein genug sein, um einen ball zu
     % akzeptieren der nur aus seinem glanzpunkt besteht, sowie die,
     % welche komplett erkannt werde (weiss und gelb)
-    if not(20 <= areaSize && areaSize <= 200)   %minSize=20, maxSize=150; die werte funktioniern nicht wirklich
+    if not(2 <= areaSize && areaSize <= 350)   %minSize=20, maxSize=150; die werte funktioniern nicht wirklich
         % falls das nicht gegeben ist, wird das label verworfen
         components_img(components_img == label) = 0;
-    elseif (x_width / y_width) >= 2 || (x_width / y_width) <= 0.5
+    elseif not(0.7 <= (x_width / y_width) <= 4)
+        components_img(components_img == label) = 0;
+    elseif (x_width > 30) || (y_width > 30)
         components_img(components_img == label) = 0;
     else
         % wenn die component erhalten bleibt, weissen wir ihr noch ein

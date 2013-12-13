@@ -1,8 +1,8 @@
-function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( colorComponents )
-%function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
+%function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( colorComponents )
+function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
 %====================================
 % fuer Testzwecke
-img = imread('res/table_test-1.png');
+img = imread('res/table_test-6.png');
 mask = table_mask(img);
 image = img .* mask;
 %imshow(image)

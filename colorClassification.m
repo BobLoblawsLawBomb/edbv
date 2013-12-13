@@ -1,6 +1,6 @@
-%function [ componentColorList ] = colorClassification( ColorComponents )
+function [ componentColorList ] = colorClassification( ColorComponents )
 %====================================
- function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
+ %function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
 % % 
 % % fuer Testzwecke
 img = imread('res/table_test-2.png');

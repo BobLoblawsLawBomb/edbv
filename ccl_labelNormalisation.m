@@ -1,11 +1,5 @@
 function [ components_img, labelCount ] = ccl_labelNormalisation(runlengthTable, bw_img)
 
-% img = imread('res/connected1.png');
-% bw_img = im2bw(img, 0.50);
-% 
-% runlengthTable = ccl_bottomUpLabeling();
-
-
 % hier werden die Werte der Labels zuerst normalisiert, sodass diese eine
 % durchgehende Nummerierung haben,
 % anschliessend wird das Ursprungsbild anhand dieser Labels geaendert
@@ -53,12 +47,10 @@ for tableIndex = 1:num
     startX = data(2);
     endX = data(3);
     label = data(4);
-    %[row, startX, endX, label] = runlengthTable{tableIndex};
     
     components_img(row, startX:endX) = label;
   
 end
-%imshow(label2rgb(components_img));
 
 % hier werden alle components eliminiert werden, die zu klein/gross sind, 
 % und daher keine baelle sein koennen.
@@ -88,7 +80,7 @@ for label=1:labelCount
     % ballgroesse. diese muss klein genug sein, um einen ball zu
     % akzeptieren der nur aus seinem glanzpunkt besteht, sowie die,
     % welche komplett erkannt werde (weiss und gelb)
-    if not(2 <= areaSize && areaSize <= 350)   %minSize=20, maxSize=150; die werte funktioniern nicht wirklich
+    if not(2 <= areaSize && areaSize <= 350)
         % falls das nicht gegeben ist, wird das label verworfen
         components_img(components_img == label) = 0;
     elseif not(0.7 <= (x_width / y_width) <= 4)
@@ -118,9 +110,6 @@ end
 % wir spaeter ueber eine falsche anzahl an components iterieren
 labelCount = newLabelCount;
 
-% TEST
-%figure(4)
-%imshow(label2rgb(components_img));
 end
      
      

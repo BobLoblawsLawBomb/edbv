@@ -58,7 +58,7 @@ for tableIndex = 1:num
     components_img(row, startX:endX) = label;
   
 end
-
+%imshow(label2rgb(components_img));
 
 % hier werden alle components eliminiert werden, die zu klein/gross sind, 
 % und daher keine baelle sein koennen.
@@ -67,26 +67,34 @@ end
 % anschliessend erneut normalisieren koennen
 labelMap = containers.Map('KeyType','int32','ValueType','int32');
 newLabelCount = 0;
+
+stat = regionprops(components_img,'BoundingBox');
+
 for label=1:labelCount
     
     % fuer jedes label alles ausmaskieren, was nicht das label ist
     comp = components_img(components_img==label);
-    
+
     % die flaeche der component ist somit die anzahl aller
     % pixel ungleich 0
     areaSize = nnz(comp);
     
-    %zum testen fixe grenzen
-    minSize = 0;
-    maxSize = 10000;
+    % Breite und Hoehe für BoundingBox der Komponente
+    x_width = stat(label).BoundingBox(3);
+    y_width = stat(label).BoundingBox(4);
     
-    % TODO: hier brauchen wir noch das grnezintervall einer validen
-    % ballgroe?e. diese muss klein genug sein, um einen ball zu
+    
+    % TODO: hier brauchen wir noch das grenzintervall einer validen
+    % ballgroesse. diese muss klein genug sein, um einen ball zu
     % akzeptieren der nur aus seinem glanzpunkt besteht, sowie die,
     % welche komplett erkannt werde (weiss und gelb)
-    if not(0 <= areaSize && areaSize <= 500)   %minSize=20, maxSize=150; die werte funktioniern nicht wirklich
+    if not(2 <= areaSize && areaSize <= 350)   %minSize=20, maxSize=150; die werte funktioniern nicht wirklich
         % falls das nicht gegeben ist, wird das label verworfen
-        components_img(components_img==label) = 0;
+        components_img(components_img == label) = 0;
+    elseif not(0.7 <= (x_width / y_width) <= 4)
+        components_img(components_img == label) = 0;
+    elseif (x_width > 30) || (y_width > 30)
+        components_img(components_img == label) = 0;
     else
         % wenn die component erhalten bleibt, weissen wir ihr noch ein
         % neues normalisiertes label zu. das neue normalisierte label ist 

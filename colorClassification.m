@@ -1,11 +1,11 @@
-function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( colorComponents )
-%function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
+%function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification( colorComponents )
+function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
 %====================================
 % fuer Testzwecke
-img = imread('res/table_test-1.png');
+img = imread('res/table_test-6.png');
 mask = table_mask(img);
 image = img .* mask;
-imshow(image)
+%imshow(image)
 [BWComponents, ColorComponents] = connectedComponent(image, 0.5);
 %====================================
 
@@ -29,39 +29,39 @@ for x = 1:num
     
     current = ColorComponents{x};
     
-    size(current)
+    %size(current)
     
-    imshow(current)
+    imshow(current);
 
-%     %gruener Teil wegschneiden
-%     cform = makecform('srgb2lab');
-%     lab = applycform(current,cform);
-%     rg_chroma = lab(:,:,2);
-%     THRESHOLD = 0.40;
-%     BW = im2bw(rg_chroma, THRESHOLD);
+                                    %     %gruener Teil wegschneiden
+                                    %     cform = makecform('srgb2lab');
+                                    %     lab = applycform(current,cform);
+                                    %     rg_chroma = lab(:,:,2);
+                                    %     THRESHOLD = 0.40;
+                                    %     BW = im2bw(rg_chroma, THRESHOLD);
+
+                                    %     mask = uint8(current);
+                                    %     mask = repmat( mask, [1 1 3]);
+                                    %     component = mask .* current;
+                                    %     
+                                    %     imshow(component);
+                                    %   
     
-    mask = uint8(BW);
-    mask = repmat( mask, [1 1 3]);
-    component = mask .* current;
-    
-    imshow(component);
-  
-    
-    ballClass = componentColorClass(component);
+    ballClass = componentColorClass(current);
     
     % ================================================   
     % Die Component mit der erkannten Farbe einfaerben
-    comp_mask = im2bw(component,0.00001);
+    comp_mask = im2bw(current,0.00001);
     
-    comp_red = component(:,:,1);
-    comp_green = component(:,:,2);
-    comp_blue = component(:,:,3);
+    comp_red = current(:,:,1);
+    comp_green = current(:,:,2);
+    comp_blue = current(:,:,3);
     
     comp_red(comp_mask>0) = ballClass.rgbColor(1);
     comp_green(comp_mask>0) = ballClass.rgbColor(2);
     comp_blue(comp_mask>0) = ballClass.rgbColor(3);
     
-    new_comp = zeros(size(component));
+    new_comp = zeros(size(current));
     new_comp(:,:,1) = comp_red;
     new_comp(:,:,2) = comp_green;
     new_comp(:,:,3) = comp_blue;

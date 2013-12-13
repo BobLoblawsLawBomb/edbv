@@ -3,6 +3,7 @@ classdef YellowBucket < AbstractBucket
     %   Detailed explanation goes here
     
     properties(Constant = true)
+        colorIndex = 8;
         colorName = 'Yellow';
         rgbColor = [255,255,0];
         hueMin = 40/360;

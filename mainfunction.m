@@ -70,7 +70,7 @@ while ~isDone(videoReader)
     if(frameNo == 1)
         %TODO: Erstes Component Labeling anwenden
         %componenten nach label getrennt, 
-        %kann noch fragmente vom tisch bzw. k? enthalten
+        %kann noch fragmente vom tisch bzw. koe enthalten
         [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
         
 %         diameterList = zeros(length(resultBW(:)));

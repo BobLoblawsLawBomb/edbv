@@ -36,27 +36,10 @@ table_green = imfilter(table_green,h);
 % tischflaeche
 lab(:,:,2) = table_green + table_red;
 
-max(max(lab(:,:,1)))
-max(max(lab(:,:,2)))
-max(max(lab(:,:,3)))
 
-lab = im2double(lab);
+cform = makecform('lab2srgb');
+image = applycform(lab, cform); 
 
-max(max(lab(:,:,1)))
-max(max(lab(:,:,2)))
-max(max(lab(:,:,3)))
 
-% bild zurueck in den RGB raum konvertieren
-image = colorspace('Lab->RGB',lab);
-% [R, G, B] = Lab2RGB(lab);
-% image(:,:,1) = R;
-% image(:,:,2) = G;
-% image(:,:,3) = B;
-
-% BREAKPOINT
-
-max(max(image(:,:,1)))
-max(max(image(:,:,2)))
-max(max(image(:,:,3)))
 
 imshow(image);

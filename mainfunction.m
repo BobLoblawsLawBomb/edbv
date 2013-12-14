@@ -7,10 +7,12 @@ function [ output_args ] = mainfunction()%argument:  video_path
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 %
-% video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
+video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hit1.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
-video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
+
+%video_path = [pwd,filesep,'res',filesep,video_path];
+
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
 videoInfo = VideoReader(video_path);
@@ -67,7 +69,7 @@ while ~isDone(videoReader)
     if(frameNo == 1)
         %TODO: Erstes Component Labeling anwenden
         %componenten nach label getrennt, 
-        %kann noch fragmente vom tisch bzw. k? enthalten
+        %kann noch fragmente vom tisch bzw. koe enthalten
         [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
         
 %         diameterList = zeros(length(resultBW(:)));

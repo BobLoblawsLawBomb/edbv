@@ -4,6 +4,12 @@ function [ is_ok ] = test_video(video_name, only_first_frame, show_image)
 %   Tests the video with the given name (in the res folder)
 %   If only_first_frame is false, the whole video is analyzed (default: true)
 %   If show_image is true, the result of the corner detection is shown (default: false)
+%   Note:   Testing the whole video is slow and in most cases the video is 
+%           classified as not suitable (so by default this is not applied). 
+%           A color check is also applied, but it does not detect the 
+%           proper colors, so the video is classified as suitable even if 
+%           there are too much balls of one color (the result is printed to 
+%           the console).
 
 if (nargin<2)
     only_first_frame = true;
@@ -33,7 +39,7 @@ if ~is_ok
 	return;
 end
 
-% Fuer die folgenden Schritte kannd as Bild verkleinert werden:
+% Fuer die folgenden Schritte kann das Bild verkleinert werden:
 im = imresize(im,[360 NaN]);
 [y,x,z]=size(im);
 

@@ -21,7 +21,8 @@ normalizedLabelCount = 0;
 
 for x=1:num
     
-    currentLabel = runlengthTable{x}(4);
+    %TODO kann nicht damit umgehen wenn gar keine objekte erkannt werden. (Index exceeds matrix dimensions.)
+    currentLabel = runlengthTable{x}(4); 
     
     % Exisiert fuer ein altes Label noch kein Eintrag in der Map, so wir
     % einer erstellt und diesem alten Label ein neues normalisiertes Label
@@ -93,7 +94,7 @@ for label=1:labelCount
         % immer <=altes normalisiertes label
         newLabelCount = newLabelCount + 1;
         labelMap(label) = newLabelCount;
-        fprintf('substituting label %i with %i \n', label,newLabelCount);
+        %fprintf('substituting label %i with %i \n', label,newLabelCount);
     end
 end
 

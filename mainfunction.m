@@ -7,11 +7,15 @@ function [ output_args ] = mainfunction()%argument:  video_path
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 %
-video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
+% video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hit1.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
+video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
+videoInfo = VideoReader(video_path);
+numberOfFrames = videoInfo.NumberOfFrames;
+clear videoInfo;
 converter = vision.ImageDataTypeConverter; 
 converter.OutputDataType = 'uint8';
 opticalFlow = vision.OpticalFlow('ReferenceFrameDelay', 1);
@@ -59,7 +63,7 @@ compVelocity = [0 0];
 positions=cell(0);
 x=1;
 while ~isDone(videoReader)
-    disp(['next Frame no: ', num2str(frameNo)]);
+    disp(['next Frame no: ', num2str(frameNo), ' / ', num2str(numberOfFrames)]);
     if(frameNo == 1)
         %TODO: Erstes Component Labeling anwenden
         %componenten nach label getrennt, 
@@ -191,6 +195,8 @@ while ~isDone(videoReader)
 
         of_comp2 = zeros;
         
+        ofpvis = double(repmat(zeros(size(of)),[1 1 3]));
+        
         ofc_idx = 3;
         for i = 1 : of_comp_count
             of_comp = of_comps;
@@ -207,11 +213,21 @@ while ~isDone(videoReader)
             of_comp = logical(of_comp);
             ofCompMasks(:,:,1,ofc_idx) = of_comp;
             ofCompPositions(:,:,1,ofc_idx) = int32(fliplr(getPositionOfComponent(of_comp)));
+            point = ofCompPositions(:,:,1,ofc_idx);
+            ofpvis(point(1), point(2), 1) = 0;
+            ofpvis(point(1), point(2), 2) = 1;
+            ofpvis(point(1), point(2), 3) = 1;
 %             disp(ofCompPositions(:,:,1,ofc_idx));
             ofc_idx = ofc_idx + 1;
         end
         figure(7)
+        of_comp2 = double(repmat(of_comp2, [1 1 3]));
+        of_comp2 = (of_comp2 + ofpvis);
+        of_comp2 = of_comp2 / max(max(max(of_comp2)));
         imshow(of_comp2);
+        
+        cppvis = double(repmat(zeros(size(of)),[1 1 3]));
+        cppvis_old = double(repmat(zeros(size(of)),[1 1 3]));
         
         %liste der alten Positionen der Bälle
         compPositionSize = size(compPosition);
@@ -219,6 +235,10 @@ while ~isDone(videoReader)
             oldCompPositions(:, :, i) = int32(fliplr(compPosition(:, :, i, frameNo - 1)));
             compPosition(:, :, i, frameNo) = -1; %set error code, für den fall das kein neuer eintrag dazu kommt
 %             disp([num2str(i), ': ', num2str(oldCompPositions(:, :, i))]);
+            oldCompPosition = oldCompPositions(:, :, i);
+            cppvis_old(oldCompPosition(1), oldCompPosition(2), 1) = 1;
+            cppvis_old(oldCompPosition(1), oldCompPosition(2), 2) = 1;
+            cppvis_old(oldCompPosition(1), oldCompPosition(2), 3) = 0;
         end
         
         %Bälle im neuen Frame finden
@@ -227,10 +247,15 @@ while ~isDone(videoReader)
         %Jede neue Position versuchen mit einer alten zu verknüpfen
         for i = 1 : length(resultBW(:))
             %             resultRaw = or(resultRaw, logical(resultBW{i}));
-            newCompPosition = getPositionOfComponent(resultBW{i});
+            newCompPosition = int32(getPositionOfComponent(resultBW{i}));
             %             disp('newCompPosition');
             %             disp(newCompPosition);
-            [oldCompIndex vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified( oldCompPositions, newCompPosition, ofCompMasks, ofCompPositions, of, 6, 6);
+            
+            cppvis(newCompPosition(2), newCompPosition(1), 1) = 1;
+            cppvis(newCompPosition(2), newCompPosition(1), 2) = 0;
+            cppvis(newCompPosition(2), newCompPosition(1), 3) = 1;
+            
+            [oldCompIndex, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified( oldCompPositions, newCompPosition, ofCompMasks, ofCompPositions, of, 5, 6);
             %TODO: react to oldCompIndex = 0, maybe create new component
 %             disp('fin');
 %             disp(oldCompIndex);
@@ -270,9 +295,11 @@ while ~isDone(videoReader)
         end
         
         %linedraw-debugging-output
-%         im_with_line = drawline(im, compPosition, ones(compPositionSize(3), 1, 3));
-%         figure(10)
-%         imshow(im_with_line);
+        im_with_line = drawline(im, compPosition, ones(compPositionSize(3), 1, 3));
+        textInserter = vision.TextInserter([num2str(frameNo), ' / ', num2str(numberOfFrames)],'Color', [255,255,255], 'FontSize', 24, 'Location', [20 20]);
+        im_with_line = step(textInserter, im_with_line);
+        figure(10)
+        imshow(im_with_line);
         
 %         figure(7)
 %         imshow(resultRaw);
@@ -314,7 +341,7 @@ while ~isDone(videoReader)
         
         %optical-flow-intensitäten in matrix speichern
 %         vof = abs(of);
-        output_mask = double(im)*0.001 + double(repmat(mat2gray(ofVelocity),[1 1 3]));
+        output_mask = double(lastim)*0.001 + double(repmat(mat2gray(ofVelocity),[1 1 3]));
         maxv = max(max(max(output_mask)));
         if maxv > 1
             output_mask = output_mask./maxv;
@@ -333,11 +360,17 @@ while ~isDone(videoReader)
         output_cmask(:,:,3) = output_cmask(:,:,3)*0;
         
         %masken ebene einfärben
-        output_resultRaw = double(label2rgb(resultRaw));
+        %output_resultRaw = double(label2rgb(resultRaw));
+        output_resultRaw = double(repmat(resultRaw,[1 1 3]));
         output_resultRaw(output_resultRaw(:,:,1:3) == 255) = 0;
+        output_resultRaw(:,:,1) = output_resultRaw(:,:,1)*0;
+        output_resultRaw(:,:,2) = output_resultRaw(:,:,2)*1;
+        output_resultRaw(:,:,3) = output_resultRaw(:,:,3)*0;
         
+        output_complabels = double(label2rgb(resultRaw));
+        output_complabels(output_complabels(:,:,1:3) == 255) = 0;
         figure(15);
-        imshow(output_resultRaw);
+        imshow(output_complabels);
         
 %         output_resultRaw = double(repmat(logical(resultRaw), [1 1 3]));
 %         output_resultRaw(:,:,1) = output_resultRaw(:,:,1)*0;
@@ -355,10 +388,26 @@ while ~isDone(videoReader)
         %sichtbar bleibt
         output_mask = double(output_mask);
         idx = output_mask < 0.12;
-        output_mask(idx) = output_mask(idx) + output_vmask(idx);
+        output_mask(idx) = output_mask(idx) + output_vmask(idx)*2;
         output_mask(idx) = output_mask(idx) + output_cmask(idx);
-        output_mask = output_mask + (output_resultRaw/255);
+        
+        maxv = max(max(max(output_mask)));
+        output_mask = output_mask./maxv;
+        
+        output_mask = output_mask + (output_resultRaw/125);
 %         output_mask = output_mask + output_seachMask;
+        maxv = max(max(max(output_mask)));
+        output_mask = output_mask./maxv;
+        
+        output_mask = output_mask + ofpvis;
+        maxv = max(max(max(output_mask)));
+        output_mask = output_mask./maxv;
+        
+        output_mask = output_mask + cppvis/2;
+        maxv = max(max(max(output_mask)));
+        output_mask = output_mask./maxv;
+        
+        output_mask = output_mask + cppvis_old/2;
         maxv = max(max(max(output_mask)));
         output_mask = output_mask./maxv;
         

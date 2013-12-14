@@ -2,9 +2,12 @@ function [index, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified
 %UNTITLED6 Summary of this function goes here
 %   Detailed explanation goes here
     
+    ymaskseachoffset = 0; %muss scheinbar etwas weiter unten (positiver) als possearchoffset sein
+    ypossearchoffset = -4;
+    
     mask = false(size(of));
 
-    position = [newPosition(1), newPosition(2)];
+    position = [newPosition(1), newPosition(2) + ymaskseachoffset];
     positionWithFactor = position;
     positionWithFactor(3) = mask_search_radius;
     uint8Mask = insertShape(uint8(mask), 'FilledCircle', positionWithFactor);
@@ -42,6 +45,7 @@ function [index, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified
 %     disp(intensityPositions);
 %     disp(iPosSize);
 %     disp('search points:');
+%     disp(iPosSize(4));
     
     for i = 1 : iPosSize(3)
         
@@ -51,14 +55,23 @@ function [index, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified
             
 %             disp([num2str(i),' ',num2str(k),' ',num2str(iPosSize(1)),' ',num2str(iPosSize(2))]);
             point = intensityPositions(:,:,i,k);
+%             disp([num2str(i),' ',num2str(k),' ',num2str(point(1)),' ',num2str(point(2))]);
             
             if point(1) == -1 && point(2) == -1
                 continue
             end
             
+%             figure(40)
+%             dispCircleMask = double(repmat(circleMask, [1 1 3]));
+%             dispCircleMask(point(1), point(2), 1) = 1;
+%             dispCircleMask(point(1), point(2), 2) = 0;
+%             dispCircleMask(point(1), point(2), 3) = 0;
+%             imshow(dispCircleMask);
+            
             if isPointWithinMask(point, circleMask)
                 foundIntensityPoints(:,:,l,j) = point;
                 foundIntensityMasks{l,j} = intensityMasks(:,:,i,k);
+                disp([num2str(i),' ',num2str(k),' ',num2str(point(1)),' ',num2str(point(2))]);
 %                 disp('found point:');
 %                 disp(['at ', num2str(l),' ', num2str(j)]);
 %                 disp(point);
@@ -68,6 +81,8 @@ function [index, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified
         
         l = l + 1;
     end
+    
+%     disp('end search points:');
     
     % Falls kein einziger punkt einer OpticalFlow-Maske im suchbereich
     % gefunden wurde wird index =  zurückgegeben, was bedeutet dass 
@@ -80,9 +95,9 @@ function [index, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified
     % Schwerpunkt am nähesten zum Ursprungspunkt ist
     if exist('foundIntensityPoints', 'var') == 1
         fIPointsSize = size(foundIntensityPoints);
-%         disp(fIPointsSize);
+        disp(fIPointsSize);
         for i = 1 : fIPointsSize(1)
-%             disp(foundIntensityPoints(:,:,i));
+            disp(foundIntensityPoints(:,:,i));
             centroid = calculateCentroid(foundIntensityPoints(:,:,i));
             
             newD = sqrt(double((centroid(1)-newPosition(1))^2 + (centroid(2)-newPosition(2))^2));
@@ -118,25 +133,26 @@ function [index, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified
         %skalierung der geschwindigkeit, weil der wert sonst so klein ist,
         %das keine verschiebung erfolgt
         va = abs(vx + vy*i);
-        vx = -(vx / s)*200 * (0.5 + (va/(1 + (va^3)))*2); %skalierung die anfangs stark steigt und bald abfaellt
-        vy = -(vy / s)*200 * (0.5 + (va/(1 + (va^3)))*2);
+        vx = -(vx / s)*150;% * (0.5 + (va/(1 + (va^3)))*2); %skalierung die anfangs stark steigt und bald abfaellt
+        vy = -(vy / s)*150;% * (0.5 + (va/(1 + (va^3)))*2);
 %         vx = -(vx / s)*200 * (0.5 + (va/(0.5 + (va^4)))*2); %skalierung die anfangs stark steigt und bald abfaellt
 %         vy = -(vy / s)*200 * (0.5 + (va/(0.5 + (va^4)))*2);
 %         vx = -(vx / s)*100 * (0.5 + ((va*4)/(0.25 + (va)))*(1/exp(va^4))); %skalierung die anfangs stark steigt und bald abfaellt
 %         vy = -(vy / s)*100 * (0.5 + ((va*4)/(0.25 + (va)))*(1/exp(va^4)));
     end
     
-%     if va ~= 0
-%         disp([num2str(vx), ' ',num2str(vy), ' = ', num2str(va)]);
-%     end
+    if va ~= 0
+        disp([num2str(vx), ' ',num2str(vy), ' = ', num2str(va)]);
+    end
     
+    %testhalber ohne verschiebung
     nvx = vx;
     nvy = vy;
     
     % Verschiebe ursprungspunkt in die entgegengesetzte Richtung des
     % gemittelten Geschwindigkeitsvektor.
     
-    calculatedOldPosition = [newPosition(1) + nvx, newPosition(2) + nvy ];
+    calculatedOldPosition = [double(newPosition(1)) + nvx, double(newPosition(2)) + nvy ];
     
 %     disp('calculatedOldPosition');
 %     disp(calculatedOldPosition);
@@ -145,11 +161,14 @@ function [index, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified
     
     mask2 = false(size(of));
 
-    position2 = [calculatedOldPosition(1), calculatedOldPosition(2) + 2];
+    position2 = [calculatedOldPosition(1), calculatedOldPosition(2) + ypossearchoffset];
     position2WithFactor = position2;
-    position2WithFactor(3) = position_search_radius + 1*(va/(0.5 + (va^3)))*2;% + 1*(va/3);
+    %TODO seach_radius mit geschwindigkeit skalieren, damit er falls keine
+    %of-maske vorhanden ist nicht fälschlicherweise eine verbindung zu
+    %einer nahen anderen komponente festlegt
+    position2WithFactor(3) = position_search_radius + 1*(va/2);% + 2*(va/(0.5 + (va^3)));% + 1*(va/3);
     uint8Mask = insertShape(uint8(mask2), 'FilledCircle', position2WithFactor);
-
+    
     circleMask2 = im2bw(uint8Mask,0.5);
     vmask = circleMask2; %for debugging
     

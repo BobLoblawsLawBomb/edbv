@@ -3,11 +3,26 @@ function [ componentColorList ] = colorClassification( ColorComponents )
 %function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
 % % 
 % % fuer Testzwecke
-img = imread('res/table_test-2.png');
+img = imread('res/table_test-7.png');
 z = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
 mask = table_mask(img);
 image = img .* mask;
-%imshow(image)
+
+
+% cform = makecform('srgb2lab');
+% lab = applycform(image, cform); 
+% rg_chroma = lab(:,:,2); % hell bedeutet mehr rot, dunkel mehr gruen
+% rg_bw = imcomplement(im2bw(rg_chroma,0.5));
+% table_red = rg_chroma .* uint8(imcomplement(rg_bw));
+% table_green = rg_chroma .* uint8(rg_bw);
+% h = fspecial('gaussian', 20, 0.5);
+% table_green = imfilter(table_green,h);
+% lab(:,:,2) = table_green + table_red;
+% cform = makecform('lab2srgb');
+% image = applycform(lab, cform); 
+% imshow(image)
+
+
 [~, ColorComponents] = connectedComponent(image, 0.5);
 %====================================
 

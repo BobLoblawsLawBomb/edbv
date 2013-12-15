@@ -1,4 +1,4 @@
-function [index, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified( oldPositions, newPosition, intensityMasks, intensityPositions, of, mask_search_radius, position_search_radius)
+function [index, vx, vy, vmask, smask] = linkComponents( oldPositions, newPosition, intensityMasks, intensityPositions, of, mask_search_radius, position_search_radius)
 %UNTITLED6 Summary of this function goes here
 %   Detailed explanation goes here
     

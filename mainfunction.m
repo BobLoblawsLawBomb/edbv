@@ -55,6 +55,8 @@ gim = single(rgb2gray(im))./255;
 %A(:,:,2,2) = [3 3]; %Position von Ball 2 in Frame 2
 compPosition = [0 0];
 
+compColor = [0 0];
+
 %TODO: VektorMatrix anlegen die f?r jeden Frame f?r jeden Ball einen Richtungsvektor speichert
 %Form: 
 %A = [1 2]; %Richtung von Ball 1 in Frame 1
@@ -73,6 +75,7 @@ while ~isDone(videoReader)
         %componenten nach label getrennt, 
         %kann noch fragmente vom tisch bzw. koe enthalten
         [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
+        [colorClasses] = colorClassification(resultColor);
         
 %         diameterList = zeros(length(resultBW(:)));
         
@@ -82,6 +85,7 @@ while ~isDone(videoReader)
 %             disp([num2str(frameNo), ' ', num2str(i), ' ',num2str(p)]);
 %             disp(sum(sum(resultBW{i})));
             compPosition(:, :, i, frameNo) = getPositionOfComponent(resultBW{i});
+            compColor(:, :, i, frameNo) = colorClasses{i};
             compVelocity(:, :, i, 1) = [0 0];
             
 %             s =  regionprops(resultBW{i},'EquivDiameter');
@@ -259,6 +263,10 @@ while ~isDone(videoReader)
         [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
         millis_comp_labeling = toc*1000;
         
+        tic;
+        [colorClasses] = colorClassification(resultColor);
+        millis_color_class = toc*1000;
+        
         %Jede neue Position versuchen mit einer alten zu verknüpfen
         tic;
         for i = 1 : length(resultBW(:))
@@ -271,7 +279,7 @@ while ~isDone(videoReader)
             cppvis(newCompPosition(2), newCompPosition(1), 2) = 0;
             cppvis(newCompPosition(2), newCompPosition(1), 3) = 1;
             
-            [oldCompIndex, vx, vy, vmask, smask] = linkNewPositionWithOldPosition_modified( oldCompPositions, newCompPosition, ofCompMasks, ofCompPositions, of, 5, 6);
+            [oldCompIndex, vx, vy, vmask, smask] = linkComponents( oldCompPositions, newCompPosition, ofCompMasks, ofCompPositions, of, 5, 6);
             %TODO: react to oldCompIndex = 0, maybe create new component
 %             disp('fin');
 %             disp(oldCompIndex);
@@ -331,9 +339,11 @@ while ~isDone(videoReader)
         lineimg = step(textInserter, lineimg);
         textInserter = vision.TextInserter(['Millis Comp Pos: ', num2str(millis_comp_pos)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 100]);
         lineimg = step(textInserter, lineimg);
-        textInserter = vision.TextInserter(['Millis Linking: ', num2str(millis_linking)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 115]);
+        textInserter = vision.TextInserter(['Millis Comp Color: ', num2str(millis_color_class)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 115]);
         lineimg = step(textInserter, lineimg);
-        textInserter = vision.TextInserter(['Millis Linedraw: ', num2str(millis_linedraw)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 130]);
+        textInserter = vision.TextInserter(['Millis Linking: ', num2str(millis_linking)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 130]);
+        lineimg = step(textInserter, lineimg);
+        textInserter = vision.TextInserter(['Millis Linedraw: ', num2str(millis_linedraw)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 145]);
         lineimg = step(textInserter, lineimg);
         
 %         try

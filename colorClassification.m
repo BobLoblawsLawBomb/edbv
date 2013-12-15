@@ -1,5 +1,5 @@
 function [ componentColorList ] = colorClassification( ColorComponents )
-%====================================
+
 %function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
 % % 
 % % fuer Testzwecke
@@ -7,7 +7,6 @@ function [ componentColorList ] = colorClassification( ColorComponents )
 % z = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
 % mask = table_mask(img);
 % image = img .* mask;
-
 
 % cform = makecform('srgb2lab');
 % lab = applycform(image, cform); 
@@ -22,14 +21,12 @@ function [ componentColorList ] = colorClassification( ColorComponents )
 % image = applycform(lab, cform); 
 % imshow(image)
 
-
 % [~, ColorComponents] = connectedComponent(image, 0.5);
+%===========================================
 
 z = repmat( uint8(zeros(size(ColorComponents{1},1),size(ColorComponents{1},2))), [1 1 3]);
-%====================================
 
 [~, num] = size(ColorComponents);
-
 
 
 % diese Liste enthaelt fuer jede Component einen Eintrag, der mit einem

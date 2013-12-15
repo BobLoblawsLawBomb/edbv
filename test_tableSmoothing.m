@@ -1,9 +1,9 @@
-img = imread('res/table_test-7.png');
+img = imread('res/table_test-1.png');
 
 % zuerst maskieren wie immer den tisch aus
 mask = table_mask(img);
 image = img .* mask;
-
+imshow(image);
 % jetzt holen wir uns im Lab Farbraum den rot/gruenen Farbkanal
 cform = makecform('srgb2lab');
 lab = applycform(image, cform); 
@@ -35,16 +35,19 @@ table_green = imfilter(table_green,h);
 table_green = table_green .* uint8(rg_bw);
 
 % BREAKPOINT
-imshow(table_green);
+imshow(table_green)
 
 % nun kombinieren wir wieder alles auf dem tisch mit der modifizierten
 % tischflaeche
 lab(:,:,2) = table_green + table_red;
 
-
+% bild zurueck in den RGB raum konvertieren
 cform = makecform('lab2srgb');
-image = applycform(lab, cform); 
+image = applycform(image, cform); 
 
-
-
+% BREAKPOINT
 imshow(image);
+
+%[~, ColorComponents] = connectedComponent(image, 0.5);
+%[ componentColorList ] = colorClassification( ColorComponents );
+

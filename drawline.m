@@ -13,8 +13,7 @@ function [ im_with_line ] = drawline(im, A, cols)
 J = im;
 
 for  ball_nr = 1 : size( A , 3)
-    
-  % TODO: get correct ball color
+  
   ball_color = cols(ball_nr,:);
 
   pos_frame_from = uint32(A(:, :, ball_nr, 1));

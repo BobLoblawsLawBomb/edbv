@@ -2,14 +2,16 @@ function [ output_args ] = mainfunction()%argument:  video_path
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
+iptsetpref('ImshowBorder','tight');
+
 %default test video path
 %
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 %
-video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
-% video_path = [pwd,filesep,'res',filesep,'test_hit1.mp4'];
-% video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
+% video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
+% video_path = [pwd,filesep,'res',filesep,'test_hd_2_short.mp4'];
+video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
 
 %video_path = [pwd,filesep,'res',filesep,video_path];
 
@@ -142,7 +144,9 @@ while ~isDone(videoReader)
 %         end
         
         %OpticalFlow auf aktuellen Frame, unter ber?ckichtung des vorhergehenden, anwenden.
+        tic;
         of = step(opticalFlow, gim, lastgim);
+        millis_of = toc*1000;
         
         % --- OPTICAL FLOW TEST OUTPUT ---
         lines = int32(videooptflowlines(of, 30));
@@ -181,7 +185,10 @@ while ~isDone(videoReader)
         ofVelocity = abs(of);
         ofVelocityFiltered = zeros(size(ofVelocity));
         ofVelocityFiltered(ofVelocity(:,:) > 0.01) = 1;
+        
+        tic;
         [of_comps, of_comp_count] = ccl_labeling( ofVelocityFiltered );
+        millis_of_labeling = toc*1000;
         
         %opticalFlow masks und positions matrix erstellen
 %         ofCompMasks = zeros([1, of_comp_count, 1, 1, 1]);
@@ -195,9 +202,10 @@ while ~isDone(videoReader)
         ofCompMasks(:,:,1,2) = zeros(size(gim));
         ofCompPositions(:,:,1,2) = [-1, -1];
 
-        of_comp2 = zeros;
-        
+        of_comp2 = double(repmat(zeros(size(of)),[1 1 1]));
         ofpvis = double(repmat(zeros(size(of)),[1 1 3]));
+        
+        tic; 
         
         ofc_idx = 3;
         for i = 1 : of_comp_count
@@ -222,6 +230,9 @@ while ~isDone(videoReader)
 %             disp(ofCompPositions(:,:,1,ofc_idx));
             ofc_idx = ofc_idx + 1;
         end
+        
+        millis_comp_pos = toc*1000;
+        
         figure(7)
         of_comp2 = double(repmat(of_comp2, [1 1 3]));
         of_comp2 = (of_comp2 + ofpvis);
@@ -244,9 +255,12 @@ while ~isDone(videoReader)
         end
         
         %Bälle im neuen Frame finden
+        tic;
         [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
+        millis_comp_labeling = toc*1000;
         
         %Jede neue Position versuchen mit einer alten zu verknüpfen
+        tic;
         for i = 1 : length(resultBW(:))
             %             resultRaw = or(resultRaw, logical(resultBW{i}));
             newCompPosition = int32(getPositionOfComponent(resultBW{i}));
@@ -296,13 +310,38 @@ while ~isDone(videoReader)
             end
         end
         
-        %linedraw-debugging-output
-        im_with_line = drawline(im, compPosition, ones(compPositionSize(3), 1, 3));
-        textInserter = vision.TextInserter([num2str(frameNo), ' / ', num2str(numberOfFrames)],'Color', [255,255,255], 'FontSize', 24, 'Location', [20 20]);
-        im_with_line = step(textInserter, im_with_line);
-        figure(10)
-        imshow(im_with_line);
+        millis_linking = toc*1000;
         
+        %linedraw-debugging-output
+        tic;
+        imsize = size(im);
+        lineimg = drawLines(imsize, compPosition, zeros(compPositionSize(3), 1, 3), 1);
+        millis_linedraw = toc*1000;
+        
+        alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
+        lineimg = step(alphablender, lineimg, im);
+        
+        textInserter = vision.TextInserter([num2str(frameNo), ' / ', num2str(numberOfFrames)],'Color', [255,255,255], 'FontSize', 24, 'Location', [20 20]);
+        lineimg = step(textInserter, lineimg);
+        textInserter = vision.TextInserter(['Millis OF: ', num2str(millis_of)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 55]);
+        lineimg = step(textInserter, lineimg);
+        textInserter = vision.TextInserter(['Millis OF Mask: ', num2str(millis_of_labeling)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 70]);
+        lineimg = step(textInserter, lineimg);
+        textInserter = vision.TextInserter(['Millis Comp Mask: ', num2str(millis_comp_labeling)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 85]);
+        lineimg = step(textInserter, lineimg);
+        textInserter = vision.TextInserter(['Millis Comp Pos: ', num2str(millis_comp_pos)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 100]);
+        lineimg = step(textInserter, lineimg);
+        textInserter = vision.TextInserter(['Millis Linking: ', num2str(millis_linking)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 115]);
+        lineimg = step(textInserter, lineimg);
+        textInserter = vision.TextInserter(['Millis Linedraw: ', num2str(millis_linedraw)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 130]);
+        lineimg = step(textInserter, lineimg);
+        
+%         try
+%             clf(10);
+%         end
+        figure(10);
+        imshow(lineimg);
+                
 %         figure(7)
 %         imshow(resultRaw);
         
@@ -442,10 +481,21 @@ release(videoReader);
 %TODO: Linien-Overlay erzeugen und ?ber den letzten Frame legen, sowie als
 %      Resultat zur?ckgeben.
 
-im_with_line = drawline(im, compPosition, ones(compPositionSize(3), 1, 3));
-figure(12)
-imshow(im_with_line);
+lineimg = drawLines(size(im), compPosition, zeros(compPositionSize(3), 1, 3), 1);
+alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
+lineimg = step(alphablender, lineimg, im);
 
+%Version mit Border um die linien
+% lineimg = drawLines(size(im), compPosition, zeros(compPositionSize(3), 1, 3), 2);
+% lineimg2 = drawLines(imsize, compPosition, repmat([0.9 0.9 0.9],[compPositionSize(3), 1, 1]), 1);
+% alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg2, 0.99)), 'MaskSource', 'Property');
+% lineimg = step(alphablender, lineimg2, lineimg);
+% alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
+% lineimg = step(alphablender, lineimg, im);
+
+figure(12);
+imshow(lineimg);
+        
 % imsize = size(im);
 % lineimg = zeros(imsize);
 % lineimg = drawline(lineimg, compPosition, ones(compPositionSize(3), 1, 3));

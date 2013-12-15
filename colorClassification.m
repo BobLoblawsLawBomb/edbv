@@ -3,12 +3,12 @@ function [ componentColorList ] = colorClassification( ColorComponents )
 %function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
 % % 
 % % fuer Testzwecke
-img = imread('res/table_test-2.png');
-z = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
-mask = table_mask(img);
-image = img .* mask;
-%imshow(image)
-[~, ColorComponents] = connectedComponent(image, 0.5);
+ img = imread('res/table_test-1.png');
+ z = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
+% mask = table_mask(img);
+% image = img .* mask;
+% %imshow(image)
+% [~, ColorComponents] = connectedComponent(image, 0.5);
 %====================================
 
 [~, num] = size(ColorComponents);

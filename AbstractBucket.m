@@ -12,6 +12,9 @@ classdef (Abstract) AbstractBucket
         satMax;
         valMin;
         valMax;
+        
+        hueMinB;
+        hueMaxB;
     end
     
 end

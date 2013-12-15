@@ -12,6 +12,9 @@ classdef BlueBucket < AbstractBucket
         satMax = 1;
         valMin = 0.35;
         valMax = 1;
+        
+        hueMinB = 169/360;
+        hueMaxB = 201/360;
     end
     
 end

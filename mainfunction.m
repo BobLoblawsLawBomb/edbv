@@ -9,9 +9,13 @@ iptsetpref('ImshowBorder','tight');
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 %
-% video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
+% video_path = [pwd,filesep,'res',filesep,'test_blue.mp4'];
+video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
+% video_path = [pwd,filesep,'res',filesep,'test_hd_1_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_2_short.mp4'];
-video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
+% video_path = [pwd,filesep,'res',filesep,'test_hd_3_short.mp4'];
+% video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
+
 
 %video_path = [pwd,filesep,'res',filesep,video_path];
 
@@ -55,7 +59,11 @@ gim = single(rgb2gray(im))./255;
 %A(:,:,2,2) = [3 3]; %Position von Ball 2 in Frame 2
 compPosition = [0 0];
 
-compColor = [0 0];
+compClass = 0;
+
+compIgnore = 0;
+compLostCount = 0;
+
 
 %TODO: VektorMatrix anlegen die f?r jeden Frame f?r jeden Ball einen Richtungsvektor speichert
 %Form: 
@@ -70,12 +78,13 @@ positions=cell(0);
 x=1;
 while ~isDone(videoReader)
     disp(['next Frame no: ', num2str(frameNo), ' / ', num2str(numberOfFrames)]);
+    
     if(frameNo == 1)
         %TODO: Erstes Component Labeling anwenden
         %componenten nach label getrennt, 
         %kann noch fragmente vom tisch bzw. koe enthalten
         [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
-        [colorClasses] = colorClassification(resultColor);
+        compClasses = colorClassification(resultColor);
         
 %         diameterList = zeros(length(resultBW(:)));
         
@@ -85,8 +94,10 @@ while ~isDone(videoReader)
 %             disp([num2str(frameNo), ' ', num2str(i), ' ',num2str(p)]);
 %             disp(sum(sum(resultBW{i})));
             compPosition(:, :, i, frameNo) = getPositionOfComponent(resultBW{i});
-            compColor(:, :, i, frameNo) = colorClasses{i};
+            compClass(:, i, frameNo) = compClasses{i};
             compVelocity(:, :, i, 1) = [0 0];
+            compIgnore(i) = 0;
+            compLostCount(i) = 0;
             
 %             s =  regionprops(resultBW{i},'EquivDiameter');
 %             diameterList(i) = s.EquivDiameter;
@@ -97,6 +108,8 @@ while ~isDone(videoReader)
         %N?chsten Frame auslesen
 %         im2 = step(converter, step(videoReader)).*mask;
         im2 = step(converter, step(videoReader));
+        
+        millis_sum1 = datevec(now);
         
         mask = table_mask(im2);
         im2 = im2.*mask;
@@ -153,12 +166,12 @@ while ~isDone(videoReader)
         millis_of = toc*1000;
         
         % --- OPTICAL FLOW TEST OUTPUT ---
-        lines = int32(videooptflowlines(of, 30));
-        
-        if ~isempty(lines)
-            out = step(shapeInserterLine, im, lines);
-            step(videoPlayer, out);
-        end
+%         lines = int32(videooptflowlines(of, 30));
+%         
+%         if ~isempty(lines)
+%             out = step(shapeInserterLine, im, lines);
+%             step(videoPlayer, out);
+%         end
         % --------------------------------
         
         %      Mit Component-Masken
@@ -167,13 +180,13 @@ while ~isDone(videoReader)
         %      Geschwindigkeitsvektoren der einzelnen Components ermitteln.
         %calcComponentVelocity(of, componentMask);
         
-        %matrix um bereiche zu speichern in denen die geschwindigkeiten der
-        %komponenten gemittelt werden.
-        output_vmask = false(size(im2bw(im)));
-        output_cmask = false(size(im2bw(im)));
-        
-        %matrix um geschwindigkeits-vektor-linien zu speichern
-        vlines = [0 0 0 0];
+%         %matrix um bereiche zu speichern in denen die geschwindigkeiten der
+%         %komponenten gemittelt werden.
+%         output_vmask = false(size(im2bw(im)));
+%         output_cmask = false(size(im2bw(im)));
+%         
+%         %matrix um geschwindigkeits-vektor-linien zu speichern
+%         vlines = [0 0 0 0];
         
         %berechne positionen der komponenten
 %         for k = 1 : length(resultBW(:))
@@ -250,12 +263,19 @@ while ~isDone(videoReader)
         compPositionSize = size(compPosition);
         for i = 1 : compPositionSize(3)
             oldCompPositions(:, :, i) = int32(fliplr(compPosition(:, :, i, frameNo - 1)));
-            compPosition(:, :, i, frameNo) = -1; %set error code, für den fall das kein neuer eintrag dazu kommt
+            oldCompClasses(:, i) = fliplr(compClass(:, i, frameNo - 1));
+            %set error code, für den fall das kein neuer eintrag dazu kommt
+            compPosition(:, :, i, frameNo) = NaN;
+            compClass(:, i, frameNo) = NaN;
+            
+            %debugging output
 %             disp([num2str(i), ': ', num2str(oldCompPositions(:, :, i))]);
             oldCompPosition = oldCompPositions(:, :, i);
-            cppvis_old(oldCompPosition(1), oldCompPosition(2), 1) = 1;
-            cppvis_old(oldCompPosition(1), oldCompPosition(2), 2) = 1;
-            cppvis_old(oldCompPosition(1), oldCompPosition(2), 3) = 0;
+%             if(oldCompPosition(1) ~= 0 && oldCompPosition(2) ~= 0)
+                cppvis_old(oldCompPosition(1), oldCompPosition(2), 1) = 1;
+                cppvis_old(oldCompPosition(1), oldCompPosition(2), 2) = 1;
+                cppvis_old(oldCompPosition(1), oldCompPosition(2), 3) = 0;
+%             end
         end
         
         %Bälle im neuen Frame finden
@@ -264,66 +284,105 @@ while ~isDone(videoReader)
         millis_comp_labeling = toc*1000;
         
         tic;
-        [colorClasses] = colorClassification(resultColor);
+        compClasses = colorClassification(resultColor);
         millis_color_class = toc*1000;
+        
+        newPositionSize = size(resultBW);
+        newCompPositions = zeros(newPositionSize(2), 2);
+        newCompClasses = zeros(newPositionSize(2), 1);
+%         disp(newCompPositions);
+        for i = 1 : newPositionSize(2)
+            %             resultRaw = or(resultRaw, logical(resultBW{i}));
+%             disp(int32(getPositionOfComponent(resultBW{i})));
+            newCompPositions(i,:) = int32(getPositionOfComponent(resultBW{i}));
+            newCompClasses(i) = compClasses{i};
+            %             disp('newCompPosition');
+            %             disp(newCompPosition);
+            
+            newCompPosition = newCompPositions(i,:);
+            cppvis(newCompPosition(2), newCompPosition(1), 1) = 1;
+            cppvis(newCompPosition(2), newCompPosition(1), 2) = 0;
+            cppvis(newCompPosition(2), newCompPosition(1), 3) = 1;
+        end
         
         %Jede neue Position versuchen mit einer alten zu verknüpfen
         tic;
+            
+        [oldCompIndices, vx, vy, output_vmask, output_cmask, vlines] = tryToLinkComponents(oldCompPositions, newCompPositions, oldCompClasses, newCompClasses, ofCompMasks, ofCompPositions, of, 6, 5, compIgnore);% [5, 4]
+        
         for i = 1 : length(resultBW(:))
-            %             resultRaw = or(resultRaw, logical(resultBW{i}));
-            newCompPosition = int32(getPositionOfComponent(resultBW{i}));
-            %             disp('newCompPosition');
-            %             disp(newCompPosition);
+            oldCompIndex = oldCompIndices(i);
+            newCompPosition = newCompPositions(i,:);
+            newCompClass = newCompClasses(i);
             
             cppvis(newCompPosition(2), newCompPosition(1), 1) = 1;
             cppvis(newCompPosition(2), newCompPosition(1), 2) = 0;
             cppvis(newCompPosition(2), newCompPosition(1), 3) = 1;
             
-            [oldCompIndex, vx, vy, vmask, smask] = linkComponents( oldCompPositions, newCompPosition, ofCompMasks, ofCompPositions, of, 5, 6);
-            %TODO: react to oldCompIndex = 0, maybe create new component
-%             disp('fin');
-%             disp(oldCompIndex);
             if(oldCompIndex ~= 0)
-                %                 disp(['set: ', num2str(oldCompIndex), ' to ', num2str(newCompPosition), ' | before: ', num2str(compPosition(:, :, oldCompIndex, frameNo-1))]);
                 compPosition(:, :, oldCompIndex, frameNo) = newCompPosition;
-                %for debugging output
-                %                 resultRaw = or(resultRaw, logical(resultRaw_part));
-                %                 searchMask = or(searchMask, logical(searchMask_part));
-                
-                %draw oldPosition-search-areas
-                output_vmask = or(output_vmask, vmask);
-                
-                %draw component-masks
-                output_cmask = or(output_cmask, smask);
+                compClass(:, oldCompIndex, frameNo) = newCompClass;
                 
                 %draw velocity lines
+%                 disp(oldCompIndex);
                 p1 = compPosition(:, :, oldCompIndex, frameNo);
                 %vlines(oldCompIndex, :) = [p1(1) p1(2) p1(1)+vx*1000 p1(2)+vy*1000];
-                vlines(oldCompIndex, :) = [p1(1) p1(2) p1(1)+vx p1(2)+vy];
-                
+                vlines(oldCompIndex, :) = [p1(1) p1(2) p1(1)+vx(i) p1(2)+vy(i)];
+            
             else
                 disp(['create new Component: ', num2str(compPositionSize(3) + 1), ' at ', num2str(newCompPosition(1)), ' ', num2str(newCompPosition(2))]);
+                compIgnore(compPositionSize(3) + 1) = 0;
+                compLostCount(compPositionSize(3) + 1) = 0;
                 for j = 1 : frameNo
                     compPosition(:, :, compPositionSize(3) + 1, j) = newCompPosition;
+                    compClass(:, compPositionSize(3) + 1, j) = newCompClass;
                 end
             end
         end
         
         compPositionSize = size(compPosition);
         for i = 1 : compPositionSize(3)
-            if compPosition(:, :, i, frameNo) == -1
+            if isnan(compPosition(:, :, i, frameNo))
                 compPosition(:, :, i, frameNo) = compPosition(:, :, i, frameNo - 1);
-                %check distance to recognized components, if there are
+                compClass(:, i, frameNo) = compClass(:, i, frameNo - 1);
+                
+                compLostCount(i) = compLostCount(i) + 1;
+                
+                %If a Position was not recognized 3 times in a row, it will
+                %be ignored in the future, preventing components being
+                %connected to nonexistant artifacts
+                if(compLostCount(i) > 3)
+                      compIgnore(i) = 1;
+%                     compPosition( :, :, i, : ) = [];
+%                     compPosition = compPosition( :, :, [1:i-1, i+1:end], : );
+%                     complength = complength - 1;
+                end
+                %TODO check distance to recognized components, if there are
                 %none, maybe over several frames, delete the position.
             end
+%             disp(size(compPosition));
+%             if(i == complength)
+%                 break;
+%             end
         end
+        
+        disp(['ignore: ', num2str(sum(compIgnore)), ' / ', num2str(length(compIgnore))]);
         
         millis_linking = toc*1000;
         
+        millis_sum2 = datevec(now);
+        millis_sum = (millis_sum2(6) - millis_sum1(6))*1000;
+        
         %linedraw-debugging-output
         tic;
+        %getColors
+        cols = zeros(compPositionSize(3), 3);
+        for i = 1 : compPositionSize(3)
+            cols(i,:) = BucketManager.getBucket(compClass(:,i)).rgbColor/255;
+        end
         imsize = size(im);
-        lineimg = drawLines(imsize, compPosition, zeros(compPositionSize(3), 1, 3), 1);
+        lineimg = drawLines(imsize, compPosition, cols, 1);%repmat([0.9 0.9 0.9],[compPositionSize(3), 1, 1]), 1);
+%         lineimg = drawLines(imsize, compPosition, zeros(compPositionSize(3), 1, 3), 1);
         millis_linedraw = toc*1000;
         
         alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
@@ -344,6 +403,8 @@ while ~isDone(videoReader)
         textInserter = vision.TextInserter(['Millis Linking: ', num2str(millis_linking)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 130]);
         lineimg = step(textInserter, lineimg);
         textInserter = vision.TextInserter(['Millis Linedraw: ', num2str(millis_linedraw)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 145]);
+        lineimg = step(textInserter, lineimg);
+        textInserter = vision.TextInserter(['Millis Sum: ', num2str(millis_sum)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 160]);
         lineimg = step(textInserter, lineimg);
         
 %         try
@@ -491,7 +552,11 @@ release(videoReader);
 %TODO: Linien-Overlay erzeugen und ?ber den letzten Frame legen, sowie als
 %      Resultat zur?ckgeben.
 
-lineimg = drawLines(size(im), compPosition, zeros(compPositionSize(3), 1, 3), 1);
+cols = zeros(compPositionSize(3), 3);
+for i = 1 : compPositionSize(3)
+    cols(i,:) = BucketManager.getBucket(compClass(:,i)).rgbColor/255;
+end
+lineimg = drawLines(size(im), compPosition, cols, 1);%zeros(compPositionSize(3), 1, 3), 1);
 alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
 lineimg = step(alphablender, lineimg, im);
 

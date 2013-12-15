@@ -12,6 +12,9 @@ classdef BrownBucket < AbstractBucket
         satMax = 1;
         valMin = 0.35;
         valMax = 0.75;
+        
+        hueMinB = 67/360;
+        hueMaxB = 77/360;
     end
 
 end

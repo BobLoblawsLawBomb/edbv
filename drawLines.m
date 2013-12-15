@@ -13,6 +13,7 @@ end
 fig = figure(100);
 set(fig, 'Visible', 'off');
 set(fig, 'Position', [0 0 w h]);
+set(fig, 'PaperSize', [w h]);
 
 %Background muss gezeichnet werden, damit die punkte an die richtige stelle
 %gezeichnet werden.. irgendwo versteckt sich eine skalierung und/oder
@@ -37,7 +38,7 @@ hold off;
 
 %create an image from the figure
 %Source: http://www.mathworks.com/matlabcentral/answers/99925
-% set(fig, 'PaperPositionMode', 'auto');
+set(fig, 'PaperPositionMode', 'auto');
 lineimage = hardcopy(fig, '-Dzbuffer', '-r0');
 
 end

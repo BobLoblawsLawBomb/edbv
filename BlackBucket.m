@@ -12,6 +12,9 @@ classdef BlackBucket < AbstractBucket
         satMax = 1;
         valMin = 0;
         valMax = 0.15;
+        
+        hueMinB = 100/360;
+        hueMaxB = 120/360;
     end
 end
 

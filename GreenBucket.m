@@ -12,6 +12,9 @@ classdef GreenBucket < AbstractBucket
         satMax = 1;
         valMin = 0.35;
         valMax = 1;
+        
+        hueMinB = 134/360;
+        hueMaxB = 147/360;
     end
 
 end

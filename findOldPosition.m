@@ -1,9 +1,13 @@
-function [index, vx, vy, vmask, smask] = linkComponents( oldPositions, newPosition, intensityMasks, intensityPositions, of, mask_search_radius, position_search_radius)
+function [index, vx, vy, vmask, smask] = findOldPosition( oldPositions, newPosition, oldClasses, newClass, intensityMasks, intensityPositions, of, mask_search_radius, position_search_radius, compIgnore)
 %UNTITLED6 Summary of this function goes here
 %   Detailed explanation goes here
+    %TODO:
+    %Bei geschwindigkeit Suchkreis in die Länge zeihen (in bewegungsrichtung)
+    %Bei streuung (verwende dynamisches Histogramm), Suchkreis in die
+    %Breite ziehen (normal auf die bewegungsrichtung)
     
     ymaskseachoffset = 0; %muss scheinbar etwas weiter unten (positiver) als possearchoffset sein
-    ypossearchoffset = -4;
+    ypossearchoffset = 0; % -2 % -4
     
     mask = false(size(of));
 
@@ -71,7 +75,7 @@ function [index, vx, vy, vmask, smask] = linkComponents( oldPositions, newPositi
             if isPointWithinMask(point, circleMask)
                 foundIntensityPoints(:,:,l,j) = point;
                 foundIntensityMasks{l,j} = intensityMasks(:,:,i,k);
-                disp([num2str(i),' ',num2str(k),' ',num2str(point(1)),' ',num2str(point(2))]);
+%                 disp([num2str(i),' ',num2str(k),' ',num2str(point(1)),' ',num2str(point(2))]);
 %                 disp('found point:');
 %                 disp(['at ', num2str(l),' ', num2str(j)]);
 %                 disp(point);
@@ -95,9 +99,9 @@ function [index, vx, vy, vmask, smask] = linkComponents( oldPositions, newPositi
     % Schwerpunkt am nähesten zum Ursprungspunkt ist
     if exist('foundIntensityPoints', 'var') == 1
         fIPointsSize = size(foundIntensityPoints);
-        disp(fIPointsSize);
+%         disp(fIPointsSize);
         for i = 1 : fIPointsSize(1)
-            disp(foundIntensityPoints(:,:,i));
+%             disp(foundIntensityPoints(:,:,i));
             centroid = calculateCentroid(foundIntensityPoints(:,:,i));
             
             newD = sqrt(double((centroid(1)-newPosition(1))^2 + (centroid(2)-newPosition(2))^2));
@@ -133,17 +137,17 @@ function [index, vx, vy, vmask, smask] = linkComponents( oldPositions, newPositi
         %skalierung der geschwindigkeit, weil der wert sonst so klein ist,
         %das keine verschiebung erfolgt
         va = abs(vx + vy*i);
-        vx = -(vx / s)*150;% * (0.5 + (va/(1 + (va^3)))*2); %skalierung die anfangs stark steigt und bald abfaellt
-        vy = -(vy / s)*150;% * (0.5 + (va/(1 + (va^3)))*2);
+        vx = -(vx / s)*70;% * (0.5 + (va/(1 + (va^3)))*2); %skalierung die anfangs stark steigt und bald abfaellt
+        vy = -(vy / s)*70;% * (0.5 + (va/(1 + (va^3)))*2);
 %         vx = -(vx / s)*200 * (0.5 + (va/(0.5 + (va^4)))*2); %skalierung die anfangs stark steigt und bald abfaellt
 %         vy = -(vy / s)*200 * (0.5 + (va/(0.5 + (va^4)))*2);
 %         vx = -(vx / s)*100 * (0.5 + ((va*4)/(0.25 + (va)))*(1/exp(va^4))); %skalierung die anfangs stark steigt und bald abfaellt
 %         vy = -(vy / s)*100 * (0.5 + ((va*4)/(0.25 + (va)))*(1/exp(va^4)));
     end
     
-    if va ~= 0
-        disp([num2str(vx), ' ',num2str(vy), ' = ', num2str(va)]);
-    end
+%     if va ~= 0
+%         disp([num2str(vx), ' ',num2str(vy), ' = ', num2str(va)]);
+%     end
     
     %testhalber ohne verschiebung
     nvx = vx;
@@ -166,8 +170,12 @@ function [index, vx, vy, vmask, smask] = linkComponents( oldPositions, newPositi
     %TODO seach_radius mit geschwindigkeit skalieren, damit er falls keine
     %of-maske vorhanden ist nicht fälschlicherweise eine verbindung zu
     %einer nahen anderen komponente festlegt
-    position2WithFactor(3) = position_search_radius + 1*(va/2);% + 2*(va/(0.5 + (va^3)));% + 1*(va/3);
+    position2WithFactor(3) = position_search_radius + 50*(va/(180 + (va^1.6)));%+ 50*(va/(200 + (va^1.8)))[hat gut funktioniert];%+ 2*(va/(0.5 + (va^3)));% + 1*(va/3); %+ 1*(va/3);
     uint8Mask = insertShape(uint8(mask2), 'FilledCircle', position2WithFactor);
+    
+    if va > 4
+        disp(['GESCHWINDIGKEIT_VA: ',num2str(va)]);
+    end
     
     circleMask2 = im2bw(uint8Mask,0.5);
     vmask = circleMask2; %for debugging
@@ -180,10 +188,13 @@ function [index, vx, vy, vmask, smask] = linkComponents( oldPositions, newPositi
    
    j = 1;
    
-   for i = 1 : length(oldPositions)
-       if isPointWithinMask(oldPositions(:,:,i), circleMask2)
-          relevantOldPositionIndices(j) = i;
-          j = j + 1;
+   oldPositionSize = size(oldPositions);
+   for i = 1 : oldPositionSize(3)
+       if compIgnore(i) == 0
+           if isPointWithinMask(oldPositions(:,:,i), circleMask2)
+              relevantOldPositionIndices(j) = i;
+              j = j + 1;
+           end
        end
    end
    
@@ -192,20 +203,29 @@ function [index, vx, vy, vmask, smask] = linkComponents( oldPositions, newPositi
    %Falls keine oldPosition im umkreis exisitiert wird 0 zurückgegeben, was
    %bedeutet ein neues element wurde entdeckt
    
+%    disp(['calculated: ', num2str(calculatedOldPosition(1)), '  ', num2str(calculatedOldPosition(2))]);
+   
    index = 0;
    
    if exist('relevantOldPositionIndices', 'var') == 1
        d = inf;
+       calcX = double(calculatedOldPosition(1));
+       calcY = double(calculatedOldPosition(2));
        for i = 1 : length(relevantOldPositionIndices)
            oldPositionIndex = relevantOldPositionIndices(i);
+           oldX = double(oldPositions(:,2,oldPositionIndex));
+           oldY = double(oldPositions(:,1,oldPositionIndex));
            
-           newD = sqrt((double(calculatedOldPosition(1)) - double(oldPositions(:,1,oldPositionIndex)))^2 + (double(calculatedOldPosition(2)) - double(oldPositions(:,2,oldPositionIndex)))^2);
+%            disp(['relevant: ', num2str(oldX), '  ', num2str(oldY)]);
+           
+           newD = sqrt((calcX - oldX)^2 + (calcY - oldY)^2);
            
            if newD < d
                d = newD;
                index = oldPositionIndex;
            end
        end
+%        disp(['picked: ', num2str(oldPositions(:,2,index)), '  ', num2str(oldPositions(:,1,index))]);
    end
    
 end

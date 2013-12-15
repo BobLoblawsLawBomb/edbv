@@ -12,6 +12,9 @@ classdef RedBucket < AbstractBucket
         satMax = 1;
         valMin = 0.70;
         valMax = 1;
+        
+        hueMinB = 351/360;
+        hueMaxB = 11/360;
     end
 
 end

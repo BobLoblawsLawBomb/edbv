@@ -51,9 +51,9 @@ function [ result ] = componentColorClass( component )
         
     end
     
-    for n=1:8
-        fprintf('%s\t %i \n', class(bucketList{n}),bucketStack(n));
-    end
+%     for n=1:8
+%         fprintf('%s\t %i \n', class(bucketList{n}),bucketStack(n));
+%     end
     
     % find the bucket with the most classified pixels
     [~, bucketIndex] = max(bucketStack(:));

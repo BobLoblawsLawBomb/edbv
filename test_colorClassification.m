@@ -1,4 +1,4 @@
-img = imread('res/table_test-7.png');
+img = imread('res/images/table_test-3.png');
 mask = table_mask(img);
 image = img .* mask;
 

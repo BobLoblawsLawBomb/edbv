@@ -14,7 +14,7 @@ function [ resultBW, resultColor, resultRaw] = connectedComponent( table_mask , 
 %aus dem bild wird ein binaerbild, nur die hellsten stellen werden weiss
 BW = im2bw(table_mask , threshold);
 
-%imshow(BW);
+imshow(BW);
 
 %Elemente werden von einander getrennt
 %Anwendung des selbst implementierten Algorithmus zu Connected Component Labeling 
@@ -72,7 +72,7 @@ for x = 1:num
     
 end;
 
-% imshow(color_img);
+ imshow(color_img);
 
 end
 

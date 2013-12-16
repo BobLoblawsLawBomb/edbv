@@ -1,4 +1,4 @@
-function [ result ] = table_mask( input )
+function [ result ] = createTableMask( input )
 %TABLE_MASK makes a binary mask for a pool or snooker table
 %   @author Maximilian Irro
 

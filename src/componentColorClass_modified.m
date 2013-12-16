@@ -60,8 +60,8 @@ function [ result, result2, intens] = componentColorClass_modified( component )
 %     figure(75);
 %     imshow(color_data);
     
-    meansat = nanmean(nanmean(sat));
-    meanval = nanmean(nanmean(val));
+    meansat = mean(mean(sat));
+    meanval = mean(mean(val));
     
     [hueUniqueList, hueCountList, count] = dynamicHistogram(hue, 0.1, 0, 0, 1);
     [bestcount, I] = max(hueCountList);

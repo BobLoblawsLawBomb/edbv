@@ -1,4 +1,4 @@
-function [ output_args ] = mainfunction(path)%argument: path
+function [ output_args ] = mainfunction(video_path)%argument: path
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 %   

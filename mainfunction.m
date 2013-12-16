@@ -1,4 +1,4 @@
-function [ output_args ] = mainfunction()%argument:  video_path 
+function [ output_args ] = mainfunction(path)%argument:  video_path 
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 %   
@@ -14,7 +14,7 @@ debug_linedraw = true;
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 
 % video_path = [pwd,filesep,'res',filesep,'test_blue.mp4'];
-video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
+video_path = [pwd,filesep,'res',filesep,path];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_1_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_2_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_3_short.mp4'];
@@ -406,8 +406,15 @@ while ~isDone(videoReader)
         
             millis_linedraw = toc*1000;
             
+              
+            disp(size(im));
+            disp(size(lineimg));
+            
+            lineimg = imresize(lineimg,[360 640]);
+
             alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
             lineimg = step(alphablender, lineimg, im);
+          
             
             textInserter = vision.TextInserter([num2str(frameNo), ' / ', num2str(numberOfFrames)],'Color', [255,255,255], 'FontSize', 24, 'Location', [20 20]);
             lineimg = step(textInserter, lineimg);
@@ -537,6 +544,9 @@ lineimg = drawLines(size(im), compPosition, cols, 1);
 
 %Linien ueber letzten Frame zeichnen
 alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
+
+lineimg = imresize(lineimg,[360 640]);
+
 lineimg = step(alphablender, lineimg, im);
 
 %Version mit Border um die linien

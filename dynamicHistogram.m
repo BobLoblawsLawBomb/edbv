@@ -1,6 +1,9 @@
 function [ dataUniqueList, dataCountList, count ] = dynamicHistogram( data, variance, threshold, rangemin, rangemax)
 %UNTITLED6 Summary of this function goes here
 %   if min max are not NaN the its circular going from max to min
+%
+%   @author Andreas Mursch-Radlgruber
+%---------------------------------------------
 
 range = rangemax - rangemin;
 

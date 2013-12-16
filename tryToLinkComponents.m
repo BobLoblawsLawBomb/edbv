@@ -1,6 +1,9 @@
 function [indices, vx, vy, output_vmask, output_cmask, vlines] = tryToLinkComponents( oldPositions, newPositions, oldClasses, newClasses, ofCompMasks, ofCompPositions, of, mask_search_radius, position_search_radius, compIgnore)
 %UNTITLED6 Summary of this function goes here
 %   Detailed explanation goes here
+%
+%   @author Andreas Mursch-Radlgruber
+%---------------------------------------------
 
 %matrix um bereiche zu speichern in denen die geschwindigkeiten der
 %komponenten gemittelt werden.

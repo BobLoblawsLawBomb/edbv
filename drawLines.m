@@ -3,6 +3,9 @@ function [ lineimage ] = drawLines(imsize, A, cols, thickness)
 %   imsize = [height width]
 %   A = array mit punktpositionen pro ball pro frame
 %   cols = farbwerte [r g b] pro ball
+%
+%   @author Andreas Mursch-Radlgruber
+%---------------------------------------------
 
 w = imsize(2);
 h = imsize(1);

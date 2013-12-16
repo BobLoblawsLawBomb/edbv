@@ -1,6 +1,9 @@
 function [ vx, vy , newMask] = calcComponentVelocity( of, im, position, compSize)
 %CALCCOMPONENTVELOCITY Summary of this function goes here
 %   Detailed explanation goes here
+%   
+%   @author Andreas Mursch-Radlgruber
+%---------------------------------------------
 
     newPositionWithFactor = position;
     newPositionWithFactor(3) = compSize;

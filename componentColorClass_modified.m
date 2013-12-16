@@ -1,7 +1,10 @@
 function [ result, result2, intens] = componentColorClass_modified( component )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
+%   
 %   @author Maximilian Irro
+%   @author Andreas Mursch-Radlgruber
+%---------------------------------------------
 
     debug = false;
 

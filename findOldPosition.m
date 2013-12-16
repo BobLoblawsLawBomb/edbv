@@ -1,6 +1,10 @@
 function [index, vx, vy, vmask, smask] = findOldPosition( oldPositions, newPosition, oldClasses, newClass, intensityMasks, intensityPositions, of, mask_search_radius, position_search_radius, compIgnore)
 %UNTITLED6 Summary of this function goes here
 %   Detailed explanation goes here
+%
+%   @author Andreas Mursch-Radlgruber
+%---------------------------------------------
+
     %TODO:
     %Bei geschwindigkeit Suchkreis in die Länge zeihen (in bewegungsrichtung)
     %Bei streuung (verwende dynamisches Histogramm), Suchkreis in die
@@ -102,7 +106,7 @@ function [index, vx, vy, vmask, smask] = findOldPosition( oldPositions, newPosit
 %         disp(fIPointsSize);
         for i = 1 : fIPointsSize(1)
 %             disp(foundIntensityPoints(:,:,i));
-            centroid = calculateCentroid(foundIntensityPoints(:,:,i));
+            centroid = mean(foundIntensityPoints(:,:,i),1);%calculateCentroid(foundIntensityPoints(:,:,i));
             
             newD = sqrt(double((centroid(1)-newPosition(1))^2 + (centroid(2)-newPosition(2))^2));
             
@@ -112,6 +116,11 @@ function [index, vx, vy, vmask, smask] = findOldPosition( oldPositions, newPosit
             end
         end
     end
+    
+    %Wichtig: Auch wenn keine OF-Maske gefunden hat, sollte er trotzdem in
+    %der umgebung suchen, falls es sich um einen fehler handelt oder kleine
+    %verschiebungen passieren, es kann leicht sein dass OF-Masken übersehen
+    %werden, vor allem bei cluster-bildungen
     
     % Berechne mittlere geschwindigkeit der beteiligten OpticalFlow-Masken
     s = 0;

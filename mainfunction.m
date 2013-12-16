@@ -1,4 +1,4 @@
-function [ output_args ] = mainfunction()%argument:  path 
+function [ output_args ] = mainfunction(path)%argument: path
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 %   
@@ -16,7 +16,7 @@ debug_linedraw = true;
 % video_path = [pwd,filesep,'res',filesep,'testvideo_3.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'testvideo_2.mp4'];
-video_path = [pwd,filesep,'res',filesep,'test_poor_quality_1_short.mp4'];
+% video_path = [pwd,filesep,'res',filesep,'test_poor_quality_1_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,path];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_1_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_2_short.mp4'];
@@ -24,7 +24,7 @@ video_path = [pwd,filesep,'res',filesep,'test_poor_quality_1_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
 
 
-%video_path = [pwd,filesep,'res',filesep,video_path];
+video_path = [pwd,filesep,'res',filesep,video_path];
 
 %Initialisierung von notwendigen Parametern und Objekten
 iptsetpref('ImshowBorder','tight');

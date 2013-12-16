@@ -547,6 +547,8 @@ alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2b
 
 lineimg = imresize(lineimg,[360 640]);
 
+im = imresize(im,[360 640]);
+
 lineimg = step(alphablender, lineimg, im);
 
 %Version mit Border um die linien

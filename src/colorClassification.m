@@ -40,7 +40,7 @@ for x = 1:num
 %     figure(50);
 %     imshow(current);  
     
-    [ballClassV1, ballClassV2, intens] = componentColorClass_modified(current);
+    [ballClassV1, ballClassV2, intens] = calcColorClass(current);
     componentColorList{x} = ballClassV2.colorIndex;
 %     disp(ballClass.colorIndex);
     

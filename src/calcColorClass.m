@@ -1,4 +1,4 @@
-function [ result, result2, intens] = componentColorClass_modified( component )
+function [ result, result2, intens] = calcColorClass( component )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 %   
@@ -10,7 +10,7 @@ function [ result, result2, intens] = componentColorClass_modified( component )
 
     bucketList = {  WhiteBucket(), PinkBucket(), BlueBucket(), BrownBucket(), GreenBucket(), BlackBucket(), YellowBucket(), RedBucket()};
             
-    bucketStack = [0,0,0,0,0,0,0,0];
+%     bucketStack = [0,0,0,0,0,0,0,0];
     
     % cropping the component-matrix to the relevant portion reduces the
     % performance hit by about 95% or 2000 milliseconds (!!) in a testcase 
@@ -33,7 +33,7 @@ function [ result, result2, intens] = componentColorClass_modified( component )
     
     % calculate average over region and check only for averages
 
-    compMask = im2bw(croppedComponent, 0.000001);
+%     compMask = im2bw(croppedComponent, 0.000001);
     
     hsv_of_comp = rgb2hsv(croppedComponent);
     hue = hsv_of_comp(:,:,1); 
@@ -75,7 +75,7 @@ function [ result, result2, intens] = componentColorClass_modified( component )
     end
         
     blackthreshold = 0.5;
-    whitethreshold = 0.7;
+%     whitethreshold = 0.7;
     
 %     disp((1-meansat)+meanval);
 %     disp((1-meanval)+meansat);

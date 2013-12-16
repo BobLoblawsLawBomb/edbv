@@ -1,4 +1,4 @@
-function [ lineimage ] = drawLines(imsize, A, cols, thickness)
+function [ lineimage ] = drawLines(im, A, cols, thickness)
 %UNTITLED Summary of this function goes here
 %   imsize = [height width]
 %   A = array mit punktpositionen pro ball pro frame
@@ -7,6 +7,7 @@ function [ lineimage ] = drawLines(imsize, A, cols, thickness)
 %   @author Andreas Mursch-Radlgruber
 %---------------------------------------------
 
+imsize = size(im);
 w = imsize(2);
 h = imsize(1);
 
@@ -21,8 +22,8 @@ set(fig, 'PaperSize', [w h]);
 %Background muss gezeichnet werden, damit die punkte an die richtige stelle
 %gezeichnet werden.. irgendwo versteckt sich eine skalierung und/oder
 %ein offset der so korrigiert wird.
-background = ones(imsize);
-imshow(background);
+%background = ones(imsize);
+imshow(im);
 
 hold on;
 

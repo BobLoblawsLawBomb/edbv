@@ -11,7 +11,7 @@ function [ runlengthTable ] = ccl_runLengthLabeling( bw_img )
 % darueberliegenden Zeile bereits gelabelt wurde.
 
 % Tabelle der Zeichenketten der Zeilen
-runlengthTable = cell(1);
+runlengthTable = cell(0);
 count = 1;
 rows = size(bw_img, 1);
 

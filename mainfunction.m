@@ -544,13 +544,21 @@ end
 lineimg = drawLines(size(im), compPosition, cols, 1);
 
 %Linien ueber letzten Frame zeichnen
-alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
+
+disp(size(lineimg));
+disp(size(im));
 
 lineimg = imresize(lineimg,[360 640]);
-
 im = imresize(im,[360 640]);
 
+alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
+
+disp('After:');
+disp(size(lineimg));
+disp(size(im));
+
 lineimg = step(alphablender, lineimg, im);
+
 
 %Version mit Border um die linien
 % lineimg = drawLines(size(im), compPosition, zeros(compPositionSize(3), 1, 3), 2);

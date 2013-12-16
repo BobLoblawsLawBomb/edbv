@@ -37,8 +37,8 @@ bbox = regionprops(L, 'BoundingBox');
 stat = regionprops(L,'centroid');
 stat2 = regionprops(L, 'EquivDiameter');
 
-resultBW = cell(1);
-resultColor = cell(1);
+resultBW = cell(0);
+resultColor = cell(0);
 
 idx = 1;
 for x = 1:num

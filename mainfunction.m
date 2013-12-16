@@ -13,6 +13,7 @@ debug_linedraw = true;
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 
+% video_path = [pwd,filesep,'res',filesep,'test_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_blue.mp4'];
 video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_1_short.mp4'];
@@ -98,7 +99,7 @@ while ~isDone(videoReader)
         %Jeder Komponente wird eine Farb-Klasse zugewiesen
         compClasses = colorClassification(resultColor);
         
-        %Fuer jede erkannte Komponente im ersten Frame werden benötigte
+        %Fuer jede erkannte Komponente im ersten Frame werden ben?tigte
         %Matrizen initialisiert
        
         for i = 1 : length(resultBW(:))
@@ -111,7 +112,7 @@ while ~isDone(videoReader)
             %Component Velocities werden mit [0 0] initialisiert.
             compVelocity(:, :, i, 1) = [0 0];
             
-            %Ignore und LostCount listen für Tracking-Informationen werden
+            %Ignore und LostCount listen f?r Tracking-Informationen werden
             %mit 0 initialisiert.
             compIgnore(i) = 0;
             compLostCount(i) = 0;
@@ -182,7 +183,7 @@ while ~isDone(videoReader)
         ofc_idx = 3;
         for i = 1 : of_comp_count
             
-            %lösche alles was nicht zur aktuellen komponente (ID = i) gehört.
+            %l?sche alles was nicht zur aktuellen komponente (ID = i) geh?rt.
             of_comp = of_comps;
             of_comp(of_comp < i | of_comp > i) = 0;
             
@@ -246,7 +247,7 @@ while ~isDone(videoReader)
             oldCompClasses(:, i) = compClass(:, i, frameNo - 1);
             
             %Setze error code fuer Position und Farb-Klasse der Komponente 
-            %im aktuellen Frame, für den Fall, dass sie nicht wieder gefunden 
+            %im aktuellen Frame, f?r den Fall, dass sie nicht wieder gefunden 
             %wird und kein neuer Eintrag dazu kommt
             compPosition(:, :, i, frameNo) = NaN;
             compClass(:, i, frameNo) = NaN;
@@ -444,7 +445,7 @@ while ~isDone(videoReader)
             end
             
             %bereiche in denen geschwindigkeiten der komponenten gemittelt
-            %werden einfärben
+            %werden einf?rben
             output_vmask = double(repmat(output_vmask, [1 1 3]));
             output_vmask(:,:,1) = output_vmask(:,:,1)*0;
             output_vmask(:,:,2) = output_vmask(:,:,2)*0.075;
@@ -455,7 +456,7 @@ while ~isDone(videoReader)
             output_cmask(:,:,2) = output_cmask(:,:,2)*0;
             output_cmask(:,:,3) = output_cmask(:,:,3)*0;
             
-            %masken ebene einfärben
+            %masken ebene einf?rben
             %output_resultRaw = double(label2rgb(resultRaw));
             output_resultRaw = double(repmat(resultRaw,[1 1 3]));
             output_resultRaw(output_resultRaw(:,:,1:3) == 255) = 0;
@@ -469,8 +470,8 @@ while ~isDone(videoReader)
             figure(15);
             imshow(output_complabels);
             
-            %komponenten nur mit bereichen der optical-flow-intensitäts-matrix
-            %mischen bei denen die intensität gering ist, damit diese gut
+            %komponenten nur mit bereichen der optical-flow-intensit?ts-matrix
+            %mischen bei denen die intensit?t gering ist, damit diese gut
             %sichtbar bleibt
             output_mask = double(output_mask);
             idx = output_mask < 0.12;

@@ -51,6 +51,7 @@ h = fspecial('average', 10);
 table = imfilter(table,h);
 
 glanzpunkte =  image .* repmat(uint8(imcomplement(rg_bw)), [1 1 3]);
+imshow(glanzpunkte)
 
 image = glanzpunkte + table;
 

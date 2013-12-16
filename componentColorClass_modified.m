@@ -89,7 +89,7 @@ function [ result, result2, intens] = componentColorClass_modified( component )
         return;
     end
     
-    if max(max(max(color_data))) == 0
+    if max(max(max(color_data))) == 0 || length(bestHue) == 0
         if(debug)
             disp('NOTHING');
         end

@@ -20,7 +20,6 @@ video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short2_3.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hit1.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_blue.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_3_short.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_poor_quality_1_short.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_1_short.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_2_short.mp4'];

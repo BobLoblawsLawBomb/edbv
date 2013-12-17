@@ -194,7 +194,7 @@ function [ result, intens] = calcColorClass2( component )
     end
     
     %Pruefen ob die Kugel schwarz ist
-    if(meanval < 0.3 && meansat > 0.5 && var < 0.075)
+    if( meanval < 0.33 && meansat > 0.5)% && var < 0.075)
         if(debug)
             disp('BLACK');
         end

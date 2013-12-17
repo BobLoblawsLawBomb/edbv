@@ -1,10 +1,14 @@
 function [ components_img, labelCount ] = ccl_labelNormalisation(runlengthTable, bw_img)
-
+%
 % hier werden die Werte der Labels zuerst normalisiert, sodass diese eine
 % durchgehende Nummerierung haben,
 % anschliessend wird das Ursprungsbild anhand dieser Labels geaendert
 % zurueckgegeben wird das gelabelte Logical-Bild und die Anzahl der darin
 % enthaltenen Components
+%
+%   @author Maximilian Irro
+%---------------------------------------------
+
 
 [~, num] = size(runlengthTable);
 
@@ -15,7 +19,6 @@ normalizedLabelCount = 0;
 
 for x=1:num
     
-    %TODO kann nicht damit umgehen wenn gar keine objekte erkannt werden. (Index exceeds matrix dimensions.)
     currentLabel = runlengthTable{x}(4); 
     
     % Exisiert fuer ein altes Label noch kein Eintrag in der Map, so wir

@@ -15,6 +15,11 @@ classdef RedBucket < AbstractBucket
         
         hueMinB = 351/360;
         hueMaxB = 11/360;
+        
+        meanhue = 0; % 0 sollte so stimmen
+        huedist = 0.155;
+        meansat = 0;
+        meanval = 0;
     end
 
 end

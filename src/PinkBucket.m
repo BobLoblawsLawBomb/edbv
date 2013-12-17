@@ -15,6 +15,11 @@ classdef PinkBucket < AbstractBucket
         
         hueMinB = 351/360;
         hueMaxB = 23/360;
+        
+        meanhue = 0.02;
+        huedist = 0.12;
+        meansat = 0;
+        meanval = 0;
     end
 
 end

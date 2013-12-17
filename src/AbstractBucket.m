@@ -15,6 +15,11 @@ classdef (Abstract) AbstractBucket
         
         hueMinB;
         hueMaxB;
+        
+        meanhue;
+        huedist;
+        meansat;
+        meanval;
     end
     
 end

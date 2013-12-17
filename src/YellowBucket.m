@@ -15,6 +15,11 @@ classdef YellowBucket < AbstractBucket
         
         hueMinB = 60/360;
         hueMaxB = 64/360;
+        
+        meanhue = 0.172;
+        huedist = 0.04;
+        meansat = 0;
+        meanval = 0;
     end
     
 end

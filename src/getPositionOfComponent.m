@@ -1,6 +1,7 @@
 function [pos] = getPositionOfComponent( single_component_mask )
 %Input: Maske einer Komponente
-%Output: x,y-Koordinaten der Komponente im bild
+%Output: x,y-Koordinaten des Zentrums der Komponente im bild
+%        in der Form [x y]
 %
 %   @author Andreas Mursch-Radlgruber
 %---------------------------------------------

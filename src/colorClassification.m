@@ -40,8 +40,8 @@ for x = 1:num
 %     figure(50);
 %     imshow(current);  
     
-    [ballClassV1, ballClassV2, intens] = calcColorClass(current);
-    componentColorList{x} = ballClassV2.colorIndex;
+    [ballClass, intens] = calcColorClass2(current);
+    componentColorList{x} = ballClass.colorIndex;
 %     disp(ballClass.colorIndex);
     
     % ================================================   
@@ -53,13 +53,13 @@ for x = 1:num
     comp_blue = current(:,:,3);
     
     if intens ~= 0
-        comp_red(comp_mask>0) = ballClassV2.rgbColor(1) * intens;
-        comp_green(comp_mask>0) = ballClassV2.rgbColor(2) * intens;
-        comp_blue(comp_mask>0) = ballClassV2.rgbColor(3) * intens;
+        comp_red(comp_mask>0) = ballClass.rgbColor(1) * intens;
+        comp_green(comp_mask>0) = ballClass.rgbColor(2) * intens;
+        comp_blue(comp_mask>0) = ballClass.rgbColor(3) * intens;
     else
-        comp_red(comp_mask>0) = 160;%/360;
-        comp_green(comp_mask>0) = 154;%/360;
-        comp_blue(comp_mask>0) = 203;%/360;
+        comp_red(comp_mask>0) = 160*0.5;%/360;
+        comp_green(comp_mask>0) = 154*0.5;%/360;
+        comp_blue(comp_mask>0) = 203*0.5;%/360;
     end
     
     new_comp = zeros(size(current));

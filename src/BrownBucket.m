@@ -15,6 +15,11 @@ classdef BrownBucket < AbstractBucket
         
         hueMinB = 67/360;
         hueMaxB = 77/360;
+        
+        meanhue = 0.2;
+        huedist = 0.05;
+        meansat = 0;
+        meanval = 0;
     end
 
 end

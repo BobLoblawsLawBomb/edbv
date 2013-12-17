@@ -16,17 +16,18 @@ debug_linedraw = true;
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 
 video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short2_3.mp4'];
-% video_path = [pwd,filesep,'res',filesep,'test_short.mp4'];
-% video_path = [pwd,filesep,'res',filesep,'test_hd_3_short.mp4'];
-% video_path = [pwd,filesep,'res',filesep,'test_poor_quality_1_short.mp4'];
-% video_path = [pwd,filesep,'res',filesep,path];
-% video_path = [pwd,filesep,'res',filesep,'test_hd_1_short.mp4'];
-% video_path = [pwd,filesep,'res',filesep,'test_hd_2_short.mp4'];
-% video_path = [pwd,filesep,'res',filesep,'test_hd_3_short.mp4'];
-% video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hit1.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_blue.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_3_short.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_poor_quality_1_short.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_1_short.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_2_short.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_3_short.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_4_short.mp4'];
 
 
-% video_path = [pwd,filesep,'res',filesep,path];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,path];
 
 %Initialisierung von notwendigen Parametern und Objekten
 iptsetpref('ImshowBorder','tight');
@@ -52,6 +53,9 @@ im2 = step(converter, frame);
 mask = createTableMask(im2);
 im2 = im2.*mask;
 im = imresize(im2,[360 NaN]);
+
+figure(110)
+imshow(im);
 
 %Graustufen-Version vom ersten Frame erstellen, wird fuer OpticalFlow benoetigt
 gim = single(rgb2gray(im))./255;
@@ -352,7 +356,7 @@ while ~isDone(videoReader)
                 
                 %for debugging output
                 if(debug)
-                    disp(['create new Component: ', num2str(compPositionSize(3) + 1), ' at ', num2str(newCompPosition(1)), ' ', num2str(newCompPosition(2))]);
+%                     disp(['create new Component: ', num2str(compPositionSize(3) + 1), ' at ', num2str(newCompPosition(1)), ' ', num2str(newCompPosition(2))]);
                 end
                 %--------------------
             end

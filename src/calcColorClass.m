@@ -60,13 +60,14 @@ function [ result, result2, intens] = calcColorClass( component )
 %     figure(75);
 %     imshow(color_data);
     
-    meansat = mean(mean(sat));
-    meanval = mean(mean(val));
+    meansat = nanmean(nanmean(sat));
+    meanval = nanmean(nanmean(val));
     
-    [hueUniqueList, hueCountList, count] = dynamicHistogram(hue, 0.1, 0, 0, 1);
-    [bestcount, I] = max(hueCountList);
-    bestHue = hueUniqueList(I);
-    intens = bestcount / count;
+    [hueUniqueList, hueCountList, count, bestHue, var, mcount] = dynamicHistogram(hue, 0.1, 0, 0, 1);
+    %[bestcount, I] = max(hueCountList);
+    %bestHue = hueUniqueList(I);
+    %intens = bestcount / count;
+    intens = 1 - var;
     
     if(debug)
 %     if(meanval > 0.35 && meansat < 0.45)
@@ -129,15 +130,15 @@ function [ result, result2, intens] = calcColorClass( component )
         if minhue > maxhue
             minhue = minhue - 1;
         end
-        meanhue = nanmean([minhue, maxhue]);
-        dists(n) = abs(meanhue - bestHue);
+        buckethue = nanmean([minhue, maxhue]);
+        dists(n) = abs(buckethue - bestHue);
         if dists(n) > 0.5
-            if(meanhue > bestHue)
-                meanhue = meanhue - 1;
+            if(buckethue > bestHue)
+                buckethue = buckethue - 1;
             else
                 bestHue = bestHue - 1;
             end
-            dists(n) = abs(meanhue - bestHue);
+            dists(n) = abs(buckethue - bestHue);
         end
     end
     [C,I] = min(dists);
@@ -205,8 +206,10 @@ function [ result, result2, intens] = calcColorClass( component )
                 disp('--> red');
             end
         else
-            disp(meanhue);
-            disp([num2str(bestHue), '   ', num2str(meansat), '   ', num2str(meanval), '   ', num2str(numel(hue)), '   ', num2str(intens)]);
+            if(debug)
+                disp(buckethue);
+                disp([num2str(bestHue), '   ', num2str(meansat), '   ', num2str(meanval), '   ', num2str(numel(hue)), '   ', num2str(intens)]);
+            end
         end
         changed = true;
     end

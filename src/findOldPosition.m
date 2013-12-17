@@ -182,9 +182,9 @@ function [index, vx, vy, vmask, smask] = findOldPosition( oldPositions, newPosit
     position2WithFactor(3) = position_search_radius + 50*(va/(180 + (va^1.6)));%+ 50*(va/(200 + (va^1.8)))[hat gut funktioniert];%+ 2*(va/(0.5 + (va^3)));% + 1*(va/3); %+ 1*(va/3);
     uint8Mask = insertShape(uint8(mask2), 'FilledCircle', position2WithFactor);
     
-    if va > 4
-        disp(['GESCHWINDIGKEIT_VA: ',num2str(va)]);
-    end
+%     if va > 4
+%         disp(['GESCHWINDIGKEIT_VA: ',num2str(va)]);
+%     end
     
     circleMask2 = im2bw(uint8Mask,0.5);
     vmask = circleMask2; %for debugging

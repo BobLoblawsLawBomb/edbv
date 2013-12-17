@@ -33,7 +33,7 @@ im = step(converter, frame);
 % 1. Bildaufloesung: Minimal 480x360 Bildpunkte
 
 [y,x,z]=size(im);
-is_ok = x >= 480 && y >= 352;
+is_ok = x >= 480 && y >= 360;
 if ~is_ok
     disp('Die Auflösung ist zu niedrig');
 	return;

@@ -560,9 +560,11 @@ lineimg = drawLines(im, compPosition, cols, 1);
 % lineimg = imresize(lineimg,[imsize(1) imsize(2)]);
 
 %Linien ueber letzten Frame zeichnen
+
 % alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
 
 % lineimg = step(alphablender, lineimg, im);
+
 
 %Version mit Border um die linien
 % lineimg = drawLines(size(im), compPosition, zeros(compPositionSize(3), 1, 3), 2);

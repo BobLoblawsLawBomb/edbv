@@ -1,5 +1,5 @@
 
-function [ output_args ] = mainfunction()%argument: path
+function [ output_args ] = mainfunction(path)%argument: path
 
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
@@ -15,6 +15,7 @@ debug_linedraw = true;
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'testvideo_5.mp4'];
 video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short2_3.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hit1.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_blue.mp4'];
@@ -26,8 +27,7 @@ video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short2_3.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_3_short.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_4_short.mp4'];
 
-
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,path];
+video_path = [pwd,filesep,'..',filesep,'res',filesep,path];
 
 %Initialisierung von notwendigen Parametern und Objekten
 iptsetpref('ImshowBorder','tight');
@@ -53,9 +53,6 @@ im2 = step(converter, frame);
 mask = createTableMask(im2);
 im2 = im2.*mask;
 im = imresize(im2,[360 NaN]);
-
-figure(110)
-imshow(im);
 
 %Graustufen-Version vom ersten Frame erstellen, wird fuer OpticalFlow benoetigt
 gim = single(rgb2gray(im))./255;

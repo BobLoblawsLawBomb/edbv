@@ -1,5 +1,5 @@
 
-function [ output_args ] = mainfunction(path)%argument: path
+function [ output_args ] = mainfunction()%argument: path
 
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
@@ -15,18 +15,20 @@ debug_linedraw = true;
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'testvideo_5.mp4'];
-video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short2_3.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'foo-x264.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_poor_quality_5_correct.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'testvideo_1.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short2_3.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hit1.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_blue.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_poor_quality_1_short.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_1_short.mp4'];
+video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_1_short2.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_2_short.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_3_short.mp4'];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_4_short.mp4'];
 
-video_path = [pwd,filesep,'..',filesep,'res',filesep,path];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,path];
 
 %Initialisierung von notwendigen Parametern und Objekten
 iptsetpref('ImshowBorder','tight');
@@ -275,7 +277,7 @@ while ~isDone(videoReader)
         %Farb-Klassifizierung im aktuellen Frame anwenden.
         %Jeder Komponente wird eine Farb-Klasse zugewiesen
         tic;
-        compClasses = colorClassification(resultColor);
+        [compClasses, compClassesImage] = colorClassification(resultColor);
         millis_color_class = toc*1000;
         
         %Initialisiere Liste von Compoenten Positionen und Farb-Klassen vom
@@ -454,31 +456,44 @@ while ~isDone(videoReader)
         %for debugging output
         if(debug)
             
-            output_mask = double(lastim)*0.001 + double(repmat(mat2gray(ofVelocity),[1 1 3]));
-            maxv = max(max(max(output_mask)));
-            if maxv > 1
-                output_mask = output_mask./maxv;
-            end
+%             output_mask = double(repmat(mat2gray(ofVelocity),[1 1 3]));
+%             output_mask = double(lastim)*0.001 + double(repmat(mat2gray(ofVelocity),[1 1 3]));
+%             maxv = max(max(max(output_mask)));
+%             if maxv > 1
+%                 output_mask = output_mask./maxv;
+%             end
             
+            output_mask = double(repmat(zeros(size(ofVelocity)),[1 1 3]));
+
             %bereiche in denen geschwindigkeiten der komponenten gemittelt
             %werden einf?rben
+%             output_vmask = double(repmat(output_vmask, [1 1 3]));
+%             output_vmask(:,:,1) = output_vmask(:,:,1)*0;
+%             output_vmask(:,:,2) = output_vmask(:,:,2)*0.075;
+%             output_vmask(:,:,3) = output_vmask(:,:,3)*0.25;
+%             
+%             output_cmask = double(repmat(output_cmask, [1 1 3]));
+%             output_cmask(:,:,1) = output_cmask(:,:,1)*0.15;
+%             output_cmask(:,:,2) = output_cmask(:,:,2)*0;
+%             output_cmask(:,:,3) = output_cmask(:,:,3)*0;
+            
             output_vmask = double(repmat(output_vmask, [1 1 3]));
             output_vmask(:,:,1) = output_vmask(:,:,1)*0;
-            output_vmask(:,:,2) = output_vmask(:,:,2)*0.075;
-            output_vmask(:,:,3) = output_vmask(:,:,3)*0.25;
+            output_vmask(:,:,2) = output_vmask(:,:,2)*0.175;
+            output_vmask(:,:,3) = output_vmask(:,:,3)*0.35;
             
             output_cmask = double(repmat(output_cmask, [1 1 3]));
-            output_cmask(:,:,1) = output_cmask(:,:,1)*0.15;
+            output_cmask(:,:,1) = output_cmask(:,:,1)*0.25;
             output_cmask(:,:,2) = output_cmask(:,:,2)*0;
             output_cmask(:,:,3) = output_cmask(:,:,3)*0;
             
             %masken ebene einf?rben
             %output_resultRaw = double(label2rgb(resultRaw));
-            output_resultRaw = double(repmat(resultRaw,[1 1 3]));
-            output_resultRaw(output_resultRaw(:,:,1:3) == 255) = 0;
-            output_resultRaw(:,:,1) = output_resultRaw(:,:,1)*0;
-            output_resultRaw(:,:,2) = output_resultRaw(:,:,2)*1;
-            output_resultRaw(:,:,3) = output_resultRaw(:,:,3)*0;
+%             output_resultRaw = double(repmat(resultRaw,[1 1 3]));
+%             output_resultRaw(output_resultRaw(:,:,1:3) == 255) = 0;
+%             output_resultRaw(:,:,1) = output_resultRaw(:,:,1)*0;
+%             output_resultRaw(:,:,2) = output_resultRaw(:,:,2)*1;
+%             output_resultRaw(:,:,3) = output_resultRaw(:,:,3)*0;
             
             output_complabels = double(label2rgb(resultRaw));
             output_complabels(output_complabels(:,:,1:3) == 255) = 0;
@@ -494,24 +509,24 @@ while ~isDone(videoReader)
             output_mask(idx) = output_mask(idx) + output_vmask(idx)*2;
             output_mask(idx) = output_mask(idx) + output_cmask(idx);
             
-            maxv = max(max(max(output_mask)));
-            output_mask = output_mask./maxv;
+%             maxv = max(max(max(output_mask)));
+%             output_mask = output_mask./maxv;
             
-            output_mask = output_mask + (output_resultRaw/125);
-            maxv = max(max(max(output_mask)));
-            output_mask = output_mask./maxv;
+%             output_mask = output_mask + (output_resultRaw/125);
+%             maxv = max(max(max(output_mask)));
+%             output_mask = output_mask./maxv;
             
             output_mask = output_mask + ofpvis;
-            maxv = max(max(max(output_mask)));
-            output_mask = output_mask./maxv;
+%             maxv = max(max(max(output_mask)));
+%             output_mask = output_mask./maxv;
             
             output_mask = output_mask + cppvis/2;
-            maxv = max(max(max(output_mask)));
-            output_mask = output_mask./maxv;
+%             maxv = max(max(max(output_mask)));
+%             output_mask = output_mask./maxv;
             
             output_mask = output_mask + cppvis_old/2;
-            maxv = max(max(max(output_mask)));
-            output_mask = output_mask./maxv;
+%             maxv = max(max(max(output_mask)));
+%             output_mask = output_mask./maxv;
             
             %masken einzeichnen
             
@@ -525,10 +540,22 @@ while ~isDone(videoReader)
             figure(1)
             imshow(output_mask);
             
+            fig3 = figure(3);
+            ofAngle = angle(of);
+            of_max = max(max(max(abs(of))));
+            color_of = double(repmat(zeros(size(of)), [1 1 3]));
+            color_of(:,:,1) = 0.5 + ofAngle/(2*pi);
+            color_of(:,:,2) = 1;
+            color_of(:,:,3) = ofVelocity/of_max;
+            imshow(hsv2rgb(color_of));
+            
         end
         
         %For movie creation at the end
-%         MF(frameNo - 1) = im2frame(output_mask);
+        MF(frameNo - 1) = im2frame(output_mask);
+%         MF(frameNo - 1) = im2frame(hsv2rgb(color_of));
+%         MF(frameNo - 1) = im2frame(lineimg);
+%         MF(frameNo - 1) = im2frame(compClassesImage);
     end
     
     %Vorbereitung fuer naechsten Frame
@@ -576,8 +603,8 @@ set(fig, 'name', 'Result');
 imshow(lineimg);
 
 %exports a movie for debugging purposes
-% MF(frameNo - 1) = im2frame(im_with_line);
-% movie2avi(MF, [pwd,filesep,'results',filesep,'debug_mov.avi'], 'Compression', 'None');
+% MF(frameNo - 1) = im2frame(lineimg);
+movie2avi(MF, [pwd,filesep,'..',filesep,'results',filesep,'debug_mov.avi'], 'Compression', 'None');
 
 output_args = 'Success!';
 

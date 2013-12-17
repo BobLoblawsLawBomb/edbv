@@ -1,4 +1,4 @@
-function [ componentColorList ] = colorClassification( ColorComponents )
+function [ componentColorList , z ] = colorClassification( ColorComponents )
 
 %function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
 % % 
@@ -57,9 +57,9 @@ for x = 1:num
         comp_green(comp_mask>0) = ballClass.rgbColor(2) * intens;
         comp_blue(comp_mask>0) = ballClass.rgbColor(3) * intens;
     else
-        comp_red(comp_mask>0) = 160*0.5;%/360;
-        comp_green(comp_mask>0) = 154*0.5;%/360;
-        comp_blue(comp_mask>0) = 203*0.5;%/360;
+        comp_red(comp_mask>0) = 160*0.15;%/360;
+        comp_green(comp_mask>0) = 154*0.05;%/360;
+        comp_blue(comp_mask>0) = 203*0.15;%/360;
     end
     
     new_comp = zeros(size(current));

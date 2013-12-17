@@ -1,14 +1,28 @@
 function [ runlengthTable ] = ccl_runLengthLabeling( bw_img )
-
-% n Reihen, 4 Spalten: Aktuelle Reihe, start, ende, Label
-
-% bw_img Zeilenweise durchgehen und nach Zeichenketten suchen.
-% fuer jede Zeichenkette den Anfangswert und den Endwert in der
-% runlengthTable speichern
-% gleichzeitig die Zeichenkette labeln, d.h. den Labelwert in die Tabelle
-% speichern
-% fuer jeden Element der Zeichenkette ueberpruefen, ob das Element der in
-% darueberliegenden Zeile bereits gelabelt wurde.
+%
+% Diese Funktion runlength encoded das uebergebene bereits maskierte Bild
+% und führt das erste grobe top-down Labeling der Komponenten durch.
+%
+% Ausgabe: runlengthTable enthaelt pro Eintag einen runlength-encodeten
+% String, der in der Binaerdarstellung des Ursprungsbilds nur 1-er enthalten
+% hat. Ein Eintrag entspricht einem Vektor mit 4 Elementen. Das erste
+% Element gibt die Zeile im Bild an, an der sich der String befindet. Das
+% zweite Element gibt die Angangspositon an, das dritte die Endposition.
+% Das vierte Element gibt das Label der Komponente an, zu dem der
+% Zeichen-String gehoert
+%
+% Das uebergebene Binaerbild bw_img wird Zeilen fuer Zeile durchgehen.
+% Fuer jede Zeichenkette in der Zeile wird der Anfangswert und der Endwert in der
+% runlengthTable gespeichert.
+% Gleichzeitig wird die Zeichenkette auch gelabelt, d.h. der Labelwert wird
+% in die Tabelle geschrieben.
+% Zusätzlich wird fuer jedes Element der Zeichenkette ueberpruefen, ob das Element der in
+% darueberliegenden Zeile bereits gelabelt wurde. Wenn dieser Fall
+% zutrifft und dieses Label kleiner als das aktuelle ist, wird das Label des 
+% daraueberliegenden Elements uebernommen
+%   
+%   @author Theresa Froeschl
+%---------------------------------------------
 
 % Tabelle der Zeichenketten der Zeilen
 runlengthTable = cell(0);

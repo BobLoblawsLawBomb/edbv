@@ -1,17 +1,24 @@
-function [ resultBW, resultColor, resultRaw] = connectedComponent( table_mask , threshold)
-%input bild: Tisch muss bereits durch die Tisch-Maske ausgeschnitten sein
-%Diese Funktion ermittelt die Components im Bild (d.h. die Kugeln) 
-%Dafuer werden die Glanzpunkte der Kugeln benutzt. Durch sehr helle Stellen
-%im Bild, die zu keiner Kugel geh?ren, werden auch Fragmente vom Tisch und
-%Koe als Glanzpunkte interpretiert.
-
-%Ausgabe: 
-%- resultBW: ist ein n-dim. cell-Element, das in jeder Zelle ein Binaerbild
+function [ resultBW, resultColor] = connectedComponent( table_mask , threshold)
+%
+% Diese Funktion ermittelt die Components im Bild (d.h. die Kugeln) 
+% Dafuer werden die Glanzpunkte der Kugeln benutzt. Durch sehr helle Stellen
+% im Bild, die zu keiner Kugel gehoeren, werden auch Fragmente vom Tisch und
+% Koe als Glanzpunkte interpretiert.
+%
+% Input: Tisch muss bereits durch die Tisch-Maske ausgeschnitten sein
+% 
+% Ausgabe: 
+% - resultBW: ist ein n-dim. cell-Element, das in jeder Zelle ein Binaerbild
 %            einer Komponente enthaellt. insgesammt sind es n Components
-%- resultColor: ist ebenfalls ein n-dim. cell-Element, das in jeder Zelle
+% - resultColor: ist ebenfalls ein n-dim. cell-Element, das in jeder Zelle
 %            ein farbiges Bild (also ein 3-dim RGB-Bild) einer Komponente enthaelt.
+%
+% aus dem bild wird ein binaerbild, nur die hellsten stellen werden weiss
+%
+%   @author Theresa Froeschl
+%   @author Maximilian Irro
+%---------------------------------------------
 
-%aus dem bild wird ein binaerbild, nur die hellsten stellen werden weiss
 BW = im2bw(table_mask , threshold);
 
 figure(20);
@@ -24,8 +31,6 @@ imshow(BW);
 L = uint8(L);
 BW = im2uint8(BW);
 color_img = repmat( uint8(zeros(size(BW,1),size(BW,2))), [1 1 3]);
-
-resultRaw = L;
 
 %berechne moeglichst passende komponente fuer eine kugel
 %annahme: 

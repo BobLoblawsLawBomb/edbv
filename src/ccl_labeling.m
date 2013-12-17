@@ -11,6 +11,16 @@ function [components_img, labelCount] = ccl_labeling( bw_img )
 % verändert, sodass die Folge der Labels aller Komponenten keine Lücken
 % mehr enthält. Am Ende soll das größte Label die Gesamtanzahl der
 % Komponenten haben.
+%
+% Eingabe: Binaerbild des Bildes fuer das die Components ermittelt werden
+% sollen. Auf diesem Bild muss der Tisch bereits mit der TableMask
+% ausgeschnitten sein.
+%
+% Ausgabe: 
+% components_img: das veraenderte Logical Eingabebild, in dem die
+%                 Komponenten nun gelabelt sind. Jedes Label hat besteht aus einem eindeutigen
+%                 ganzen Zahlenwert.
+% labelCount: Zahlenwert, das die Anzahl der Labels im Bild angibt.
 %   
 %   @author Theresa Froeschl
 %---------------------------------------------

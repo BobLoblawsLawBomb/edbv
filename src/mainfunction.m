@@ -97,7 +97,7 @@ while ~isDone(videoReader)
         %Erstes Component Labeling anwenden.
         %Komponenten nach label getrennt.
         %Anmk.: kann noch fragmente vom tisch bzw. koe enthalten
-        [resultBW, resultColor] = connectedComponent(im, 0.5);
+        [resultBW, resultColor, resultRaw] = connectedComponent(im, 0.5);
         
         %Erste Farb-Klassifizierung anwenden.
         %Jeder Komponente wird eine Farb-Klasse zugewiesen

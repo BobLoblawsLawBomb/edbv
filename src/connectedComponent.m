@@ -1,4 +1,4 @@
-function [ resultBW, resultColor] = connectedComponent( table_mask , threshold)
+function [ resultBW, resultColor, resultRaw] = connectedComponent( table_mask , threshold)
 %
 % Diese Funktion ermittelt die Components im Bild (d.h. die Kugeln) 
 % Dafuer werden die Glanzpunkte der Kugeln benutzt. Durch sehr helle Stellen
@@ -31,6 +31,8 @@ imshow(BW);
 L = uint8(L);
 BW = im2uint8(BW);
 color_img = repmat( uint8(zeros(size(BW,1),size(BW,2))), [1 1 3]);
+
+resultRaw = L;
 
 %berechne moeglichst passende komponente fuer eine kugel
 %annahme: 

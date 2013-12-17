@@ -1,4 +1,6 @@
+
 function [ output_args ] = mainfunction(path)%argument: path
+
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 %   
@@ -13,9 +15,9 @@ debug_linedraw = true;
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 
-% video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short2_3.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_short.mp4'];
-% video_path = [pwd,filesep,'res',filesep,'testvideo_2.mp4'];
+% video_path = [pwd,filesep,'res',filesep,'test_hd_3_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_poor_quality_1_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,path];
 % video_path = [pwd,filesep,'res',filesep,'test_hd_1_short.mp4'];
@@ -24,7 +26,7 @@ debug_linedraw = true;
 % video_path = [pwd,filesep,'res',filesep,'test_hd_4_short.mp4'];
 
 
-video_path = [pwd,filesep,'res',filesep,path];
+video_path = [pwd,filesep,'..',filesep,'res',filesep,path];
 
 %Initialisierung von notwendigen Parametern und Objekten
 iptsetpref('ImshowBorder','tight');
@@ -47,7 +49,7 @@ frame = step(videoReader);
 im2 = step(converter, frame);
 
 %Tisch ausschneiden / Maske erstellen
-mask = table_mask(im2);
+mask = createTableMask(im2);
 im2 = im2.*mask;
 im = imresize(im2,[360 NaN]);
 
@@ -129,7 +131,7 @@ while ~isDone(videoReader)
         
         %Tisch fuer jeden Frame erneut ausschneiden um mit eventuell
         %auftretende Ueberlappungen besser umgehen zu koennen.
-        mask = table_mask(im2);
+        mask = createTableMask(im2);
         im2 = im2.*mask;
         im = imresize(im2,[360 NaN]);
         

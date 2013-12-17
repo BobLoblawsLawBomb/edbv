@@ -5,7 +5,7 @@ function [ output_args ] = mainfunction(path)%argument: path
 %   @author Andreas Mursch-Radlgruber
 %---------------------------------------------
 
-debug = false;
+debug = true;
 debug_linedraw = true;
 
 % default test video path
@@ -13,7 +13,7 @@ debug_linedraw = true;
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 
-% video_path = [pwd,filesep,'res',filesep,'testvideo_3.mp4'];
+% video_path = [pwd,filesep,'res',filesep,'test_short2_3.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_short.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'testvideo_2.mp4'];
 % video_path = [pwd,filesep,'res',filesep,'test_poor_quality_1_short.mp4'];
@@ -404,8 +404,7 @@ while ~isDone(videoReader)
                 cols(i,:) = BucketManager.getBucket(compClass(:,i)).rgbColor/255;
             end
             
-            imsize = size(im);
-            lineimg = drawLines(imsize, compPosition, cols, 1);
+            lineimg = drawLines(im, compPosition, cols, 1);
         
             millis_linedraw = toc*1000;
             
@@ -414,15 +413,15 @@ while ~isDone(videoReader)
 %             disp(size(lineimg));
 %             disp(size(uint8(im2bw(lineimg, 0.99))));
 
-            imsize = size(im);
-            lineimg = imresize(lineimg,[imsize(1) imsize(2)]);
+%             imsize = size(im);
+%             lineimg = imresize(lineimg,[imsize(1) imsize(2)]);
             
 %             disp(size(im));
 %             disp(size(lineimg));
 %             disp(size(uint8(im2bw(lineimg, 0.99))));
 
-            alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
-            lineimg = step(alphablender, lineimg, im);
+%             alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
+%             lineimg = step(alphablender, lineimg, im);
             
             
             textInserter = vision.TextInserter([num2str(frameNo), ' / ', num2str(numberOfFrames)],'Color', [255,255,255], 'FontSize', 24, 'Location', [20 20]);
@@ -549,17 +548,16 @@ for i = 1 : compPositionSize(3)
 end
 
 %Linien zeichnen
-lineimg = drawLines(size(im), compPosition, cols, 1);
+lineimg = drawLines(im, compPosition, cols, 1);
 
-imsize = size(im);
-lineimg = imresize(lineimg,[imsize(1) imsize(2)]);
+% imsize = size(im);
+% lineimg = imresize(lineimg,[imsize(1) imsize(2)]);
 
 %Linien ueber letzten Frame zeichnen
 
+% alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
 
-alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
-
-lineimg = step(alphablender, lineimg, im);
+% lineimg = step(alphablender, lineimg, im);
 
 
 %Version mit Border um die linien

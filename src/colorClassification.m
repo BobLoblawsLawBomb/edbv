@@ -21,6 +21,8 @@ function [ componentColorList , compClassesImage ] = colorClassification( ColorC
 
 if(createImage)
     compClassesImage = repmat( uint8(zeros(size(ColorComponents{1},1),size(ColorComponents{1},2))), [1 1 3]);
+else
+    compClassesImage = [];
 end
 
 [~, num] = size(ColorComponents);

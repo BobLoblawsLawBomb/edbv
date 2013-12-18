@@ -21,8 +21,8 @@ function [ resultBW, resultColor, resultRaw] = connectedComponent( table_mask , 
 
 BW = im2bw(table_mask , threshold);
 
-figure(20);
-imshow(BW);
+% figure(20);
+% imshow(BW);
 
 %Elemente werden von einander getrennt
 %Anwendung des selbst implementierten Algorithmus zu Connected Component Labeling 
@@ -80,8 +80,8 @@ for x = 1:num
     
 end;
 
- figure(21);
- imshow(color_img);
+%  figure(21);
+%  imshow(color_img);
 
 end
 

@@ -7,28 +7,39 @@ function [ output_args ] = mainfunction()%argument: path
 %   @author Andreas Mursch-Radlgruber
 %---------------------------------------------
 
-debug = true;
+debug = false;
 debug_linedraw = true;
+video_output = false;
+display_millis = true;
 
 % default test video path
 
 % relative pfade scheinen mit dem videfilereader auf
 % unix systeme nicht zu funktionieren, siehe http://blogs.bu.edu/mhirsch/2012/04/matlab-r2012a-linux-computer-vision-toolbox-bug/
 
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'foo-x264.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_poor_quality_5_correct.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'testvideo_1.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short2_3.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hit1.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_blue.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_short.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_poor_quality_1_short.mp4'];
-video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_1_short2.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_2_short.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_3_short.mp4'];
-% video_path = [pwd,filesep,'..',filesep,'res',filesep,'test_hd_4_short.mp4'];
+% videoname = 'testvideo_5_2';
+% videoname = 'testvideo_1';
+% videoname = 'testvideo_2';
+% videoname = 'testvideo_3';
+% videoname = 'testvideo_4';
+% videoname = 'testvideo_5';
+% videoname = 'testvideo_6';
+% videoname = 'testvideo_7';
+% videoname = 'testvideo_8';
+% videoname = 'testvideo_9';
+% videoname = 'testvideo_10';
+% videoname = 'test_short2_3';
+% videoname = 'test_hit1';
+% videoname = 'test_blue';
+% videoname = 'test_short';
+videoname = 'test_hd_1_short2';
+% videoname = 'test_hd_2_short';
+% videoname = 'test_hd_3_short';
+% videoname = 'test_hd_4_short';
 
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,path];
+
+video_path = [pwd,filesep,'..',filesep,'res',filesep,videoname,'.mp4'];
 
 %Initialisierung von notwendigen Parametern und Objekten
 iptsetpref('ImshowBorder','tight');
@@ -54,6 +65,10 @@ im2 = step(converter, frame);
 mask = createTableMask(im2);
 im2 = im2.*mask;
 im = imresize(im2,[360 NaN]);
+
+if(video_output)
+    table_masked_image = im;
+end
 
 %Graustufen-Version vom ersten Frame erstellen, wird fuer OpticalFlow benoetigt
 gim = single(rgb2gray(im))./255;
@@ -103,7 +118,15 @@ while ~isDone(videoReader)
         
         %Erste Farb-Klassifizierung anwenden.
         %Jeder Komponente wird eine Farb-Klasse zugewiesen
-        compClasses = colorClassification(resultColor);
+        [compClasses, compClassesImage] = colorClassification(resultColor, debug || video_output);
+        
+        if(debug)
+            try
+                clf(50);
+            end
+            figure(50);
+            imshow(compClassesImage);
+        end
         
         %Fuer jede erkannte Komponente im ersten Frame werden ben?tigte
         %Matrizen initialisiert
@@ -136,6 +159,10 @@ while ~isDone(videoReader)
         mask = createTableMask(im2);
         im2 = im2.*mask;
         im = imresize(im2,[360 NaN]);
+        
+        if(video_output)
+            table_masked_image = im;
+        end
         
         %Graustufen-Version von Frame erstellen, wird fuer OpticalFlow
         %benoetigt
@@ -175,7 +202,7 @@ while ~isDone(videoReader)
         ofCompPositions(:,:,1,2) = [-1, -1];
         
         %for debugging output - initialisiere bild matrizen
-        if(debug)
+        if(debug || video_output)
             of_comp2 = double(repmat(zeros(size(of)),[1 1 1]));
             ofpvis = double(repmat(zeros(size(of)),[1 1 3]));
         end
@@ -211,7 +238,7 @@ while ~isDone(videoReader)
             ofCompPositions(:,:,1,ofc_idx) = int32(fliplr(getPositionOfComponent(of_comp)));
             
             %for debugging output
-            if(debug)
+            if(debug || video_output)
                 point = ofCompPositions(:,:,1,ofc_idx);
                 ofpvis(point(1), point(2), 1) = 0;
                 ofpvis(point(1), point(2), 2) = 1;
@@ -225,17 +252,19 @@ while ~isDone(videoReader)
         millis_comp_pos = toc*1000;
         
         %for debugging output
-        if(debug)
-            figure(7)
+        if(debug || video_output)
             of_comp2 = double(repmat(of_comp2, [1 1 3]));
             of_comp2 = (of_comp2 + ofpvis);
             of_comp2 = of_comp2 / max(max(max(of_comp2)));
-            imshow(of_comp2);
+            if(debug)
+                figure(7)
+                imshow(of_comp2);
+            end
         end
         %--------------------
         
         %for debugging output
-        if(debug)
+        if(debug || video_output)
             cppvis = double(repmat(zeros(size(of)),[1 1 3]));
             cppvis_old = double(repmat(zeros(size(of)),[1 1 3]));
         end
@@ -259,7 +288,7 @@ while ~isDone(videoReader)
             compClass(:, i, frameNo) = NaN;
             
             %for debugging output
-            if(debug)
+            if(debug || video_output)
                 oldCompPosition = oldCompPositions(:, :, i);
                 cppvis_old(oldCompPosition(1), oldCompPosition(2), 1) = 1;
                 cppvis_old(oldCompPosition(1), oldCompPosition(2), 2) = 1;
@@ -277,7 +306,7 @@ while ~isDone(videoReader)
         %Farb-Klassifizierung im aktuellen Frame anwenden.
         %Jeder Komponente wird eine Farb-Klasse zugewiesen
         tic;
-        [compClasses, compClassesImage] = colorClassification(resultColor);
+        [compClasses, compClassesImage] = colorClassification(resultColor, debug || video_output);
         millis_color_class = toc*1000;
         
         %Initialisiere Liste von Compoenten Positionen und Farb-Klassen vom
@@ -292,7 +321,7 @@ while ~isDone(videoReader)
             newCompClasses(i) = compClasses{i};
             
             %for debugging output
-            if(debug)
+            if(debug || video_output)
                 newCompPosition = newCompPositions(i,:);
                 cppvis(newCompPosition(2), newCompPosition(1), 1) = 1;
                 cppvis(newCompPosition(2), newCompPosition(1), 2) = 0;
@@ -302,11 +331,15 @@ while ~isDone(videoReader)
         end
         
         tic;
-        
+        % Für abgabe folgende parameter: 6, 5
         %Zu jeder Komponente die im aktuellen Frame gefunden wurde, wird 
         %versucht die selbe Komponente im vorherigen Frame zu finden und
         %zuzuweisen.
-        [oldCompIndices, vx, vy, output_vmask, output_cmask, vlines] = tryToLinkComponents(oldCompPositions, newCompPositions, oldCompClasses, newCompClasses, ofCompMasks, ofCompPositions, of, 6, 5, compIgnore);% [5, 4]
+        %Current Tracking
+        [oldCompIndices, vx, vy, output_vmask, output_cmask, vlines] = tryToLinkComponents(oldCompPositions, newCompPositions, oldCompClasses, newCompClasses, ofCompMasks, ofCompPositions, of, 6, 6, compIgnore);% [5, 4]
+        
+        %Old Tracking
+%         [oldCompIndices, vx, vy, output_vmask, output_cmask, vlines] = tryToLinkComponents(oldCompPositions, newCompPositions, oldCompClasses, newCompClasses, ofCompMasks, ofCompPositions, of, 6, 5, compIgnore);% [5, 4]
         
         %Jede Komponente im aktuellen Frame wird der gefundenen Komponente
         %aus dem vorherigen Frame zugewiesen, falls keine gefunden wurde
@@ -317,7 +350,7 @@ while ~isDone(videoReader)
             newCompClass = newCompClasses(i);
             
             %for debugging output
-            if(debug)
+            if(debug || video_output)
                 cppvis(newCompPosition(2), newCompPosition(1), 1) = 1;
                 cppvis(newCompPosition(2), newCompPosition(1), 2) = 0;
                 cppvis(newCompPosition(2), newCompPosition(1), 3) = 1;
@@ -333,7 +366,7 @@ while ~isDone(videoReader)
                 compClass(:, oldCompIndex, frameNo) = newCompClass;
                 
                 %for debugging output - draw velocity lines
-                if(debug)
+                if(debug || video_output)
                     p1 = compPosition(:, :, oldCompIndex, frameNo);
                     vlines(oldCompIndex, :) = [p1(1) p1(2) p1(1)+vx(i) p1(2)+vy(i)];
                 end
@@ -353,9 +386,9 @@ while ~isDone(videoReader)
                 end
                 
                 %for debugging output
-                if(debug)
+%                 if(debug)
 %                     disp(['create new Component: ', num2str(compPositionSize(3) + 1), ' at ', num2str(newCompPosition(1)), ' ', num2str(newCompPosition(2))]);
-                end
+%                 end
                 %--------------------
             end
         end
@@ -398,7 +431,7 @@ while ~isDone(videoReader)
         millis_sum = (millis_sum2(6) - millis_sum1(6))*1000;
         
         %linedraw-debugging-output
-        if(debug_linedraw)
+        if(debug_linedraw || output_video)
             
             tic;
             
@@ -409,53 +442,47 @@ while ~isDone(videoReader)
             end
             
             lineimg = drawLines(im, compPosition, cols, 1);
-        
+            
             millis_linedraw = toc*1000;
             
-              
-%             disp(size(im));
-%             disp(size(lineimg));
-%             disp(size(uint8(im2bw(lineimg, 0.99))));
-
-%             imsize = size(im);
-%             lineimg = imresize(lineimg,[imsize(1) imsize(2)]);
+            if(display_millis)
+                textInserter = vision.TextInserter([num2str(frameNo), ' / ', num2str(numberOfFrames)],'Color', [255,255,255], 'FontSize', 24, 'Location', [20 20]);
+                lineimg = step(textInserter, lineimg);
+                textInserter = vision.TextInserter(['Millis OF: ', num2str(millis_of)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 55]);
+                lineimg = step(textInserter, lineimg);
+                textInserter = vision.TextInserter(['Millis OF Mask: ', num2str(millis_of_labeling)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 70]);
+                lineimg = step(textInserter, lineimg);
+                textInserter = vision.TextInserter(['Millis Comp Mask: ', num2str(millis_comp_labeling)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 85]);
+                lineimg = step(textInserter, lineimg);
+                textInserter = vision.TextInserter(['Millis Comp Pos: ', num2str(millis_comp_pos)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 100]);
+                lineimg = step(textInserter, lineimg);
+                textInserter = vision.TextInserter(['Millis Comp Color: ', num2str(millis_color_class)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 115]);
+                lineimg = step(textInserter, lineimg);
+                textInserter = vision.TextInserter(['Millis Linking: ', num2str(millis_linking)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 130]);
+                lineimg = step(textInserter, lineimg);
+                textInserter = vision.TextInserter(['Millis Linedraw: ', num2str(millis_linedraw)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 145]);
+                lineimg = step(textInserter, lineimg);
+                textInserter = vision.TextInserter(['Millis Sum: ', num2str(millis_sum)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 160]);
+                lineimg = step(textInserter, lineimg);
+            end
             
-%             disp(size(im));
-%             disp(size(lineimg));
-%             disp(size(uint8(im2bw(lineimg, 0.99))));
-
-%             alphablender = vision.AlphaBlender('Operation','Binary mask', 'Mask', uint8(im2bw(lineimg, 0.99)), 'MaskSource', 'Property');
-%             lineimg = step(alphablender, lineimg, im);
-            
-            
-            textInserter = vision.TextInserter([num2str(frameNo), ' / ', num2str(numberOfFrames)],'Color', [255,255,255], 'FontSize', 24, 'Location', [20 20]);
-            lineimg = step(textInserter, lineimg);
-            textInserter = vision.TextInserter(['Millis OF: ', num2str(millis_of)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 55]);
-            lineimg = step(textInserter, lineimg);
-            textInserter = vision.TextInserter(['Millis OF Mask: ', num2str(millis_of_labeling)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 70]);
-            lineimg = step(textInserter, lineimg);
-            textInserter = vision.TextInserter(['Millis Comp Mask: ', num2str(millis_comp_labeling)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 85]);
-            lineimg = step(textInserter, lineimg);
-            textInserter = vision.TextInserter(['Millis Comp Pos: ', num2str(millis_comp_pos)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 100]);
-            lineimg = step(textInserter, lineimg);
-            textInserter = vision.TextInserter(['Millis Comp Color: ', num2str(millis_color_class)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 115]);
-            lineimg = step(textInserter, lineimg);
-            textInserter = vision.TextInserter(['Millis Linking: ', num2str(millis_linking)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 130]);
-            lineimg = step(textInserter, lineimg);
-            textInserter = vision.TextInserter(['Millis Linedraw: ', num2str(millis_linedraw)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 145]);
-            lineimg = step(textInserter, lineimg);
-            textInserter = vision.TextInserter(['Millis Sum: ', num2str(millis_sum)],'Color', [255,255,255], 'FontSize', 12, 'Location', [20 160]);
-            lineimg = step(textInserter, lineimg);
-            
-            figure(10);
-            imshow(lineimg);
+            if(debug_linedraw)
+                figure(10);
+                imshow(lineimg);
+            end
         
         end
         %--------------------
         
         %for debugging output
-        if(debug)
-            
+        if(debug || video_output)
+            if(debug)
+                try
+                    clf(50);
+                end
+                figure(50);
+                imshow(compClassesImage);
+            end
 %             output_mask = double(repmat(mat2gray(ofVelocity),[1 1 3]));
 %             output_mask = double(lastim)*0.001 + double(repmat(mat2gray(ofVelocity),[1 1 3]));
 %             maxv = max(max(max(output_mask)));
@@ -466,7 +493,7 @@ while ~isDone(videoReader)
             output_mask = double(repmat(zeros(size(ofVelocity)),[1 1 3]));
 
             %bereiche in denen geschwindigkeiten der komponenten gemittelt
-            %werden einf?rben
+            %werden einfaerben
 %             output_vmask = double(repmat(output_vmask, [1 1 3]));
 %             output_vmask(:,:,1) = output_vmask(:,:,1)*0;
 %             output_vmask(:,:,2) = output_vmask(:,:,2)*0.075;
@@ -487,7 +514,7 @@ while ~isDone(videoReader)
             output_cmask(:,:,2) = output_cmask(:,:,2)*0;
             output_cmask(:,:,3) = output_cmask(:,:,3)*0;
             
-            %masken ebene einf?rben
+            %masken ebene einfaerben
             %output_resultRaw = double(label2rgb(resultRaw));
 %             output_resultRaw = double(repmat(resultRaw,[1 1 3]));
 %             output_resultRaw(output_resultRaw(:,:,1:3) == 255) = 0;
@@ -495,11 +522,13 @@ while ~isDone(videoReader)
 %             output_resultRaw(:,:,2) = output_resultRaw(:,:,2)*1;
 %             output_resultRaw(:,:,3) = output_resultRaw(:,:,3)*0;
             
-            output_complabels = double(label2rgb(resultRaw));
-            output_complabels(output_complabels(:,:,1:3) == 255) = 0;
+            size(resultRaw);
+            output_complabels = double(label2rgb(resultRaw,'jet','k'))/255;
             
-            figure(15);
-            imshow(output_complabels);
+            if(debug)
+                figure(15);
+                imshow(output_complabels);
+            end
             
             %komponenten nur mit bereichen der optical-flow-intensit?ts-matrix
             %mischen bei denen die intensit?t gering ist, damit diese gut
@@ -509,24 +538,9 @@ while ~isDone(videoReader)
             output_mask(idx) = output_mask(idx) + output_vmask(idx)*2;
             output_mask(idx) = output_mask(idx) + output_cmask(idx);
             
-%             maxv = max(max(max(output_mask)));
-%             output_mask = output_mask./maxv;
-            
-%             output_mask = output_mask + (output_resultRaw/125);
-%             maxv = max(max(max(output_mask)));
-%             output_mask = output_mask./maxv;
-            
             output_mask = output_mask + ofpvis;
-%             maxv = max(max(max(output_mask)));
-%             output_mask = output_mask./maxv;
-            
             output_mask = output_mask + cppvis/2;
-%             maxv = max(max(max(output_mask)));
-%             output_mask = output_mask./maxv;
-            
             output_mask = output_mask + cppvis_old/2;
-%             maxv = max(max(max(output_mask)));
-%             output_mask = output_mask./maxv;
             
             %masken einzeichnen
             
@@ -537,25 +551,35 @@ while ~isDone(videoReader)
             maxv = max(max(max(output_mask)));
             output_mask = output_mask./maxv;
             
-            figure(1)
-            imshow(output_mask);
+            if(debug)
+                figure(1)
+                imshow(output_mask);
+            end
             
-            fig3 = figure(3);
             ofAngle = angle(of);
             of_max = max(max(max(abs(of))));
             color_of = double(repmat(zeros(size(of)), [1 1 3]));
             color_of(:,:,1) = 0.5 + ofAngle/(2*pi);
             color_of(:,:,2) = 1;
             color_of(:,:,3) = ofVelocity/of_max;
-            imshow(hsv2rgb(color_of));
+            color_of = hsv2rgb(color_of);
+            
+            if(debug)
+                figure(3);
+                imshow(color_of);
+            end
+            
+            %For movie creation at the end
+            if(video_output)
+                MF_tablemask(frameNo - 1) = im2frame(table_masked_image);
+                MF_labeling(frameNo - 1) = im2frame(output_complabels);
+                MF_tracking(frameNo - 1) = im2frame(output_mask);
+                MF_opticalflow(frameNo - 1) = im2frame(color_of);
+                MF_lines(frameNo - 1) = im2frame(lineimg);
+                MF_color(frameNo - 1) = im2frame(compClassesImage);
+            end
             
         end
-        
-        %For movie creation at the end
-        MF(frameNo - 1) = im2frame(output_mask);
-%         MF(frameNo - 1) = im2frame(hsv2rgb(color_of));
-%         MF(frameNo - 1) = im2frame(lineimg);
-%         MF(frameNo - 1) = im2frame(compClassesImage);
     end
     
     %Vorbereitung fuer naechsten Frame
@@ -604,7 +628,14 @@ imshow(lineimg);
 
 %exports a movie for debugging purposes
 % MF(frameNo - 1) = im2frame(lineimg);
-movie2avi(MF, [pwd,filesep,'..',filesep,'results',filesep,'debug_mov.avi'], 'Compression', 'None');
+if(video_output)
+    movie2avi(MF_tablemask, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_tablemask','.avi'], 'Compression', 'None');
+    movie2avi(MF_labeling, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_labeling','.avi'], 'Compression', 'None');
+    movie2avi(MF_opticalflow, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_opticalflow','.avi'], 'Compression', 'None');
+    movie2avi(MF_tracking, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_tracking','.avi'], 'Compression', 'None');
+    movie2avi(MF_color, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_color','.avi'], 'Compression', 'None');
+    movie2avi(MF_lines, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_lines','.avi'], 'Compression', 'None');
+end
 
 output_args = 'Success!';
 

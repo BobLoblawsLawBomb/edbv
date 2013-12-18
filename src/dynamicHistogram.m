@@ -1,33 +1,106 @@
 function [ dataUniqueList, dataCountList, count, my , varianz, mcount] = dynamicHistogram( data, tolerance, threshold, rangemin, rangemax)
-%UNTITLED6 Summary of this function goes here
-%   if min max are not NaN the its circular going from max to min
-%
+%    Zur statistischen Analyse von Ähnlichkeiten in einem Datensatz.
+%    Erstellt ein Histogramm, dass für jeden einzigartigen Wert in data
+%    zählt wieviele ähnliche Werte es im datensatz zu diesem Wert gibt. 
+%    Also die Menge der Werte aus data die sich innerhalb des tolerance-
+%    Bereichs um den betrachteten Wert befinden.
+%    Anschließend werden der statistische Mittelwert und die Varianz dieses
+%    Histogramms errechnet.
+%    
+%   --- INPUT ---
+%   
+%   data
+%    Die Werte welche analysiert werden sollen.
+%    Als n x m Matrix.
+% 
+%   tolerance
+%    Distanz wie weit ein Wert von einem Datenwert maximal entfernt sein
+%    kann um immernoch als ähnlich gewertet zu werden.
+% 
+%   threshold
+%    Nur Werte über threshold werden vom Datensatz für die Auswertung
+%    verwendet.
+%    Falls threshold = NaN, wird dieser ignoriert.
+%   
+%   rangemin
+%    Gibt den Wert an der bei einem zirkulär geschlossenem Wertebereich dem
+%    gleichen Wert wie rangemax entsprechen soll. (z.B. 0 bei 0-360°)
+%   
+%   rangemax
+%    Gibt den Wert an der bei einem zirkulär geschlossenem Wertebereich dem
+%    gleichen Wert wie rangemin entsprechen soll. (z.B. 360 bei 0-360°)
+%   
+%   Falls rangemin und rangemax nicht NaN sind, wird ein zirkulärer
+%   Wertebreich bei der Auswertung angenommen.
+%   
+%   --- OUTPUT ---
+%   
+%   dataUniqueList
+%    Aufsteigend sortierte Liste mit allen Werten aus dem Datensatz 
+%    ohne Mehrfach-Einträge.
+%   
+%   dataCountList
+%    Liste mit gleich vielen Einträgen wie dataUniqueList, beinhaltet zu
+%    jeder Position korrespondierend mit dataUniqueList die entsprechende
+%    Zählung wieviele ähnliche Werte im Wertebereich gefunden wurden.
+%   
+%   count
+%    Anzahl der Werte im Datensatz oberhalb des threshold.
+%   
+%   my
+%    Der Erwartungswert der Ähnlichkeitsverteilung.
+%   
+%   varianz
+%    Die Varianz der Ähnlichkeitsverteilung.
+%   
+%   mcount
+%    Die mittlere Anzahl an ähnlichen Werten am Erwartungswert.
+%   
+%   
 %   @author Andreas Mursch-Radlgruber
-%---------------------------------------------
+% ---------------------------------------------
 
 debug = false;
 
+%Wertebereich in dem ein Zyklus besteht.
 range = rangemax - rangemin;
 
 [w, h] = size(data);
 
+%Falls die Daten eine n x m Matrix sind, werden sie in eine Liste
+%konvertiert.
 dataListAll = reshape(data, w*h, 1);
-dataListTrim = dataListAll(dataListAll(:) > threshold);
+
+%Nur Daten oberhalb des threshold betrachten
+if ~isnan(threshold)
+    dataListTrim = dataListAll(dataListAll(:) > threshold);
+else
+    dataListTrim = dataListAll;
+end
+
+%Datenwerte aufsteigend sortieren
 dataListSorted = sort(dataListTrim); % von bei pos 1 weg: min < value <= max
+
+%Doppelte Datenwerte entfernen und eine aufsteigend sortierte Liste
+%einzigartiger Werte erstellen
 dataUniqueList = unique(dataListSorted);
+
+%Ergebnis-List fuer die Zähnlung ähnlicher Werte anlegen.
 dataCountList = zeros(size(dataUniqueList));
 
 count = length(dataListTrim);
 
-% disp([size(dataUniqueList) size(dataListSorted)]);
-
+%Fuer jeden Wert im Datensatz werden alle Werte (auch doppelte!) im 
+%umliegenden tolerance-Bereich gezählt.
 for k = 1 : size(dataUniqueList)
     anglek = dataUniqueList(k);
-    % count similiar data in the variance-range
     
+    %Grenzen des tolerance-Bereich festlegen
     edge1 = anglek - tolerance;
     edge2 = anglek + tolerance;
     
+    %Falls der Datensatz zyklisch ist, muss dafür gesorgt werden, dass die
+    %Grenzen innerhalb des zyklischen Bereichs bleiben.
     if ~isnan(rangemin) && ~isnan(rangemax)
         
         if edge1 <= rangemin
@@ -39,7 +112,17 @@ for k = 1 : size(dataUniqueList)
         end
         
     end
-
+    
+    %Es wird ein Histogramm mit 1 oder 3 Bins erzeugt, wobei die tolerance-
+    %Grenzen die Limits der Bins darstellen. Dann kann einfach der Wert der
+    %korrekten Bins als Zählung verwendet werden.
+    %Dabei ist zu beachten, dass wir die Äußeren Bins betrachten, falls die
+    %range-grenzen überschritten werden und den Inneren falls nicht.
+    %Anmk.: Das ganze ließe sich ohne der histc funktion wesentlich
+    %performanter implementieren indem wir ausnutzen, dass wir mit
+    %sortierten Listen arbeiten, wobei pro wert immer nur ein paar werte
+    %mehr oder weniger abgezogen oder dazugezählt werden müssten, statt
+    %jedesmal ein neues Histogramm zu berechnen.
     if edge1 > edge2   % achtung, in diesem fall springt der zu betrachtende bereich von max zu min
         n = histc(dataListSorted, [-inf edge2 edge1 inf]);
         dataCountList(k) = n(1) + n(3);
@@ -48,31 +131,6 @@ for k = 1 : size(dataUniqueList)
         dataCountList(k) = n(1);
     end
 end
-
-%visualize velocity directions with colors
-% fig3 = figure(3);
-% data_max = max(dataUniqueList);
-% color_data = double(repmat(zeros(size(data)), [1 1 3]));
-% color_data(:,:,1) = data;
-% color_data(:,:,2) = 1;
-% color_data(:,:,3) = 1;%abs(data)/data_max;
-% imshow(hsv2rgb(color_data));
-
-%visualize velocity intensity
-
-
-% ofVelocity_max = max(max(max(ofVelocityFiltered)));
-% color_of = double(repmat(zeros(size(ofVelocityFiltered)), [1 1 3]));
-% color_of(:,:,1) = 0;
-% color_of(:,:,2) = 0;
-% color_of(:,:,3) = 1;%ofVelocityFiltered/ofVelocity_max;
-% imshow(hsv2rgb(color_of));
-
-%print(fig3, '-dpng', [pwd filesep 'results' filesep 'OF_Color_' num2str(frameNo) '.png'])
-
-% try
-%     clf(2);
-% end
 
 elcount = numel(dataCountList);
 countsum = sum(dataCountList);
@@ -140,6 +198,7 @@ else
 end
 mcount = mcount/elcount;
 
+%for debugging output
 if(debug)
     disp(['my: ',num2str(my),' ',num2str(mcount),' ',num2str(varianz)]);
     
@@ -149,10 +208,7 @@ if(debug)
     xlim([0 1]);
     
     if elcount > 2
-        %     [pks, locs] = findpeaks(dataCountList, 'MINPEAKHEIGHT', 1, 'THRESHOLD', 3);
-        %     [C,I] = max(dataCountList);
         hold on;
-        %     plot(dataUniqueList(I), C + 0.05, 'k^', 'markerfacecolor', [1 0 0]);
         plot(my, mcount + 0.05, 'k^', 'markerfacecolor', [1 0 0]);
         v1 = my - varianz/2;
         v2 = my + varianz/2;

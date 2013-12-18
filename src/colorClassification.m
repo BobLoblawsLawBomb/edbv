@@ -1,4 +1,4 @@
-function [ componentColorList , z ] = colorClassification( ColorComponents )
+function [ componentColorList , compClassesImage ] = colorClassification( ColorComponents, createImage)
 
 %function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
 % % 
@@ -24,7 +24,9 @@ function [ componentColorList , z ] = colorClassification( ColorComponents )
 % [~, ColorComponents] = connectedComponent(image, 0.5);
 %===========================================
 
-z = repmat( uint8(zeros(size(ColorComponents{1},1),size(ColorComponents{1},2))), [1 1 3]);
+if(createImage)
+    compClassesImage = repmat( uint8(zeros(size(ColorComponents{1},1),size(ColorComponents{1},2))), [1 1 3]);
+end
 
 [~, num] = size(ColorComponents);
 
@@ -36,45 +38,43 @@ componentColorList = cell(1,num);
 for x = 1:num
     
     current = ColorComponents{x};
-        
-%     figure(50);
-%     imshow(current);  
     
-    [ballClass, intens] = calcColorClass2(current);
+    %     figure(50);
+    %     imshow(current);
+    
+    [ballClass, intens] = calcColorClass(current);
     componentColorList{x} = ballClass.colorIndex;
-%     disp(ballClass.colorIndex);
+    %     disp(ballClass.colorIndex);
     
-    % ================================================   
-%     Die Component mit der erkannten Farbe einfaerben
-    comp_mask = im2bw(current,0.00001);
-    
-    comp_red = current(:,:,1);
-    comp_green = current(:,:,2);
-    comp_blue = current(:,:,3);
-    
-    if intens ~= 0
-        comp_red(comp_mask>0) = ballClass.rgbColor(1) * intens;
-        comp_green(comp_mask>0) = ballClass.rgbColor(2) * intens;
-        comp_blue(comp_mask>0) = ballClass.rgbColor(3) * intens;
-    else
-        comp_red(comp_mask>0) = 160*0.15;%/360;
-        comp_green(comp_mask>0) = 154*0.05;%/360;
-        comp_blue(comp_mask>0) = 203*0.15;%/360;
-    end
-    
-    new_comp = zeros(size(current));
-    new_comp(:,:,1) = comp_red;
-    new_comp(:,:,2) = comp_green;
-    new_comp(:,:,3) = comp_blue;
-    
-%     imshow(uint8(new_comp));
-    z = z + uint8(new_comp);
     % ================================================
-                
+    %     Die Component mit der erkannten Farbe einfaerben
+    if(createImage)
+        comp_mask = im2bw(current,0.00001);
+        
+        comp_red = current(:,:,1);
+        comp_green = current(:,:,2);
+        comp_blue = current(:,:,3);
+        
+        if intens ~= 0
+            comp_red(comp_mask>0) = ballClass.rgbColor(1) * intens;
+            comp_green(comp_mask>0) = ballClass.rgbColor(2) * intens;
+            comp_blue(comp_mask>0) = ballClass.rgbColor(3) * intens;
+        else
+            comp_red(comp_mask>0) = 160*0.15;%/360;
+            comp_green(comp_mask>0) = 154*0.05;%/360;
+            comp_blue(comp_mask>0) = 203*0.15;%/360;
+        end
+        
+        new_comp = zeros(size(current));
+        new_comp(:,:,1) = comp_red;
+        new_comp(:,:,2) = comp_green;
+        new_comp(:,:,3) = comp_blue;
+        
+        %     imshow(uint8(new_comp));
+        compClassesImage = compClassesImage + uint8(new_comp);
+    end
+    % ================================================
+    
 end
-try
-   clf(50); 
-end
-figure(50);
-imshow(z);
+
 end

@@ -1,4 +1,4 @@
-function [ result, intens] = calcColorClass2( component )
+function [ result, intens] = calcColorClass( component )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 %   

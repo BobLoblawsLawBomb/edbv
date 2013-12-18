@@ -1,9 +1,30 @@
 function [ lineimage ] = drawLines(im, A, cols, thickness)
-%UNTITLED Summary of this function goes here
-%   imsize = [height width]
-%   A = array mit punktpositionen pro ball pro frame
-%   cols = farbwerte [r g b] pro ball
+%   Zeichnet farbige Linien über ein Bild.
+% 
+%   --- INPUT ---
+%   
+%   im
+%    Das Bild über das die Linien gezeichnet werden. Es gibt auch
+%    die Skalierung vor.
+%   
+%   A
+%    Matrix mit Punktpositionen pro Linie pro Linien-Schritt (Frame)
+%    Sie hat foldende Form: A(x, y, line, frame)
+%   
+%   cols
+%    Matrix mit Farbwerten [r g b] pro Linie.
+%    Sie hat folgende Form: [r g b] = cols(linie, :)
+%   
+%   thickness
+%    Die Dicke der gezeichneten Linien in pixel.
+%   
+%   --- OUTPUT ---
+%   
+%   lineimage
+%    n x m x 3 Matrix welche die Bildinformationen mit farbig darüber 
+%    gezeichneten Linien beinhaltet.
 %
+%   
 %   @author Andreas Mursch-Radlgruber
 %---------------------------------------------
 
@@ -32,6 +53,7 @@ axis([0, w, 0, h]);
 axis ij;
 axis off;
 
+%Plotte die einzelnen Linien.
 for  ball_nr = 1 : size( A , 3)
     ball_color(:,:) = cols(ball_nr,:);
     ballPointList(:,:) = A(:, :, ball_nr, :);

@@ -8,8 +8,8 @@ function [components_img, labelCount] = ccl_labeling( bw_img )
 % Mit ccl_bottomUpLabeling() werden Korrekturen an den Labels vorgenommen,
 % sodass eine Komponente auch wirklich nur ein einziges Label hat.
 % Bei ccl_labelNormalisation werden die Labels der Komponenten so
-% verändert, sodass die Folge der Labels aller Komponenten keine Lücken
-% mehr enthält. Am Ende soll das größte Label die Gesamtanzahl der
+% veraendert, sodass die Folge der Labels aller Komponenten keine Luecken
+% mehr enthaelt. Am Ende soll das groesste Label die Gesamtanzahl der
 % Komponenten haben.
 %
 % Eingabe: Binaerbild des Bildes fuer das die Components ermittelt werden

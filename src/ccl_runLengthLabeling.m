@@ -1,7 +1,7 @@
 function [ runlengthTable ] = ccl_runLengthLabeling( bw_img )
 %
 % Diese Funktion runlength encoded das uebergebene bereits maskierte Bild
-% und führt das erste grobe top-down Labeling der Komponenten durch.
+% und fuehrt das erste grobe top-down Labeling der Komponenten durch.
 %
 % Ausgabe: runlengthTable enthaelt pro Eintag einen runlength-encodeten
 % String, der in der Binaerdarstellung des Ursprungsbilds nur 1-er enthalten
@@ -16,7 +16,7 @@ function [ runlengthTable ] = ccl_runLengthLabeling( bw_img )
 % runlengthTable gespeichert.
 % Gleichzeitig wird die Zeichenkette auch gelabelt, d.h. der Labelwert wird
 % in die Tabelle geschrieben.
-% Zusätzlich wird fuer jedes Element der Zeichenkette ueberpruefen, ob das Element der in
+% Zusaetzlich wird fuer jedes Element der Zeichenkette ueberpruefen, ob das Element der in
 % darueberliegenden Zeile bereits gelabelt wurde. Wenn dieser Fall
 % zutrifft und dieses Label kleiner als das aktuelle ist, wird das Label des 
 % daraueberliegenden Elements uebernommen

@@ -51,7 +51,7 @@ mask = createTableMask(im);
 im2 = im.*mask;
 
 [ resultBW, resultColor, resultRaw] = connectedComponent(im2, 0.5);
-componentColorList = colorClassification(resultColor);
+componentColorList = colorClassification(resultColor, false);
 number_of_black = 0;
 number_of_blue = 0;
 number_of_brown = 0;

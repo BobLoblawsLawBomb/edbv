@@ -19,7 +19,7 @@ if (nargin<3)
     show_image = false;
 end
 
-video_path = [pwd,filesep,'res',filesep,video_name];
+video_path = [pwd,filesep,'..',filesep,'res',filesep,video_name];
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
 converter = vision.ImageDataTypeConverter; 
@@ -47,7 +47,7 @@ im = imresize(im,[360 NaN]);
 
 % 2. Farbige Kugeln (nicht rot/weiss) muessen gefunden werden (falls am Tisch vorhanden)
 
-mask = table_mask(im);
+mask = createTableMask(im);
 im2 = im.*mask;
 
 [ resultBW, resultColor, resultRaw] = connectedComponent(im2, 0.5);

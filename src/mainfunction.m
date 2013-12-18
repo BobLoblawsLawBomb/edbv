@@ -1,16 +1,57 @@
 
-function [ output_args ] = mainfunction()%argument: path
-
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+function [ output ] = mainfunction(relpath, video_output, display_millis, debug_linedraw, debug)
+%   Analysiert Ballbewegungen in einem Snookerspiel.
+% 
+%   --- INPUT ---
+%   
+%   relpath
+%    Der relative Pfad zu einer Video-Datei die analysiert werden soll.
+%   
+%   video_output
+%    Boolean: Ob Analyse-Ergebnisse jedes Frames als Video gespeichert werden
+%    sollen. 
+%    Achtung, es wird unkomprimiert gespeichert um codec-probleme zu vermeiden, 
+%    das heißt die Dateien können schnell recht gross werden.
+%    Die Videos werden in den Ordner gespeichert von dem aus die
+%    mainfunction ausgeführt wurde.
+%   
+%   display_millis
+%    Boolean: Ob Auf den Analyse-Videos und dem linedraw-debug-output
+%    Performance Informationen ausgegeben werden sollen.
+%   
+%   debug_linedraw
+%    Boolean: Ob nach jedem Frame der aktuelle status des Trackings
+%    ausgegeben werden soll.
+%   
+%   debug
+%    Boolean: Ob einige Analyse-Zwischenschritte nach jedem Frame
+%    visualisiert werden sollen.
+%   
+%   --- OUTPUT ---
+%   
+%   output
+%    Ein String der angibt dass die Analyse erfolgreich abgeschlossen
+%    wurde.
+%   
 %   
 %   @author Andreas Mursch-Radlgruber
 %---------------------------------------------
 
-debug = true;
-debug_linedraw = true;
-video_output = false;
-display_millis = true;
+if nargin < 1
+    relpath = ['..',filesep,'testcases',filesep,'testvideo_10.mp4'];
+end
+if nargin < 2
+    video_output = false;
+end
+if nargin < 3
+    display_millis = false;
+end
+if nargin < 4
+    debug_linedraw = false;
+end
+if nargin < 5
+    debug = false;
+end
 
 % default test video path
 
@@ -20,7 +61,7 @@ display_millis = true;
 % videoname = 'testvideo_5_2';
 % videoname = 'testvideo_1';
 % videoname = 'testvideo_2';
-videoname = 'testvideo_3';
+% videoname = 'testvideo_3';
 % videoname = 'testvideo_4';
 % videoname = 'testvideo_5';
 % videoname = 'testvideo_6';
@@ -37,9 +78,9 @@ videoname = 'testvideo_3';
 % videoname = 'test_hd_3_short';
 % videoname = 'test_hd_4_short';
 
+video_path = [pwd, filesep, relpath];
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,path];
-
-video_path = [pwd,filesep,'..',filesep,'res',filesep,videoname,'.mp4'];
+% video_path = [pwd,filesep,'..',filesep,'testcases',filesep,videoname,'.mp4'];
 
 %Initialisierung von notwendigen Parametern und Objekten
 iptsetpref('ImshowBorder','tight');
@@ -124,7 +165,8 @@ while ~isDone(videoReader)
             try
                 clf(50);
             end
-            figure(50);
+            fig = figure(5);
+            set(fig, 'name', 'Component Colors');
             imshow(compClassesImage);
         end
         
@@ -257,7 +299,8 @@ while ~isDone(videoReader)
             of_comp2 = (of_comp2 + ofpvis);
             of_comp2 = of_comp2 / max(max(max(of_comp2)));
             if(debug)
-                figure(7)
+                fig = figure(3);
+                set(fig, 'name', 'OpticalFlow Field Connected Component Labeling');
                 imshow(of_comp2);
             end
         end
@@ -336,11 +379,14 @@ while ~isDone(videoReader)
         %versucht die selbe Komponente im vorherigen Frame zu finden und
         %zuzuweisen.
         %Current Tracking
-        [oldCompIndices, vx, vy, output_vmask, output_cmask, vlines] = tryToLinkComponents(oldCompPositions, newCompPositions, oldCompClasses, newCompClasses, ofCompMasks, ofCompPositions, of, 6, 6, compIgnore);% [5, 4]
+        [oldCompIndices, vx, vy, output_vmask, output_cmask] = tryToLinkComponents(oldCompPositions, newCompPositions, oldCompClasses, newCompClasses, ofCompMasks, ofCompPositions, of, 6, 6, compIgnore);% [5, 4]
         
         %Old Tracking
 %         [oldCompIndices, vx, vy, output_vmask, output_cmask, vlines] = tryToLinkComponents(oldCompPositions, newCompPositions, oldCompClasses, newCompClasses, ofCompMasks, ofCompPositions, of, 6, 5, compIgnore);% [5, 4]
         
+        %matrix um geschwindigkeits-vektor-linien zu speichern
+        vlines = [0 0 0 0];
+
         %Jede Komponente im aktuellen Frame wird der gefundenen Komponente
         %aus dem vorherigen Frame zugewiesen, falls keine gefunden wurde
         %wird eine neue angelegt, die getrackt werden kann.
@@ -431,7 +477,7 @@ while ~isDone(videoReader)
         millis_sum = (millis_sum2(6) - millis_sum1(6))*1000;
         
         %linedraw-debugging-output
-        if(debug_linedraw || output_video)
+        if(debug_linedraw || video_output)
             
             tic;
             
@@ -467,7 +513,8 @@ while ~isDone(videoReader)
             end
             
             if(debug_linedraw)
-                figure(10);
+                fig = figure(4);
+                set(fig, 'name', 'Recognized Paths');
                 imshow(lineimg);
             end
         
@@ -480,7 +527,8 @@ while ~isDone(videoReader)
                 try
                     clf(50);
                 end
-                figure(50);
+                fig = figure(5);
+                set(fig, 'name', 'Component Colors');
                 imshow(compClassesImage);
             end
 %             output_mask = double(repmat(mat2gray(ofVelocity),[1 1 3]));
@@ -526,7 +574,8 @@ while ~isDone(videoReader)
             output_complabels = double(label2rgb(resultRaw,'jet','k'))/255;
             
             if(debug)
-                figure(15);
+                fig = figure(6);
+                set(fig, 'name', 'Connected Component Labeling (Highlights)');
                 imshow(output_complabels);
             end
             
@@ -552,7 +601,8 @@ while ~isDone(videoReader)
             output_mask = output_mask./maxv;
             
             if(debug)
-                figure(1)
+                fig = figure(7);
+                set(fig, 'name', 'Tracking Visualization');
                 imshow(output_mask);
             end
             
@@ -565,7 +615,8 @@ while ~isDone(videoReader)
             color_of = hsv2rgb(color_of);
             
             if(debug)
-                figure(3);
+                fig = figure(8);
+                set(fig, 'name', 'OpticalFlow Field (colors represent directions)');
                 imshow(color_of);
             end
             
@@ -574,7 +625,9 @@ while ~isDone(videoReader)
                 MF_tablemask(frameNo - 1) = im2frame(table_masked_image);
                 MF_labeling(frameNo - 1) = im2frame(output_complabels);
                 MF_tracking(frameNo - 1) = im2frame(output_mask);
-                MF_opticalflow(frameNo - 1) = im2frame(color_of);
+                try
+                    MF_opticalflow(frameNo - 1) = im2frame(color_of);
+                end
                 MF_lines(frameNo - 1) = im2frame(lineimg);
                 MF_color(frameNo - 1) = im2frame(compClassesImage);
             end
@@ -623,21 +676,51 @@ lineimg = drawLines(im, compPosition, cols, 1);
 
 %Bild ausgeben
 fig = figure(1);
-set(fig, 'name', 'Result');
+set(fig, 'name', 'Recognized Paths');
 imshow(lineimg);
 
-%exports a movie for debugging purposes
+%exports movies of neat visualizations
 % MF(frameNo - 1) = im2frame(lineimg);
 if(video_output)
-    movie2avi(MF_tablemask, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_tablemask','.avi'], 'Compression', 'None');
-    movie2avi(MF_labeling, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_labeling','.avi'], 'Compression', 'None');
-    movie2avi(MF_opticalflow, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_opticalflow','.avi'], 'Compression', 'None');
-    movie2avi(MF_tracking, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_tracking','.avi'], 'Compression', 'None');
-    movie2avi(MF_color, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_color','.avi'], 'Compression', 'None');
-    movie2avi(MF_lines, [pwd,filesep,'..',filesep,'results',filesep,'vis_',videoname,'_lines','.avi'], 'Compression', 'None');
+    %extract file-name from relative path
+    fparts = strsplit(video_path, '.');
+    fparts = strsplit(fparts{length(fparts) - 1}, filesep);
+    videoname = fparts{length(fparts)};
+    
+    %export avis
+    try
+        movie2avi(MF_tablemask, [pwd,filesep,'vis_',videoname,'_tablemask','.avi'], 'Compression', 'None');
+    catch
+        clear mex; %closes open avi-files
+    end
+    try
+        movie2avi(MF_labeling, [pwd,filesep,'vis_',videoname,'_labeling','.avi'], 'Compression', 'None');
+    catch
+        clear mex; %closes open avi-files
+    end
+    try
+        movie2avi(MF_opticalflow, [pwd,filesep,'vis_',videoname,'_opticalflow','.avi'], 'Compression', 'None');
+    catch
+        clear mex; %closes open avi-files
+    end
+    try
+        movie2avi(MF_tracking, [pwd,filesep,'vis_',videoname,'_tracking','.avi'], 'Compression', 'None');
+    catch
+        clear mex; %closes open avi-files
+    end
+    try
+        movie2avi(MF_color, [pwd,filesep,'vis_',videoname,'_color','.avi'], 'Compression', 'None');
+    catch
+        clear mex; %closes open avi-files
+    end
+    try
+        movie2avi(MF_lines, [pwd,filesep,'vis_',videoname,'_lines','.avi'], 'Compression', 'None');
+    catch
+        clear mex; %closes open avi-files
+    end
 end
 
-output_args = 'Success!';
+output = 'Success!';
 
 end
 

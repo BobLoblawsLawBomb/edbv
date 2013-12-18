@@ -7,7 +7,7 @@ function [ output_args ] = mainfunction()%argument: path
 %   @author Andreas Mursch-Radlgruber
 %---------------------------------------------
 
-debug = false;
+debug = true;
 debug_linedraw = true;
 video_output = false;
 display_millis = true;
@@ -20,7 +20,7 @@ display_millis = true;
 % videoname = 'testvideo_5_2';
 % videoname = 'testvideo_1';
 % videoname = 'testvideo_2';
-% videoname = 'testvideo_3';
+videoname = 'testvideo_3';
 % videoname = 'testvideo_4';
 % videoname = 'testvideo_5';
 % videoname = 'testvideo_6';
@@ -32,7 +32,7 @@ display_millis = true;
 % videoname = 'test_hit1';
 % videoname = 'test_blue';
 % videoname = 'test_short';
-videoname = 'test_hd_1_short2';
+% videoname = 'test_hd_1_short2';
 % videoname = 'test_hd_2_short';
 % videoname = 'test_hd_3_short';
 % videoname = 'test_hd_4_short';

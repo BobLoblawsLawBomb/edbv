@@ -5,13 +5,8 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
 %   @author Andreas Mursch-Radlgruber
 %---------------------------------------------
     
-    %TODO:
-    %Bei geschwindigkeit Suchkreis in die Länge zeihen (in bewegungsrichtung)
-    %Bei streuung (verwende dynamisches Histogramm), Suchkreis in die
-    %Breite ziehen (normal auf die bewegungsrichtung)
-    
-    ymaskseachoffset = 0; %muss scheinbar etwas weiter unten (positiver) als possearchoffset sein
-    ypossearchoffset = 0; % -2 % -4
+    ymaskseachoffset = 0;
+    ypossearchoffset = 0;
     
     mask = false(size(of));
 
@@ -24,9 +19,6 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
     
     smask = circleMask;
     
-%     figure(11)
-%     imshow(circleMask);
-    
     clear foundIntensityPoints;
     clear foundIntensityMasks;
     
@@ -34,71 +26,22 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
     
     iPosSize = size(intensityPositions);
     
-%     ipvis = uint8(repmat(zeros(size(of)),[1 1 3]));
-%     for i = 1 : iPosSize(3)
-%         for k = 1 : iPosSize(4)
-%             point = intensityPositions(:,:,i,k);
-% %             disp(intensityPositions(:,:,i,k));
-%             if point(1) == -1 && point(2) == -1
-%                 continue
-%             end
-%             ipvis(point(1), point(2), 1) = 0;
-%             ipvis(point(1), point(2), 2) = 255;
-%             ipvis(point(1), point(2), 3) = 0;
-%         end
-%     end
-%     figure(30);
-%     imshow(ipvis);
-    
-%     disp(intensityPositions);
-%     disp(iPosSize);
-%     disp('search points:');
-%     disp(iPosSize(4));
-
-%     onlyInstensityPoint = [];
-%     onlyIntensityMask = [];
-%     onlyD = Inf;
-
     for i = 1 : iPosSize(3)
         
         j = 1;
         
         for k = 1 : iPosSize(4)
             
-%             disp([num2str(i),' ',num2str(k),' ',num2str(iPosSize(1)),' ',num2str(iPosSize(2))]);
             point = intensityPositions(:,:,i,k);
-%             disp([num2str(i),' ',num2str(k),' ',num2str(point(1)),' ',num2str(point(2))]);
             
             if point(1) == -1 && point(2) == -1
                 continue
             end
             
-%             figure(40)
-%             dispCircleMask = double(repmat(circleMask, [1 1 3]));
-%             dispCircleMask(point(1), point(2), 1) = 1;
-%             dispCircleMask(point(1), point(2), 2) = 0;
-%             dispCircleMask(point(1), point(2), 3) = 0;
-%             imshow(dispCircleMask);
-            
             if isPointWithinMask(point, circleMask)
                 foundIntensityPoints(:,:,l,j) = point;
                 foundIntensityMasks{l,j} = intensityMasks(:,:,i,k);
                 
-                newD = sqrt(double((point(1)-newPosition(1))^2 + (point(2)-newPosition(2))^2));
-                
-%                 if newD < onlyD
-%                     onlyInstensityPoint = point;
-%                     onlyIntensityMask = intensityMasks(:,:,i,k);
-%                     clear foundIntensityPoints;
-%                     clear foundIntensityMasks;
-%                     fountIntensityPoints(:,:,1,1) = point;
-%                     foundIntensityMasks{1,1} = intensityMasks(:,:,i,k);
-%                 end
-                
-%                 disp([num2str(i),' ',num2str(k),' ',num2str(point(1)),' ',num2str(point(2))]);
-%                 disp('found point:');
-%                 disp(['at ', num2str(l),' ', num2str(j)]);
-%                 disp(point);
                 j = j + 1;
             end
         end
@@ -106,23 +49,18 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
         l = l + 1;
     end
     
-%     disp('end search points:');
-    
     % Falls kein einziger punkt einer OpticalFlow-Maske im suchbereich
     % gefunden wurde wird index =  zurückgegeben, was bedeutet dass 
     
     classindex = 0;
     d = inf;
     
-%     disp('schwerpunkte:');
     % Suche Index der klasse für die gefundene Punktwolke, dessen
     % Schwerpunkt am nähesten zum Ursprungspunkt ist
     if exist('foundIntensityPoints', 'var') == 1
         fIPointsSize = size(foundIntensityPoints);
-%         disp(fIPointsSize);
         for i = 1 : fIPointsSize(1)
-%             disp(foundIntensityPoints(:,:,i));
-            centroid = mean(foundIntensityPoints(:,:,i),1);%calculateCentroid(foundIntensityPoints(:,:,i));
+            centroid = mean(foundIntensityPoints(:,:,i),1);
             
             newD = sqrt(double((centroid(1)-newPosition(1))^2 + (centroid(2)-newPosition(2))^2));
             
@@ -148,15 +86,11 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
         fIMasksSize = size(foundIntensityMasks);
         for i = 1 : fIMasksSize(2)
             mask = double(foundIntensityMasks{classindex, i});
-%             disp(size(mask));
             xv = real(of).*mask;
             yv = imag(of).*mask;
             s = s + sum(sum(mask));
             vx = vx + sum(sum(xv)); %calculate x-average of all points that are within the mask
             vy = vy + sum(sum(yv)); %calculate y-average of all points that are within the mask
-%             disp(s);
-%             disp(vx);
-%             disp(vy);
         end   
         
         %skalierung der geschwindigkeit, weil der wert sonst so klein ist,
@@ -164,83 +98,36 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
         va = abs(vx + vy*i);
         vx = -(vx / s)*70;% * (0.5 + (va/(1 + (va^3)))*2); %skalierung die anfangs stark steigt und bald abfaellt
         vy = -(vy / s)*70;% * (0.5 + (va/(1 + (va^3)))*2);
-%         vx = -(vx / s)*200 * (0.5 + (va/(0.5 + (va^4)))*2); %skalierung die anfangs stark steigt und bald abfaellt
-%         vy = -(vy / s)*200 * (0.5 + (va/(0.5 + (va^4)))*2);
-%         vx = -(vx / s)*100 * (0.5 + ((va*4)/(0.25 + (va)))*(1/exp(va^4))); %skalierung die anfangs stark steigt und bald abfaellt
-%         vy = -(vy / s)*100 * (0.5 + ((va*4)/(0.25 + (va)))*(1/exp(va^4)));
     end
-    
-%     if va ~= 0
-%         disp([num2str(vx), ' ',num2str(vy), ' = ', num2str(va)]);
-%     end
-    
-    %testhalber ohne verschiebung
-    nvx = vx;
-    nvy = vy;
     
     % Verschiebe ursprungspunkt in die entgegengesetzte Richtung des
     % gemittelten Geschwindigkeitsvektor.
     
-    calculatedOldPosition = [double(newPosition(1)) + nvx, double(newPosition(2)) + nvy ];
+%     calculatedOldPosition = [double(newPosition(1)) + nvx, double(newPosition(2)) + nvy ];
     
-%     disp('calculatedOldPosition');
-%     disp(calculatedOldPosition);
-    
-    %Spanne kreis um calculatedOldPosition 
-%     
-%     mask2 = false(size(of));
-%     
-%     position2 = [calculatedOldPosition(1), calculatedOldPosition(2) + ypossearchoffset];
-%     position2WithFactor = position2;
-%     %TODO seach_radius mit geschwindigkeit skalieren, damit er falls keine
-%     %of-maske vorhanden ist nicht fälschlicherweise eine verbindung zu
-%     %einer nahen anderen komponente festlegt
-%     position2WithFactor(3) = position_search_radius + 50*(va/(180 + (va^1.6)));%+ 50*(va/(200 + (va^1.8)))[hat gut funktioniert];%+ 2*(va/(0.5 + (va^3)));% + 1*(va/3); %+ 1*(va/3);
-%     uint8Mask = insertShape(uint8(mask2), 'FilledCircle', position2WithFactor);
-%     
-        if va > 4
-            disp(['GESCHWINDIGKEIT_VA: ',num2str(va)]);
-        end
-%     
-%     circleMask2 = im2bw(uint8Mask, 0.5);
-% 
-%     vmask = circleMask2; %for debugging
-%     
-
-%--------------------------------------------------------------
-
-%     %OF-Masken zusammenfügen
-%     mask = double(zeros(size(of)));
-%     fIMasksSize = size(foundIntensityMasks);
-%     for i = 1 : fIMasksSize(2)
-%         mask = mask + double(foundIntensityMasks{classindex, i});
-%     end
-%     
-%     %Statistische auswertung der Velocity
-%     
-%     %Statistische auswertung der Winkel
-
-    
-    
-%     pos = [calculatedOldPosition(1), calculatedOldPosition(2) + ypossearchoffset];
-    pos = [newPosition(1), newPosition(2)];% + ypossearchoffset];
-
     vel_stretch = 1 + 15*((va*0.65)/(20 + (va^1.75)));%1 + 15*((va*0.5)/(20 + (va^1.6)));%1 + 15*((va*0.43)/(20 + (va^1.3)));%1 + 50*(va/(180 + (va^1.6)));
     var_stretch = 1 + 15*((va*0.5)/(20 + (va^1.6)))*0.1;
-%     pos = [double(newPosition(1)) + (nvx/70)*vel_stretch, double(newPosition(2)) + (nvy/70)*vel_stretch];
-    rot = 360 - radtodeg(atan2(nvy, nvx));
-    radius = position_search_radius;
+
+    nvx = (vx/70)*vel_stretch;
+    nvy = (vy/70)*vel_stretch;
     
+    calculatedOldPosition = [double(newPosition(1)) + nvx, double(newPosition(2)) + nvy ];
+    
+%     disp(['before: ', num2str((double(newPosition(1)) + nvx)),' ', num2str((double(newPosition(2)) + nvy))]);
+%     disp(['after: ', num2str(calculatedOldPosition(1)),' ', num2str(calculatedOldPosition(2))]);
+    disp(['diff: ', num2str(calculatedOldPosition(1)-(double(newPosition(1)) + vx)),' ', num2str(calculatedOldPosition(2)-(double(newPosition(2)) + vy))]);
+    
+    rot = 360 - radtodeg(atan2(nvy, nvx));
+    pos = [newPosition(1), newPosition(2) + ypossearchoffset ];
+    
+    radius = position_search_radius;
     
     circleMask2 = createSearchArea(pos, rot, radius, vel_stretch, var_stretch);
     
     vmask = circleMask2; %for debugging
     
-%----------------------------------------------------------------
-    
    %Suche darin nach eventuell vorhandenen oldPositions und speichere deren
    %indices
-%    disp('search relevant old positions');
    
    clear relevantOldPositionIndices;
    
@@ -261,8 +148,6 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
    %Falls keine oldPosition im umkreis exisitiert wird 0 zurückgegeben, was
    %bedeutet ein neues element wurde entdeckt
    
-%    disp(['calculated: ', num2str(calculatedOldPosition(1)), '  ', num2str(calculatedOldPosition(2))]);
-   
    index = 0;
    
    if exist('relevantOldPositionIndices', 'var') == 1
@@ -274,8 +159,6 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
            oldX = double(oldPositions(:,2,oldPositionIndex));
            oldY = double(oldPositions(:,1,oldPositionIndex));
            
-%            disp(['relevant: ', num2str(oldX), '  ', num2str(oldY)]);
-           
            newD = sqrt((calcX - oldX)^2 + (calcY - oldY)^2);
            
            if newD < d
@@ -283,7 +166,6 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
                index = oldPositionIndex;
            end
        end
-%        disp(['picked: ', num2str(oldPositions(:,2,index)), '  ', num2str(oldPositions(:,1,index))]);
    end
    
    function [searchMask] = createSearchArea(pos, rot, radius, vel_stretch, var_stretch)
@@ -293,55 +175,15 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
         
         [croppedMask, x, y, cw, ch] = cropMask(uint8Mask);
         
-%         figure(199);
-%         imshow(croppedMask);
-        
-%         disp('bla');
-%         disp(size(croppedMask));
-%         disp([cw, ch]);
-%         disp([var_stretch, vel_stretch]);
-%         disp([double(cw) * var_stretch, double(ch) * vel_stretch]);
-
         J = imresize(croppedMask, [double(cw) * var_stretch, double(ch) * vel_stretch]);
-%         J = padarray(J, double([0, double(uint32(double(ch) * vel_stretch - double(ch)))]), 0, 'pre');%erweitern, damit der mittelpunkt beim rotieren auf der kugel ist
         J = imrotate(J, double(rot));
         
         off = double(ch) * vel_stretch - double(ch);
         offx = cos(deg2rad(360-rot)) * off/2;
         offy = sin(deg2rad(360-rot)) * off/2;
         
-%         disp(rot);
-%         if rot > 180
-%             figure(197);
-%             imshow(J);
-%             
-% %             disp('huh');
-% %             disp([cw, ch]);
-% %             disp([tw, th]);
-% %             disp([(double(cw) - double(tw)), (double(ch) - double(th))]);
-%         end
-        
         [J, tx, ty, tw, th] = cropMask(J);
         
-%         if rot ~= 0
-%             figure(198);
-%             imshow(J);
-%             
-% %             disp('huh');
-% %             disp([cw, ch]);
-% %             disp([tw, th]);
-% %             disp([(double(cw) - double(tw)), (double(ch) - double(th))]);
-%         end
-        
-%         figure(198);
-%         imshow(J);
-
-%         sizeTransformed = size(J);
-%         tw = sizeTransformed(1);
-%         th = sizeTransformed(2);
-        
-%         disp([offx, offy]);
-
         nx = x + (double(cw) - double(tw))/2 - 1 + double(offx);
         ny = y + (double(ch) - double(th))/2 - 1 + double(offy);
         nw = imsize(2) - (nx + tw);
@@ -361,9 +203,6 @@ function [index, vx, vy, vmask, smask] = findOldPosition(oldPositions, newPositi
         end
         
         searchMask = J;
-        
-%         figure(200);
-%         imshow(J);
         
    end
 

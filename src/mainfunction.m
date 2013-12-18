@@ -74,11 +74,13 @@ end
 % videoname = 'test_blue';
 % videoname = 'test_short';
 % videoname = 'test_hd_1_short2';
+%videoname = 'test_hd_1_short2';
 % videoname = 'test_hd_2_short';
 % videoname = 'test_hd_3_short';
 % videoname = 'test_hd_4_short';
 
 video_path = [pwd, filesep, relpath];
+
 % video_path = [pwd,filesep,'..',filesep,'res',filesep,path];
 % video_path = [pwd,filesep,'..',filesep,'testcases',filesep,videoname,'.mp4'];
 
@@ -374,7 +376,7 @@ while ~isDone(videoReader)
         end
         
         tic;
-        % Für abgabe folgende parameter: 6, 5
+        % F?r abgabe folgende parameter: 6, 5
         %Zu jeder Komponente die im aktuellen Frame gefunden wurde, wird 
         %versucht die selbe Komponente im vorherigen Frame zu finden und
         %zuzuweisen.

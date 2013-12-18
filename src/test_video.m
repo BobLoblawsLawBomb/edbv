@@ -1,7 +1,7 @@
-function [ is_ok ] = test_video(video_name, only_first_frame, show_image) 
+function [ is_ok ] = test_video(relpath, only_first_frame, show_image) 
 %UNTITLED Tests the given video
 %   Author: Florian Krall
-%   Tests the video with the given name (in the res folder)
+%   Tests the video at the given relative path
 %   If only_first_frame is false, the whole video is analyzed (default: true)
 %   If show_image is true, the result of the corner detection is shown (default: false)
 %   Note:   Testing the whole video is slow and in most cases the video is 
@@ -19,7 +19,7 @@ if (nargin<3)
     show_image = false;
 end
 
-video_path = [pwd,filesep,'..',filesep,'res',filesep,video_name];
+video_path = [pwd,filesep,relpath];
 
 videoReader = vision.VideoFileReader(video_path,'ImageColorSpace','RGB','VideoOutputDataType','uint8');
 converter = vision.ImageDataTypeConverter; 

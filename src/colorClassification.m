@@ -1,28 +1,23 @@
 function [ componentColorList , compClassesImage ] = colorClassification( ColorComponents, createImage)
-
-%function [ red, white, black, green, blue, yellow, pink, brown ] = colorClassification()
-% % 
-% % fuer Testzwecke
-% img = imread('res/table_test-7.png');
-% z = repmat( uint8(zeros(size(img,1),size(img,2))), [1 1 3]);
-% mask = table_mask(img);
-% image = img .* mask;
-
-% cform = makecform('srgb2lab');
-% lab = applycform(image, cform); 
-% rg_chroma = lab(:,:,2); % hell bedeutet mehr rot, dunkel mehr gruen
-% rg_bw = imcomplement(im2bw(rg_chroma,0.5));
-% table_red = rg_chroma .* uint8(imcomplement(rg_bw));
-% table_green = rg_chroma .* uint8(rg_bw);
-% h = fspecial('gaussian', 20, 0.5);
-% table_green = imfilter(table_green,h);
-% lab(:,:,2) = table_green + table_red;
-% cform = makecform('lab2srgb');
-% image = applycform(lab, cform); 
-% imshow(image)
-
-% [~, ColorComponents] = connectedComponent(image, 0.5);
-%===========================================
+%
+% Diese Funktion weist jeder erkannten Component eine Farbklasse zu. Die
+% Werte in der Rueckgabeliste enthalten das Index-Attributen der 
+% Farbklasse. Der Index jedes Wertes in der Liste korreliert mit dem Index
+% der Component im Component Array.
+%
+% Eingabe:
+% ColorComponents:  cell Array der Components. Jedes Element ist ein Bild in
+%                   dem alles au?er der Component ausmaskiert ist.  
+% createImage: boolean der angibt, ob ein mit eingefarbtes Ausgabebild
+% erstellt werden soll.
+%
+% Ausgabe:
+% componentColorList: cell Array mit Farbklassen Indizes. 
+% compClassesImage: falls createImage=true, ein Bild in dem die Components
+% mit der Klassenfarbe eingefaerbt sind. 
+%
+%   @author Maximilian Irro
+%---------------------------------------------
 
 if(createImage)
     compClassesImage = repmat( uint8(zeros(size(ColorComponents{1},1),size(ColorComponents{1},2))), [1 1 3]);
@@ -44,10 +39,8 @@ for x = 1:num
     
     [ballClass, intens] = calcColorClass(current);
     componentColorList{x} = ballClass.colorIndex;
-    %     disp(ballClass.colorIndex);
-    
-    % ================================================
-    %     Die Component mit der erkannten Farbe einfaerben
+
+    % Die Component mit der erkannten Farbe einfaerben
     if(createImage)
         comp_mask = im2bw(current,0.00001);
         
@@ -70,10 +63,9 @@ for x = 1:num
         new_comp(:,:,2) = comp_green;
         new_comp(:,:,3) = comp_blue;
         
-        %     imshow(uint8(new_comp));
+        % imshow(uint8(new_comp));
         compClassesImage = compClassesImage + uint8(new_comp);
     end
-    % ================================================
     
 end
 

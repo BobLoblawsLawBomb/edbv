@@ -1,37 +1,44 @@
 function [ result ] = createTableMask( input )
-%TABLE_MASK makes a binary mask for a pool or snooker table
-%   @author Maximilian Irro
+% Diese Funktion erstellt eine Binaermaske, welches mit dem Eingabebild 
+% multipliziert nur den Snookertisch und alles sich darauf befindliche 
+% erhaelt und alles anderes ausmaskiert.
+%
+% Eingabe: Standbild eines Snooker Games, idR ein Frame eines Videos, im RGB Farbraum. 
+%
+% Ausgabe: Binaermaske als uint8, 3 dimensional, in der Groesse des Input
+% Bildes, so dass es direkt mit dem Input wieder multipliziert werden kann.
+%   
+%   @author Maximlian Irro
+%---------------------------------------------
 
-%create color transformation structure
+% zuerst erstellen wir eine Farb Transformations Struktur
 cform = makecform('srgb2lab');
 
-% transform into L*a*b color space
+% nun transformieren wir in den L*a*b Farbraum
 input_lab = applycform(input, cform); 
 
-% extract the red-green chroma component
+% nun holen wir uns den Rot-Gruen Kanal
 rg_chroma = input_lab(:,:,2);
 
-% make a binary image
+% alles was eher Rot ist->1, Gruen->0
 THRESHOLD = 0.45;
 BW = im2bw(rg_chroma, THRESHOLD);
 
-% now everything except the table is 1, 
-% but we need this the other way around
+% wir wollen aber das der gruene Tisch 1 ist
 BW_inv = imcomplement(BW);
 
-% fill all holes in the segmented table
-% holes are balls (mind the bad dirty joke!)
+% nun fuellen wir noch die Loecher auf, die die Baelle hinterlassen haben,
+% als sie mit ausgeschnitten wurden, da sie nicht wirklich gruen sind
 BW_filled = imfill(BW_inv, 'holes');
 
 BW_filled = bwmorph(BW_filled,'thin',5);
 
-% convert it to uint8 to make it compatible with an image
+% BW Bilder sind logicals, wir brauchen uint8
 mask = uint8(BW_filled);
 
-% replicate the matrix 3 times, to combine it with a color image
+% 3x kopieren, um mit RGB kompatibel zu werden
 mask3 = repmat( mask, [1 1 3]);
 
-% return only the game table
 result = mask3;
 
 end

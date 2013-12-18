@@ -1,6 +1,10 @@
 classdef BrownBucket < AbstractBucket
-    %UNTITLED3 Summary of this class goes here
-    %   Detailed explanation goes here
+
+    % Die Attribut Intervalle, anhand eine braune Kugel erkannt wird
+    %
+    %   @author Theresa Froeschl
+    %   @author Maximilian Irro
+    %---------------------------------------------
     
     properties(Constant = true)
         colorIndex = 3;

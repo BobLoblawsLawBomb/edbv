@@ -1,6 +1,10 @@
 classdef RedBucket < AbstractBucket
-    %UNTITLED2 Summary of this class goes here
-    %   Detailed explanation goes here
+    
+    % Die Attribut Intervalle, anhand eine rote Kugel erkannt wird
+    %
+    %   @author Theresa Froeschl
+    %   @author Maximilian Irro
+    %---------------------------------------------
     
     properties(Constant = true)
         colorIndex = 6;

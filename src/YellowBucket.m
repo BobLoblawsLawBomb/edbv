@@ -1,6 +1,10 @@
 classdef YellowBucket < AbstractBucket
-    %UNTITLED7 Summary of this class goes here
-    %   Detailed explanation goes here
+
+    % Die Attribut Intervalle, anhand eine gelbe Kugel erkannt wird
+    %
+    %   @author Theresa Froeschl
+    %   @author Maximilian Irro
+    %---------------------------------------------
     
     properties(Constant = true)
         colorIndex = 8;

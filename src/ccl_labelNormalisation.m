@@ -35,8 +35,8 @@ for x=1:num
     
 end
 
-% die Anzahl an individuellen Labels istgleichtzeitg die Menge 
-% angefunden Components
+% die Anzahl an individuellen Labels ist gleichtzeitg die Menge 
+% an gefunden Components
 labelCount = normalizedLabelCount;
 
 % jetzt bauen wir aus unserem Binaerbild noch ein neues Bild auf, in dem
@@ -79,11 +79,6 @@ for label=1:labelCount
     x_width = stat(label).BoundingBox(3);
     y_width = stat(label).BoundingBox(4);
     
-    
-    % TODO: hier brauchen wir noch das grenzintervall einer validen
-    % ballgroesse. diese muss klein genug sein, um einen ball zu
-    % akzeptieren der nur aus seinem glanzpunkt besteht, sowie die,
-    % welche komplett erkannt werde (weiss und gelb)
     if not(2 <= areaSize && areaSize <= 350)
         % falls das nicht gegeben ist, wird das label verworfen
         components_img(components_img == label) = 0;

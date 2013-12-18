@@ -1,6 +1,11 @@
 classdef (Abstract) AbstractBucket
-    %UNTITLED2 Summary of this class goes here
-    %   Detailed explanation goes here
+    
+    % Hierbei handelt es sich das Skelet der Datenstrukturen, in welcher
+    % die Grenzen der Farbplassen gespeichert werden
+    %
+    %   @author Theresa Froeschl
+    %   @author Maximilian Irro
+    %---------------------------------------------
     
     properties (Abstract, Constant)
         colorIndex;
